@@ -13,3 +13,5 @@ log.log
 first-network/cli_logs.txt
 first-network/crypto-config/*
 data/*
+first-network/docker-compose-cli.yaml
+first-network/docker-compose-e2e.yaml

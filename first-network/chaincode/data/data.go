@@ -523,9 +523,7 @@ func (t *SimpleAsset) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
 		return t.grantRequest(stub, args)
 	} else if function == "sb" {
 		// for debug use, setBalance
-		// t.doSetBalance(stub, "yeyongjie", 100)
 		return t.sb(stub, args)
-		// return shim.Success(nil)
 	} else if function == "all" {
 		// for debug use, print all states
 		return t.printAll(stub)
@@ -533,6 +531,7 @@ func (t *SimpleAsset) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
 		// for debug use, trigger event
 		return t.triggerEvent(stub, args)
 	} else if function == "echo" {
+		// for debug use, echo
 		return t.echo(stub, args)
 	}
 

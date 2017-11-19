@@ -24,5 +24,5 @@ rmImages dev
 echo "begin to remove all existing crypto-config"
 rm -rf ./crypto-config/*
 # start the network
-./network_setup.sh  -n mychannel -t 1000 -f docker-compose-cli.yaml up
+./network_setup.sh -s -n "mychannel" -t 1000 -f docker-compose-cli.yaml up
 rm -rf ~/.hfc*

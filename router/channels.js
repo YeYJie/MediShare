@@ -400,9 +400,10 @@ router.get('/channels/:channelName/height', function(req, res) {
         });
 });
 
-router.get('/myregister', function(req, req) {
+router.get('/myregister', function(req, res) {
     logger.warn('========== get myregister ==========');
     myEventListener.myRegisterEventListener('org1');
+    res.send("myRegisterEventListener return")
 });
 
 module.exports = router;
