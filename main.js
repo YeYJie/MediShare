@@ -12,7 +12,7 @@ var bodyParser = require('body-parser');
 require('./socket/websocketserver.js')(http)
 
 var timer=require('./timer/timer.js')
-timer.start()
+// timer.start()
 
 
 var query=require('./app/query.js');
@@ -162,12 +162,17 @@ app.post('/channellist',function(req,res){
     res.send({'channelList':ledgerMgr.getChannellist()})
 })
 
+var hospital = require("./app/hospital.js");
+var doctor = require("./app/doctor.js");
+var patient = require("./app/patient.js");
 
 // ============= start server =======================
 
 var server = http.listen(port, function() {
     console.log(`Please open Internet explorer to access ：http://${host}:${port}/`);
-    // myEventListener.myRegisterEventListener('org1');
+    myEventListener.myRegisterEventListener('org1', "hospital", hospital.hospitalHandler);
+    myEventListener.myRegisterEventListener('org1', "doctor", doctor.doctorHandler);
+    myEventListener.myRegisterEventListener('org1', "patient", patient.patientHandler);
 });
 
 

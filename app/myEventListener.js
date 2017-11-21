@@ -22,61 +22,52 @@ var Peer = require('fabric-client/lib/Peer.js');
 var EventHub = require('fabric-client/lib/EventHub.js');
 var config = require('../config.json');
 var helper = require('./helper.js');
-var logger = helper.getLogger('instantiate-chaincode');
-hfc.addConfigFile(path.join(__dirname, 'network-config.json'));
+var logger = helper.getLogger('myRegisterEventListener');
+
+if(config.enableTls){
+    hfc.addConfigFile(path.join(__dirname, 'network-config-tls.json'));
+}else{
+    hfc.addConfigFile(path.join(__dirname, 'network-config.json'));
+}
+hfc.setLogger(logger);
 var ORGS = hfc.getConfigSetting('network-config');
-var tx_id = null;
+
 var eh = null;
 
+var myregisterEventListener = function(org, eventName, callback) {
 
-var myregisterEventListener = function(org) {
-
-    logger.warn('\n========== Register Event Listener ==========\n');
-    var client = helper.getClientForOrg(org);
-
-
-    eh = client.newEventHub();
-    // let data = fs.readFileSync(path.join(__dirname, ORGS[org]['peer1'][
-    //                 'tls_cacerts'
-    //                 ]));
-    eh.setPeerAddr(ORGS[org]['peer1']['events'], {
-                    // pem: Buffer.from(data).toString(),
-                    'ssl-target-name-override': ORGS[org]['peer1']['server-hostname']
+    logger.warn("========== Register Event Listener " + eventName + " ==========");
+    helper.getAdminUser(org).then(
+        (user) => {
+            var client = helper.getClientForOrg(org);
+            client.setUserContext(user);
+            // logger.warn(client);
+            eh = client.newEventHub();
+            
+            var tlspath = path.join(__dirname, "../", ORGS[org]['peer1']['tls_cacerts']);
+            // logger.warn(ORGS);
+            let data = fs.readFileSync(tlspath)
+            eh.setPeerAddr(ORGS[org]['peer1']['events'], {
+                            pem: Buffer.from(data).toString(),
+                            'ssl-target-name-override': ORGS[org]['peer1']['server-hostname']
+                        });
+            eh.registerChaincodeEvent("mycc", eventName,
+                (e) => {
+                    logger.warn("========== " + eventName + " ==========");
+                    callback(e);
+                    logger.warn("========== " + eventName + " ==========");
+                },
+                (err) => {
+                    logger.warn("========== " + eventName + " err ==========");
+                    logger.warn(err);
+                    logger.warn("========== " + eventName + " err ==========");
                 });
-
-    // eh.registerBlockEvent(
-    //   (block) => {
-    //     // var first_tx = block.data.data[0]; // get the first transaction
-    //     // var header = first_tx.payload.header; // the "header" object contains metadata of the transaction
-    //     // var channel_id = header.channel_header.channel_id;
-    //     // if ("mychannel" !== channel_id) return;
-
-    //     // do useful processing of the block
-    //     logger.warn("\n========== registerBlockEvent ==========\n")
-    //     console.log(block)
-    //     logger.warn("\n========== registerBlockEvent ==========\n")
-    //   },
-    //   (err) => {
-    //     logger.warn("\n========== registerBlockEvent err ==========\n")
-    //     console.log('Oh snap!');
-    //     logger.warn("\n========== registerBlockEvent err ==========\n")
-    //   }
-    // );
-
-
-    eh.registerChaincodeEvent("mycc", "someEvents",
-        (e) => {
-            logger.warn("\n========== registerChaincodeEvent ==========\n")
-            console.log(e)
-            logger.warn("\n========== registerChaincodeEvent ==========\n")
+             eh.connect();
         },
         (err) => {
-            logger.warn("\n========== registerChaincodeEvent err ==========\n")
-        });
+            logger.error(err);
+        }
+    );
+}
 
-    eh.connect();
-
-};
-
-// exports.instantiateChaincode = instantiateChaincode;
 exports.myRegisterEventListener = myregisterEventListener;

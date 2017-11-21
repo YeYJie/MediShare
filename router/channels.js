@@ -402,7 +402,8 @@ router.get('/channels/:channelName/height', function(req, res) {
 
 router.get('/myregister', function(req, res) {
     logger.warn('========== get myregister ==========');
-    myEventListener.myRegisterEventListener('org1');
+    let eventName = req.query.event;
+    myEventListener.myRegisterEventListener('org1', eventName);
     res.send("myRegisterEventListener return")
 });
 

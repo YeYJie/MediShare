@@ -337,7 +337,7 @@ func (t *SimpleAsset) parseRequestKey(stub shim.ChaincodeStubInterface, k string
 		buyer = ""
 		dataName = ""
 		price = "0"
-		return		
+		return
 	}
 	reqID = s[3]
 	buyer = s[5]
@@ -495,6 +495,77 @@ func (t *SimpleAsset) printAll(stub shim.ChaincodeStubInterface) peer.Response {
 	return shim.Success(nil)
 }
 
+func (t *SimpleAsset) request2(stub shim.ChaincodeStubInterface, args []string) peer.Response {
+
+	// args
+	//
+	// doctor 	patient
+	doctor := args[0]
+	patient := args[1]
+	txid := stub.GetTxID()
+	txTimestampRaw, _ := stub.GetTxTimestamp()
+	txTimestamp := txTimestampRaw.String()
+
+	key, err := stub.CreateCompositeKey("request", []string{doctor, patient, txid})
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+	err = stub.PutState(key, []byte(txTimestamp))
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+	err = stub.PutState(txid, []byte("request$$" + doctor + "$$" + patient + "$$" + txTimestamp))
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+	key, err = stub.CreateCompositeKey(patient, []string{txid})
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+	err = stub.PutState(key, []byte(doctor + "$$" + txTimestamp))
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	payload := []byte(patient + "$$" + txid + "$$" + doctor + "$$" + txTimestamp)
+	err = stub.SetEvent("patient", payload)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+	return shim.Success(nil)
+}
+
+func (t *SimpleAsset) grant2(stub shim.ChaincodeStubInterface, args []string) peer.Response {
+
+	// args
+	//
+	// patient 	txid doctor
+
+	patient := args[0]
+	txid := args[1]
+	doctor := args[2]
+	// txTimestamp, _ := stub.GetTxTimestamp().String()
+	txTimestampRaw, _ := stub.GetTxTimestamp()
+	txTimestamp := txTimestampRaw.String()
+
+	key, err := stub.CreateCompositeKey("grant", []string{txid})
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+	err = stub.PutState(key, []byte(txTimestamp))
+
+	payload := []byte(doctor + "$$" + patient + "$$" + txid)
+	err = stub.SetEvent("hospital", payload)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+	// err = stub.SetEvent("doctor", payload)
+	// if err != nil {
+	// 	return shim.Error(err.Error())
+	// }
+	return shim.Success(nil)
+}
+
 func (t *SimpleAsset) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
 
 	function, args := stub.GetFunctionAndParameters()
@@ -533,6 +604,10 @@ func (t *SimpleAsset) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
 	} else if function == "echo" {
 		// for debug use, echo
 		return t.echo(stub, args)
+	} else if function == "request2" {
+		return t.request2(stub, args)
+	} else if function == "grant2" {
+		return t.grant2(stub, args)
 	}
 
 	fmt.Println("invoke did not find func: " + function) //error
