@@ -407,4 +407,23 @@ router.get('/myregister', function(req, res) {
     res.send("myRegisterEventListener return")
 });
 
+
+var mongo = require("../app/mongo.js");
+router.get('/hospital/getPatientData', function(req, res) {
+    logger.warn('============== get patient data ===============');
+    logger.warn(req.query.doctor);
+    logger.warn(req.query.txid);
+    mongo.find(req.query.doctor, req.query.txid).then(
+        (data) => {
+            logger.warn('get patient data done');
+            logger.warn(data);
+            res.send(data);
+        },
+        (reason) => {
+            logger.warn('get patient data fails');
+            res.send("fail to get patient data");
+        }
+    );
+});
+
 module.exports = router;

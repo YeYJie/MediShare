@@ -82,7 +82,7 @@ function find(doctor, txid) {
 					} else if(result.length != 1) {
 						deferred.reject(new Error("find : more than one index"));
 					} else {
-						DBfind(db, "data", { _id: new mongo.ObjectID(result[0].index) })
+						DBfind(db, "data", { _id: new mongo.ObjectID(result[0].index) }, { _id:false})
 						.then(
 							(result) => { deferred.resolve(result); },
 							(reason) => { deferred.reject(new Error("find : can not find data")); }
