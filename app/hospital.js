@@ -23,4 +23,26 @@ var hospitalHandler = function(event) {
 	mongo.insertIndex(splited[0], splited[2], splited[1]);
 };
 
+const exec = util.promisify(require('child_process').exec);
+
+async function shit(cmd) {
+  const { stdout, stderr } = await exec(cmd);
+  console.log('stdout:', stdout);
+  console.log('stderr:', stderr);
+};
+
+var myregister = function(patient, hospital, doctor, patientTime, patientSig) {
+	console.log('calling hospital.register...');
+
+	var cmd = "./demo/hospital.sh ./demo/hospitalPri";
+	cmd += " " + patient;
+	cmd += " " + hospital;
+	cmd += " " + doctor;
+	cmd += " " + patientTime;
+	cmd += " " + patientSig;
+	console.log(cmd);
+	shit(cmd);
+};
+
 exports.hospitalHandler = hospitalHandler;
+exports.myregister = myregister;

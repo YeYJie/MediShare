@@ -170,9 +170,9 @@ var patient = require("./app/patient.js");
 
 var server = http.listen(port, function() {
     console.log(`Please open Internet explorer to access ：http://${host}:${port}/`);
-    myEventListener.myRegisterEventListener('org1', "hospital", hospital.hospitalHandler);
-    myEventListener.myRegisterEventListener('org1', "doctor", doctor.doctorHandler);
-    myEventListener.myRegisterEventListener('org1', "patient", patient.patientHandler);
+    myEventListener.myRegisterEventListener('org1', "h1", hospital.hospitalHandler);
+    myEventListener.myRegisterEventListener('org1', "d1", doctor.doctorHandler);
+    // myEventListener.myRegisterEventListener('org1', "patient", patient.patientHandler);
 });
 
 

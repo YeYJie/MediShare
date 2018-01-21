@@ -28,7 +28,64 @@ func main() {
 }
 
 func (t *SimpleAsset) Init(stub shim.ChaincodeStubInterface) peer.Response {
+	t.newDoctor(stub, []string{"d1"})
+	t.newPatient(stub, []string{"p1"})
+	t.newHospital(stub, []string{"h1"})
 	return shim.Success(nil)
+}
+
+func (t *SimpleAsset) pk(stub shim.ChaincodeStubInterface, args []string) peer.Response {
+	p, _ := t.doGetPatientPrivateKey(stub, "p1")
+	return shim.Success([]byte(p))
+}
+
+func (t *SimpleAsset) hk(stub shim.ChaincodeStubInterface, args []string) peer.Response {
+	p, _ := t.doGetHospitalPrivateKey(stub, "h1")
+	return shim.Success([]byte(p))
+}
+
+func (t *SimpleAsset) dk(stub shim.ChaincodeStubInterface, args []string) peer.Response {
+	p, _ := t.doGetDoctorPrivateKey(stub, "d1")
+	return shim.Success([]byte(p))
+}
+
+func (t *SimpleAsset) k(stub shim.ChaincodeStubInterface, args []string) peer.Response {
+	return shim.Success(nil)
+}
+
+func (t *SimpleAsset) all(stub shim.ChaincodeStubInterface, args []string) peer.Response {
+	res := ""
+	iter, _ := stub.GetStateByPartialCompositeKey("register", []string{})
+	for iter.HasNext() {
+		kv, _ := iter.Next()
+		res += kv.Key + " -> " + string(kv.Value) + "\n"
+	}
+	iter, _ = stub.GetStateByPartialCompositeKey("onRegister", []string{})
+	for iter.HasNext() {
+		kv, _ := iter.Next()
+		res += kv.Key + " -> " + string(kv.Value) + "\n"
+	}
+	iter, _ = stub.GetStateByPartialCompositeKey("deregister", []string{})
+	for iter.HasNext() {
+		kv, _ := iter.Next()
+		res += kv.Key + " -> " + string(kv.Value) + "\n"
+	}
+	iter, _ = stub.GetStateByPartialCompositeKey("request", []string{})
+	for iter.HasNext() {
+		kv, _ := iter.Next()
+		res += kv.Key + " -> " + string(kv.Value) + "\n"
+	}
+	iter, _ = stub.GetStateByPartialCompositeKey("grant", []string{})
+	for iter.HasNext() {
+		kv, _ := iter.Next()
+		res += kv.Key + " -> " + string(kv.Value) + "\n"
+	}
+	iter, _ = stub.GetStateByPartialCompositeKey("record", []string{})
+	for iter.HasNext() {
+		kv, _ := iter.Next()
+		res += kv.Key + " -> " + string(kv.Value) + "\n"
+	}
+	return shim.Success([]byte(res))
 }
 
 func (t *SimpleAsset) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
@@ -36,15 +93,16 @@ func (t *SimpleAsset) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
 	function, args := stub.GetFunctionAndParameters()
 	fmt.Println("invoke is running " + function)
 
-	// if function == "sb" {
-	// 	// for debug use, setBalance
-	// 	return t.sb(stub, args)
-	// } else
-	if function == "all" {
-		// for debug use, print all states
-		return t.printAll(stub)
-	} else if function == "te" {
-		return t.twoEvent(stub, args)
+	if function == "pk" {
+		return t.pk(stub, args)
+	} else if function == "hk" {
+		return t.hk(stub, args)
+	} else if function == "dk" {
+		return t.dk(stub, args)
+	} else if function == "k" {
+		return t.k(stub, args)
+	} else if function == "all" {
+		return t.all(stub, args)
 	} else if function == "setevent" {
 		// for debug use, trigger event
 		return t.triggerEvent(stub, args)
@@ -53,12 +111,12 @@ func (t *SimpleAsset) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
 		return t.echo(stub, args)
 	} else if function == "sleep" {
 		return t.sleep(stub, args)
-	} else if function == "request" {					// request
-		return t.requestWithoutSignature(stub, args)
+	} else if function == "requestshit" {					// request
+		// return t.requestWithoutSignature(stub, args)
 	} else if function == "requestsig" {
-		return t.requestWithSignature(stub, args)
+		// return t.requestWithSignature(stub, args)
 	} else if function == "requestWithPatientGrant" {
-		return t.requestWithPatientGrant(stub, args)
+		// return t.requestWithPatientGrant(stub, args)
 	} else if function == "grant" {						// grant
 		return t.grantWithoutSignature(stub, args)
 	} else if function == "grantsig" {
@@ -83,6 +141,24 @@ func (t *SimpleAsset) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
 		return t.getDoctorRequestsToPatient(stub, args)
 	} else if function == "getPatientRequests" {
 		return t.getPatientRequests(stub, args)
+	} else if function == "register1" {
+		return t.register1(stub, args)
+	} else if function == "register2" {
+		return t.register2(stub, args)
+	} else if function == "deRegister" {
+		return t.deRegister(stub, args)
+	} else if function == "request" {
+		return t.request(stub, args)
+	} else if function == "newRecord" {
+		return t.newRecord(stub, args)
+	} else if function == "getPatientRecord" {
+		return t.getPatientRecord(stub, args)
+	} else if function == "newHospital" {
+		return t.newHospital(stub, args)
+	} else if function == "getHospitalPrivateKey" {
+		return t.getHospitalPrivateKey(stub, args)
+	} else if function == "getHospitalPublicKey" {
+		return t.getHospitalPublicKey(stub, args)
 	}
 
 	fmt.Println("invoke did not find func: " + function) //error

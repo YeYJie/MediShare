@@ -50,7 +50,23 @@ func (t *SimpleAsset) newDoctor(stub shim.ChaincodeStubInterface, args []string)
 	return shim.Success([]byte(privateAndPublic))
 }
 
-// for debug use
+func (t *SimpleAsset) doGetDoctorPrivateKey(stub shim.ChaincodeStubInterface, doctor string) (string, error) {
+
+	iter, err := stub.GetStateByPartialCompositeKey("doctorKey", []string{doctor})
+	if err != nil {
+		return "", err
+	}
+	for iter.HasNext() {
+		kv, err := iter.Next()
+		if err != nil {
+			return "", err
+		}
+		privateKey := strings.Split(string(kv.Value), "$$")[1]
+		return privateKey, nil
+	}
+	return "", errors.New("doctor not found")
+}
+
 func (t *SimpleAsset) getDoctorPrivateKey(stub shim.ChaincodeStubInterface, args []string) peer.Response {
 
 	// args
@@ -60,19 +76,11 @@ func (t *SimpleAsset) getDoctorPrivateKey(stub shim.ChaincodeStubInterface, args
 		return shim.Error("Incorrect number of arguments")
 	}
 	doctor := args[0]
-	iter, err := stub.GetStateByPartialCompositeKey("doctorKey", []string{doctor})
+	privateKey, err := t.doGetDoctorPrivateKey(stub, doctor)
 	if err != nil {
 		return shim.Error(err.Error())
 	}
-	for iter.HasNext() {
-		kv, err := iter.Next()
-		if err != nil {
-			return shim.Error(err.Error())
-		}
-		privateKey := strings.Split(string(kv.Value), "$$")[1]
-		return shim.Success([]byte(privateKey))
-	}
-	return shim.Error("doctor not exists")
+	return shim.Success([]byte(privateKey))
 }
 
 func (t *SimpleAsset) doGetDoctorPublicKey(stub shim.ChaincodeStubInterface, doctor string) (string, error) {
@@ -120,14 +128,14 @@ func (t * SimpleAsset) doVerifyDoctorSignature(stub shim.ChaincodeStubInterface,
 	}
 	publicKeyInterface, err := x509.ParsePKIXPublicKey(block.Bytes)
 	if err != nil {
-		return errors.New("x509.ParsePKIXPublicKey fails" + publicKeyString + "|||||")
+		return errors.New("doctor x509.ParsePKIXPublicKey fails" + publicKeyString + "|||||")
 	}
 	publicKey := publicKeyInterface.(*rsa.PublicKey)
 	hashv := sha256.Sum256([]byte(content))
 	signature, _ := hex.DecodeString(sig)
 	err = rsa.VerifyPKCS1v15(publicKey, crypto.SHA256, hashv[:], signature)
 	if err != nil {
-		return errors.New("rsa.VerifyPKCS1v15 fails")
+		return errors.New("doctor rsa.VerifyPKCS1v15 fails")
 	}
 	return nil
 }

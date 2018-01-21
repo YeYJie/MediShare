@@ -12,16 +12,17 @@ import (
 	// "errors"
 	// "encoding/pem"
 	// "encoding/hex"
-	"time"
+	// "time"
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	"github.com/hyperledger/fabric/protos/peer"
 )
 
 func (t *SimpleAsset) doGrant(stub shim.ChaincodeStubInterface, patient, txid, doctor string) error {
 
-	txTimestampRaw, _ := stub.GetTxTimestamp()
-	seconds, nanos := txTimestampRaw.GetSeconds(), int64(txTimestampRaw.GetNanos())
-	txTimestamp := time.Unix(seconds, nanos).Format("2006-01-02 15:04:05 Mon")
+	// txTimestampRaw, _ := stub.GetTxTimestamp()
+	// seconds, nanos := txTimestampRaw.GetSeconds(), int64(txTimestampRaw.GetNanos())
+	// txTimestamp := time.Unix(seconds, nanos).Format("2006-01-02 15:04:05 Mon")
+	txTimestamp := t.getTxTimestamp(stub)
 
 	key, err := stub.CreateCompositeKey("grant", []string{patient, txid})
 	if err != nil {

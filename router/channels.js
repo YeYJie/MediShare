@@ -18,12 +18,12 @@ var log4js = require('log4js');
 var logger = log4js.getLogger('channelRouter');
 var express = require('express');
 var router = express.Router();
-var query=require('../app/query.js')
-var invoke=require('../app/invoke-transaction.js')
-var instantiate=require('../app/instantiate-chaincode.js')
-var install=require('../app/install-chaincode.js')
-var myEventListener = require('../app/myEventListener.js')
-
+var query=require('../app/query.js');
+var invoke=require('../app/invoke-transaction.js');
+var instantiate=require('../app/instantiate-chaincode.js');
+var install=require('../app/install-chaincode.js');
+var myEventListener = require('../app/myEventListener.js');
+var hospital = require('../app/hospital.js');
 /*
 router.get('/', function(req, res, next) {
     res.send('hello world!');
@@ -424,6 +424,17 @@ router.get('/hospital/getPatientData', function(req, res) {
             res.send("fail to get patient data");
         }
     );
+});
+
+router.get('/register', function(req, res) {
+    // patient==$2 hospital==$3 doctor==$4 patientTime=="$now" patientSig==$sig
+    let patient = req.query.patient;
+    let h = req.query.hospital;
+    let doctor = req.query.doctor;
+    let patientTime = req.query.patientTime;
+    let patientSig = req.query.patientSig;
+    hospital.myregister(patient, h, doctor, patientTime, patientSig);
+    res.send("register return");
 });
 
 module.exports = router;

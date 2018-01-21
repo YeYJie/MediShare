@@ -64,11 +64,8 @@ func (t *SimpleAsset) triggerEvent(stub shim.ChaincodeStubInterface, args []stri
 }
 
 func (t *SimpleAsset) twoEvent(stub shim.ChaincodeStubInterface, args []string) peer.Response {
-	err := stub.SetEvent("hospital", []byte("yeyongjie"))
-	err = stub.SetEvent("doctor", []byte("ndc"))
-	if err != nil {
-		return shim.Error(err.Error())
-	}
+	_ = stub.SetEvent("hospital", []byte("yeyongjie"))
+	_ = stub.SetEvent("doctor", []byte("ndc"))
 	return shim.Success(nil)
 }
 
@@ -105,27 +102,27 @@ func (t *SimpleAsset) newRsaKeyPair() (private, public string) {
 }
 
 func (t *SimpleAsset) printAll(stub shim.ChaincodeStubInterface) peer.Response {
-	t.debug("\n====printAll====\n")
-	iter, _ := stub.GetStateByRange("", "")
-	for iter.HasNext() {
-		kv, _ := iter.Next()
-		t.debug("%v -> %v", kv.Key, string(kv.Value))
-	}
-	iter, _ = stub.GetStateByPartialCompositeKey("request", []string{})
-	for iter.HasNext() {
-		kv, _ := iter.Next()
-		t.debug("%v -> %v", kv.Key, string(kv.Value))
-	}
-	iter, _ = stub.GetStateByPartialCompositeKey("patient", []string{})
-	for iter.HasNext() {
-		kv, _ := iter.Next()
-		t.debug("%v -> %v", kv.Key, string(kv.Value))
-	}
-	iter, _ = stub.GetStateByPartialCompositeKey("grant", []string{})
-	for iter.HasNext() {
-		kv, _ := iter.Next()
-		t.debug("%v -> %v", kv.Key, string(kv.Value))
-	}
+	// t.debug("\n====printAll====\n")
+	// iter, _ := stub.GetStateByRange("", "")
+	// for iter.HasNext() {
+	// 	kv, _ := iter.Next()
+	// 	t.debug("%v -> %v", kv.Key, string(kv.Value))
+	// }
+	// iter, _ = stub.GetStateByPartialCompositeKey("request", []string{})
+	// for iter.HasNext() {
+	// 	kv, _ := iter.Next()
+	// 	t.debug("%v -> %v", kv.Key, string(kv.Value))
+	// }
+	// iter, _ = stub.GetStateByPartialCompositeKey("patient", []string{})
+	// for iter.HasNext() {
+	// 	kv, _ := iter.Next()
+	// 	t.debug("%v -> %v", kv.Key, string(kv.Value))
+	// }
+	// iter, _ = stub.GetStateByPartialCompositeKey("grant", []string{})
+	// for iter.HasNext() {
+	// 	kv, _ := iter.Next()
+	// 	t.debug("%v -> %v", kv.Key, string(kv.Value))
+	// }
 	// iter, _ = stub.GetStateByPartialCompositeKey("doctorKey", []string{})
 	// for iter.HasNext() {
 	// 	kv, _ := iter.Next()
@@ -136,6 +133,19 @@ func (t *SimpleAsset) printAll(stub shim.ChaincodeStubInterface) peer.Response {
 	// 	kv, _ := iter.Next()
 	// 	t.debug("%v -> %v", kv.Key, string(kv.Value))
 	// }
-	t.debug("========\n")
+	// iter, _ = stub.GetStateByPartialCompositeKey("hospitalKey", []string{})
+	// for iter.HasNext() {
+	// 	kv, _ := iter.Next()
+	// 	t.debug("%v -> %v", kv.Key, string(kv.Value))
+	// }
+	// t.debug("========\n")
 	return shim.Success(nil)
+}
+
+func (t *SimpleAsset) getTxTimestamp(stub shim.ChaincodeStubInterface) string {
+
+	txTimestampRaw, _ := stub.GetTxTimestamp()
+	seconds, nanos := txTimestampRaw.GetSeconds(), int64(txTimestampRaw.GetNanos())
+	txTimestamp := time.Unix(seconds, nanos).Format("2006-01-02 15:04:05")
+	return txTimestamp
 }
