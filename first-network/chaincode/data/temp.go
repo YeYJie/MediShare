@@ -185,10 +185,10 @@ func (t *SimpleAsset) request(stub shim.ChaincodeStubInterface, args []string) p
 			return shim.Error(err.Error())
 		}
 
-		eventPayload := strings.Join([]string{doctor, hospital, patient, recordId, txId}, "$$")
+		eventPayload := strings.Join([]string{doctor, hospital, patient, targetHospital, recordId, txId}, "$$")
 		stub.SetEvent(targetHospital, []byte(eventPayload))
 
-		eventPayload = strings.Join([]string{txId}, "$$")
+		// eventPayload = strings.Join([]string{doctor, hospital, patient, targetHospital, recordId, txId}, "$$")
 		stub.SetEvent(doctor, []byte(eventPayload))
 	}
 	return shim.Success(nil)

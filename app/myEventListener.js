@@ -43,7 +43,7 @@ var myregisterEventListener = function(org, eventName, callback) {
             client.setUserContext(user);
             // logger.warn(client);
             eh = client.newEventHub();
-            
+
             var tlspath = path.join(__dirname, "../", ORGS[org]['peer1']['tls_cacerts']);
             // logger.warn(ORGS);
             let data = fs.readFileSync(tlspath)

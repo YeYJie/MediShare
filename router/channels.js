@@ -14,6 +14,7 @@
  limitations under the License.
  */
 
+var util = require('util');
 var log4js = require('log4js');
 var logger = log4js.getLogger('channelRouter');
 var express = require('express');
@@ -24,6 +25,7 @@ var instantiate=require('../app/instantiate-chaincode.js');
 var install=require('../app/install-chaincode.js');
 var myEventListener = require('../app/myEventListener.js');
 var hospital = require('../app/hospital.js');
+var doctor = require('../app/doctor.js');
 /*
 router.get('/', function(req, res, next) {
     res.send('hello world!');
@@ -427,7 +429,6 @@ router.get('/hospital/getPatientData', function(req, res) {
 });
 
 router.get('/register', function(req, res) {
-    // patient==$2 hospital==$3 doctor==$4 patientTime=="$now" patientSig==$sig
     let patient = req.query.patient;
     let h = req.query.hospital;
     let doctor = req.query.doctor;
@@ -435,6 +436,51 @@ router.get('/register', function(req, res) {
     let patientSig = req.query.patientSig;
     hospital.myregister(patient, h, doctor, patientTime, patientSig);
     res.send("register return");
+});
+
+
+
+var exec = require('child-process-promise').exec;
+
+router.get('/ajaxtest/:patient', function(req, res){
+
+    var patient = req.params.patient;
+
+    // doctor.getPatientRecord(patient);
+    var cmd = "./demo/getPatientRecord.sh ./demo/doctorPri d1 h1 " + patient + " ./demo/doctorProf";
+
+    exec(cmd)
+        .then(function (result) {
+            var stdout = result.stdout;
+            // var stderr = result.stderr;
+            console.log('stdout: ', stdout);
+            // console.log('stderr: ', stderr);
+            var tokens = stdout.split(", ");
+            var buildHTML = function(full, patient, targetHospital, recordId) {
+                var res = '<form method="POST" action="/apis/getPatientRecord">';
+                res += full;
+                res += '<input type="hidden" name="patient" value="' + patient + '">';
+                res += '<input type="hidden" name="targetHospital" value="' + targetHospital + '">';
+                res += '<input type="hidden" name="recordId" value="' + recordId + '">';
+                res += '<input type="submit" value="Submit" onclick="shit()"></form>'
+                return res;
+            };
+            res.send(buildHTML(stdout, patient, tokens[0], tokens[2]));
+        })
+        .catch(function (err) {
+            console.error('ERROR: ', err);
+        });
+    // res.send("shit");
+});
+
+router.post('/getPatientRecord', function(req, res) {
+    var patient = req.body.patient;
+    var targetHospital = req.body.targetHospital;
+    var recordId = req.body.recordId;
+    console.log(patient);
+    console.log(targetHospital);
+    console.log(recordId);
+    res.send("getPatientRecord return");
 });
 
 module.exports = router;

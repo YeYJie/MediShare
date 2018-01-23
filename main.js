@@ -162,9 +162,26 @@ app.post('/channellist',function(req,res){
     res.send({'channelList':ledgerMgr.getChannellist()})
 })
 
+app.get('/doctorPage', function(req, res){
+    res.sendFile(__dirname + '/page/doctor.html');
+})
+
+
 var hospital = require("./app/hospital.js");
 var doctor = require("./app/doctor.js");
 var patient = require("./app/patient.js");
+
+var io = require('socket.io')(http);
+io.on('connection', function(socket){
+  socket.on('chat message', function(msg){
+    console.log(msg);
+    if(msg.equals("event")) {
+        myEventListener.myRegisterEventListener2('org1', "d1", doctor.doctorHandler, socket);
+    } else {
+        io.emit('chat message', msg);
+    }
+  });
+});
 
 // ============= start server =======================
 

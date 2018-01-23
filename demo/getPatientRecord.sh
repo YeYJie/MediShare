@@ -10,13 +10,14 @@ patient=$4
 doctorProfFile=$5
 
 now=$(date +"%F %T")
-echo "now: $now"
+# echo "now: $now"
 
 doctorProf=$(cat $doctorProfFile)
-echo $doctorProf
+# echo $doctorProf
 
+# sig=$(./demo/sign $doctorPrivateKeyFile $doctorProf $patient "$now")
 sig=$(./sign $doctorPrivateKeyFile $doctorProf $patient "$now")
-echo $sig
+# echo $sig
 
 # http :8080/apis/channels/mychannel/chaincodes/mycc fcn=="getPatientRecord" doctor==$doctor hospital==$hospital patient==$patient doctorProf==$doctorProf doctorTime=="$now" doctorSig==$sig
 
@@ -33,4 +34,13 @@ EOF
 # --data "$(generate_post_data)" "http://127.0.0.1:8080/apis/channels/mychannel/chaincodes/mycc"
 
 # http :8080/apis/channels/mychannel/chaincodes/mycc peers==peer1 fcn=="getPatientRecord" args=="$(echo ["$doctor", "$hospital", "$patient", "$doctorProf", "$now", "$sig"])"
-http :8080/apis/channels/mychannel/chaincodes/mycc peers==peer1 fcn=="getPatientRecord" args=="$(generate_post_data)"
+
+# http --verbose :8080/apis/channels/mychannel/chaincodes/mycc peers==peer1 fcn=="getPatientRecord" args=="$(generate_post_data)"
+
+curl -sSG \
+-H "Accept: application/json" \
+-H "Content-Type:application/json" \
+--data "peers=peer1" \
+--data "fcn=getPatientRecord" \
+--data-urlencode "args=$(generate_post_data)" \
+"http://127.0.0.1:8080/apis/channels/mychannel/chaincodes/mycc"

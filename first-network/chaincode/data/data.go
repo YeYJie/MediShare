@@ -8,7 +8,7 @@ import (
 	// "crypto/rand"
 	// "crypto/x509"
 	// "crypto/sha256"
-	// "strings"
+	"strings"
 	// "errors"
 	// "encoding/pem"
 	// "encoding/hex"
@@ -53,38 +53,54 @@ func (t *SimpleAsset) k(stub shim.ChaincodeStubInterface, args []string) peer.Re
 	return shim.Success(nil)
 }
 
+func (t *SimpleAsset) appendkv(stub shim.ChaincodeStubInterface, iter shim.StateQueryIteratorInterface, dst string) string {
+	for iter.HasNext() {
+		kv, _ := iter.Next()
+		object, attrib, _ := stub.SplitCompositeKey(kv.Key)
+		// res += kv.Key + " -> " + string(kv.Value) + "\n"
+		dst += object + " " + strings.Join(attrib, " ") + "  ->  " + string(kv.Value) + "\n"
+	}
+	return dst;
+}
+
 func (t *SimpleAsset) all(stub shim.ChaincodeStubInterface, args []string) peer.Response {
 	res := ""
 	iter, _ := stub.GetStateByPartialCompositeKey("register", []string{})
-	for iter.HasNext() {
-		kv, _ := iter.Next()
-		res += kv.Key + " -> " + string(kv.Value) + "\n"
-	}
+	res = t.appendkv(stub, iter, res)
+	// for iter.HasNext() {
+	// 	kv, _ := iter.Next()
+	// 	res += kv.Key + " -> " + string(kv.Value) + "\n"
+	// }
 	iter, _ = stub.GetStateByPartialCompositeKey("onRegister", []string{})
-	for iter.HasNext() {
-		kv, _ := iter.Next()
-		res += kv.Key + " -> " + string(kv.Value) + "\n"
-	}
-	iter, _ = stub.GetStateByPartialCompositeKey("deregister", []string{})
-	for iter.HasNext() {
-		kv, _ := iter.Next()
-		res += kv.Key + " -> " + string(kv.Value) + "\n"
-	}
+	res = t.appendkv(stub, iter, res)
+	// for iter.HasNext() {
+	// 	kv, _ := iter.Next()
+	// 	res += kv.Key + " -> " + string(kv.Value) + "\n"
+	// }
+	iter, _ = stub.GetStateByPartialCompositeKey("deRegister", []string{})
+	res = t.appendkv(stub, iter, res)
+	// for iter.HasNext() {
+	// 	kv, _ := iter.Next()
+	// 	res += kv.Key + " -> " + string(kv.Value) + "\n"
+	// }
 	iter, _ = stub.GetStateByPartialCompositeKey("request", []string{})
-	for iter.HasNext() {
-		kv, _ := iter.Next()
-		res += kv.Key + " -> " + string(kv.Value) + "\n"
-	}
+	res = t.appendkv(stub, iter, res)
+	// for iter.HasNext() {
+	// 	kv, _ := iter.Next()
+	// 	res += kv.Key + " -> " + string(kv.Value) + "\n"
+	// }
 	iter, _ = stub.GetStateByPartialCompositeKey("grant", []string{})
-	for iter.HasNext() {
-		kv, _ := iter.Next()
-		res += kv.Key + " -> " + string(kv.Value) + "\n"
-	}
+	res = t.appendkv(stub, iter, res)
+	// for iter.HasNext() {
+	// 	kv, _ := iter.Next()
+	// 	res += kv.Key + " -> " + string(kv.Value) + "\n"
+	// }
 	iter, _ = stub.GetStateByPartialCompositeKey("record", []string{})
-	for iter.HasNext() {
-		kv, _ := iter.Next()
-		res += kv.Key + " -> " + string(kv.Value) + "\n"
-	}
+	res = t.appendkv(stub, iter, res)
+	// for iter.HasNext() {
+	// 	kv, _ := iter.Next()
+	// 	res += kv.Key + " -> " + string(kv.Value) + "\n"
+	// }
 	return shim.Success([]byte(res))
 }
 

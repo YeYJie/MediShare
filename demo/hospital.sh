@@ -46,6 +46,7 @@ EOF
 
 # echo $(generate_post_data)
 
+# set -x
 curl -isS \
 -H "Accept: application/json" \
 -H "Content-Type:application/json" \

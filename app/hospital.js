@@ -9,20 +9,6 @@ var helper = require('./helper.js');
 var logger = helper.getLogger('hospital');
 var mongo = require("./mongo.js");
 
-var hospitalHandler = function(event) {
-	logger.warn(event);
-	logger.warn(event.payload.toString("ascii"));
-	var splited = event.payload.toString("ascii").split("$$");
-	// var doctor = splited[0]
-	// var patient = splited[1]
-	// var txid = splited[2]
-	// logger.warn(doctor);
-	// logger.warn(patient);
-	// logger.warn(txid);
-	// mongo.insertIndex(doctor, txid, patient);
-	mongo.insertIndex(splited[0], splited[2], splited[1]);
-};
-
 const exec = util.promisify(require('child_process').exec);
 
 async function shit(cmd) {
@@ -40,6 +26,22 @@ var myregister = function(patient, hospital, doctor, patientTime, patientSig) {
 	cmd += " " + doctor;
 	cmd += " " + patientTime;
 	cmd += " " + patientSig;
+	console.log(cmd);
+	shit(cmd);
+};
+
+var hospitalHandler = function(event) {
+	// mongo.insertIndex(splited[0], splited[2], splited[1]);
+	var payload = event.payload.toString("ascii");
+	var tokens = payload.split("$$");
+	var doctor = tokens[0];
+	var hospital = tokens[1];
+	var patient = tokens[2];
+	var targetHospital = tokens[3];
+	var recordId = tokens[4];
+	var txId = tokens[5];
+	// console.log(tokens);
+	var cmd = "./demo/buildIndex.sh " + recordId + " " + txId;
 	console.log(cmd);
 	shit(cmd);
 };
