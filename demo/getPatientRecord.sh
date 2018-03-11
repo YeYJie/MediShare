@@ -16,7 +16,7 @@ doctorProf=$(cat $doctorProfFile)
 # echo $doctorProf
 
 # sig=$(./demo/sign $doctorPrivateKeyFile $doctorProf $patient "$now")
-sig=$(./sign $doctorPrivateKeyFile $doctorProf $patient "$now")
+sig=$(./demo/sign $doctorPrivateKeyFile $doctorProf $patient "$now")
 # echo $sig
 
 # http :8080/apis/channels/mychannel/chaincodes/mycc fcn=="getPatientRecord" doctor==$doctor hospital==$hospital patient==$patient doctorProf==$doctorProf doctorTime=="$now" doctorSig==$sig

@@ -34,7 +34,7 @@ var ORGS = hfc.getConfigSetting('network-config');
 
 var eh = null;
 
-var myregisterEventListener = function(org, eventName, callback) {
+var myregisterEventListener = function(org, eventName, callback, socket) {
 
     logger.warn("========== Register Event Listener " + eventName + " ==========");
     helper.getAdminUser(org).then(
@@ -54,7 +54,10 @@ var myregisterEventListener = function(org, eventName, callback) {
             eh.registerChaincodeEvent("mycc", eventName,
                 (e) => {
                     logger.warn("========== " + eventName + " ==========");
-                    callback(e);
+                    if(socket)
+                        callback(e, socket);
+                    else
+                        callback(e);
                     logger.warn("========== " + eventName + " ==========");
                 },
                 (err) => {

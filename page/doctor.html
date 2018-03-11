@@ -1,37 +1,176 @@
 <!doctype html>
 <html>
-  <head>
-    <title>Socket.IO chat</title>
-    <style>
-      * { margin: 0; padding: 0; box-sizing: border-box; }
-      body { font: 13px Helvetica, Arial; }
-      form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
-      form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
-      form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
-      #messages { list-style-type: none; margin: 0; padding: 0; }
-      #messages li { padding: 5px 10px; }
-      #messages li:nth-child(odd) { background: #eee; }
-    </style>
-  </head>
-  <script src="/socket.io/socket.io.js"></script>
-<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
-  <script>
-  $(function () {
-    var socket = io();
-    $('#form1').submit(function(){
-      socket.emit('chat message', $('#m').val());
-      $('#m').val('');
-      return false;
-    });
-    socket.on('chat message', function(msg){
-      $('#messages').append($('<li>').text(msg));
-    });
-  });
+	<head>
+		<style type="text/css">
+/*			.left-div{width: 40%; float: left};
+			.right-div{width: 60%; float: right};*/
+		</style>
+	</head>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+	<script src="/socket.io/socket.io.js"></script>
+	<script>
+
+	$(function () {
+		var socket = io();
+
+		$('#login-button').click(function(){
+			socket.emit('login', {id: $('#id').val(), pwd: $('#pwd').val()});
+			$('#id').val("");
+			$('#pwd').val("");
+		});
+		socket.on('loginSucess', function(data) {
+			console.log(data);
+			var doctor = data.doctor;
+			var hospital = data.hospital;
+
+			var doctorInfo = JSON.parse(data.doctorInfo).doctor;
+			var doctorInfoString = '<p>name : ' + doctorInfo.name + '</p>';
+			doctorInfoString += '<p>gender : ' + doctorInfo.gender + '</p>';
+			doctorInfoString += '<p>age : ' + doctorInfo.age + '</p>';
+			doctorInfoString += '<p>hospital : ' + doctorInfo.hospital + '</p>';
+			doctorInfoString += '<p>position : ' + doctorInfo.position + '</p>';
+			doctorInfoString += '<p>department : ' + doctorInfo.depatment + '</p>';
+			document.getElementById("doctorInfo").innerHTML = doctorInfoString;
+
+			$('#patientsList-ul').empty();
+			var patients = data.patients.split("\n");
+			for(var i = 0; i < patients.length; ++i) {
+				var formId = document.getElementById("patientsList-ul").getElementsByTagName("li").length + 1;
+				var patientHTML = '<li>' + patients[i] + '<button id="patient' + formId.toString()
+						+ '" data-patient="' + patients[i] + '">Get Patient Records</button></li>';
+				$('#patientsList-ul').append(patientHTML);
+				$('#patient'+formId.toString()).click(function(){
+					var patient = $(this).data('patient');
+					socket.emit('getPatientRecords', {doctor: doctor, hospital: hospital, patient: patient});
+					return false;
+				});
+			}
+
+			document.getElementById("doctorInfo").style.display = "block";
+			document.getElementById("patientInfo").style.display = "none";
+			document.getElementById("patientsList").style.display = "block";
+			document.getElementById("recordsList").style.display = "none";
+			document.getElementById("recordDetail").style.display = "none";
+			document.getElementById("login").style.display = "none";
+		});
+		socket.on('patientRecords', function(data) {
+			console.log(data);
+			$('#recordsList-ul').empty();
+			var doctor = data.doctor;
+			var hospital = data.hospital;
+			var patient = data.patient;
+
+			var patientInfo = JSON.parse(data.patientInfo).patient;
+			var patientInfoString = '<p>name : ' + patientInfo.name + '</p>';
+			patientInfoString += '<p>gender : ' + patientInfo.gender + '</p>';
+			patientInfoString += '<p>nation : ' + patientInfo.nation + '</p>';
+			patientInfoString += '<p>age : ' + patientInfo.age + '</p>';
+			patientInfoString += '<p>tellphone : ' + patientInfo.tellphone + '</p>';
+			patientInfoString += '<p>date_of_birth : ' + patientInfo.date_of_birth + '</p>';
+			patientInfoString += '<p>address : ' + patientInfo.address + '</p>';
+			patientInfoString += '<p>profession : ' + patientInfo.profession + '</p>';
+			patientInfoString += '<p>marriage : ' + patientInfo.marriage + '</p>';
+			patientInfoString += '<p>guardian : ' + patientInfo.guardian + '</p>';
+			patientInfoString += '<p>guardian_tellphone : ' + patientInfo.guardian_tellphone + '</p>';
+			patientInfoString += '<p>relation : ' + patientInfo.relation + '</p>';
+			document.getElementById("patientInfo").innerHTML = patientInfoString;
+
+			var patientRecords = data.patientRecords.trim().split("\n");
+			for(var i = 0; i < patientRecords.length; ++i) {
+				var formId = document.getElementById("recordsList-ul").getElementsByTagName("li").length + 1;
+				var tokens = patientRecords[i].split(", ");
+				var targetHospital = tokens[0];
+				var recordId = tokens[2];
+				var recordHTML = '<li>' + patientRecords[i] + '<button id="record' + formId.toString()
+						+ '" data-targetHospital="' + targetHospital + '" data-recordId="' + recordId + '">Get Record Detail</button></li>';
+				$('#recordsList-ul').append(recordHTML);
+				$('#record'+formId.toString()).click(function(){
+					var targetHospital = $(this).data('targethospital');
+					var recordId = $(this).data('recordid').toString();
+					socket.emit('getRecordDetail', {doctor: doctor, hospital: hospital, patient: patient,
+									targetHospital: targetHospital, recordId: recordId});
+					return false;
+				});
+			}
+
+			document.getElementById("doctorInfo").style.display = "none";
+			document.getElementById("patientInfo").style.display = "block";
+			document.getElementById("patientsList").style.display = "none";
+			document.getElementById("recordsList").style.display = "block";
+			document.getElementById("recordDetail").style.display = "none";
+			document.getElementById("login").style.display = "none";
+		});
+		socket.on('recordDetail', function(data) {
+			console.log(data);
+			var recordDetail = JSON.parse(data.recordDetail).record;
+			var recordDetailString = '<p>diagnose : ' + recordDetail.diagnose + '</p>';
+			recordDetailString += '<p>item_name : ' + recordDetail.item_name + '</p>';
+			recordDetailString += '<p>inspection_item : ' + recordDetail.inspection_item + '</p>';
+			recordDetailString += '<p>blood_routine_examination : ' + recordDetail.blood_routine_examination + '</p>';
+			recordDetailString += '<p>time : ' + recordDetail.time + '</p>';
+			recordDetailString += '<p>medicine : ' + recordDetail.medicine + '</p>';
+			recordDetailString += '<p>doctor_IDcard : ' + recordDetail.doctor_IDcard + '</p>';
+			document.getElementById("recordDetail-div").innerHTML = recordDetailString;
+
+
+			document.getElementById("doctorInfo").style.display = "none";
+			document.getElementById("patientInfo").style.display = "block";
+			document.getElementById("patientsList").style.display = "none";
+			document.getElementById("recordsList").style.display = "none";
+			document.getElementById("recordDetail").style.display = "block";
+			document.getElementById("login").style.display = "none";
+		});
+		$('#patientsList-goback').click(function(){
+			document.getElementById("doctorInfo").style.display = "none";
+			document.getElementById("patientsList").style.display = "none";
+			document.getElementById("recordsList").style.display = "none";
+			document.getElementById("recordDetail").style.display = "none";
+			document.getElementById("login").style.display = "block";
+		});
+		$('#recordsList-goback').click(function(){
+			document.getElementById("doctorInfo").style.display = "block";
+			document.getElementById("patientInfo").style.display = "none";
+			document.getElementById("patientsList").style.display = "block";
+			document.getElementById("recordsList").style.display = "none";
+			document.getElementById("recordDetail").style.display = "none";
+			document.getElementById("login").style.display = "none";
+		});
+		$('#recordDetail-goback').click(function(){
+			document.getElementById("doctorInfo").style.display = "none";
+			document.getElementById("patientInfo").style.display = "block";
+			document.getElementById("patientsList").style.display = "none";
+			document.getElementById("recordsList").style.display = "block";
+			document.getElementById("recordDetail").style.display = "none";
+			document.getElementById("login").style.display = "none";
+		});
+	});
 </script>
   <body>
-    <ul id="messages"></ul>
-    <form id="form1" action="">
-      <input id="m" autocomplete="off" /><button>Send</button>
-    </form>
+  <div style="width: 100%;">
+  	<div id="doctorInfo" style="display: none;float:left;"></div>
+  	<div id="patientInfo" style="display: none;float:left;"></div>
+  	<div id="patientsList" style="display: none;float:right; width: 80%">
+  		<ul id="patientsList-ul"></ul>
+  		<button id="patientsList-goback">Logout</button>
+  	</div>
+  	<div id="recordsList" style="display: none;float:right; width: 80%">
+  		<ul id="recordsList-ul"></ul>
+  		<button id="recordsList-goback">Go Back</button>
+  	</div>
+  	<div id="recordDetail" style="display: none;float:right; width: 80%">
+  		<div id="recordDetail-div"> </div>
+  		<button id="recordDetail-goback">Go Back</button>
+  	</div>
+  	<div id="login" style="position: relative;">
+  		<!-- <div style="position: absolute;top: 50%;left: 50%;height: 30%;width: 50%;margin: -15% 0 0 -25%;"> -->
+	  		<input id="id" autocomplete="off"></input>
+	  		<input id="pwd" autocomplete="off"></input>
+	  		<button id="login-button">Login</button>
+  		<!-- </div> -->
+  	</div>
+  	</div>
   </body>
 </html>

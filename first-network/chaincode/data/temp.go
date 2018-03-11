@@ -248,9 +248,9 @@ func (t *SimpleAsset) getPatientRecord(stub shim.ChaincodeStubInterface, args []
 			break;
 		}
 		result += strings.Join([]string{keyTokens[1], keyTokens[2], keyTokens[3]}, ", ")
-
+		result += ", "
 		valueTokens := strings.Split(string(kv.Value), "$$")
-		result += strings.Join([]string{" ", valueTokens[0], valueTokens[1]}, ", ")
+		result += strings.Join([]string{valueTokens[0], valueTokens[1]}, ", ")
 
 		result += "\n"
 	}

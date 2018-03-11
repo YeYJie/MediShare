@@ -25,9 +25,10 @@ var getPatientRecord = function(patient) {
 	shit(cmd);
 };
 
-var doctorHandler = function(event) {
-	// logger.warn(event);
+var doctorHandler = function(event, socket) {
+	logger.warn(event);
 	// logger.warn(event.payload.toString("ascii"));
+	var eventName = event.event_name;
 	var payload = event.payload.toString("ascii");
 	var tokens = payload.split("$$");
 	var doctor = tokens[0];
@@ -37,7 +38,18 @@ var doctorHandler = function(event) {
 	var recordId = tokens[4];
 	var txId = tokens[5];
 	console.log(tokens);
+	socket.emit('chat message', payload);
+
+	var cmd = './demo/getData.sh ' + txId;
+	exec(cmd)
+		.then((result) => {
+			socket.emit('recordDetail', {recordDetail: result.stdout});
+		})
+		.catch((err) => {
+			console.error('ERROR: ', err);
+		});
 };
+
 
 exports.doctorHandler = doctorHandler;
 exports.getPatientRecord = getPatientRecord;

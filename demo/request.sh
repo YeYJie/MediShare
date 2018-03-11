@@ -12,13 +12,14 @@ recordId=$6
 doctorProfFile=$7
 
 now=$(date +"%F %T")
-echo "now: $now"
+# echo "now: $now"
 
 doctorProf=$(cat $doctorProfFile)
-echo $doctorProf
+# echo $doctorProf
 
-sig=$(./sign $doctorPrivateKeyFile "request" $doctorProf $patient $targetHospital $recordId "$now")
-echo $sig
+# sig=$(./sign $doctorPrivateKeyFile "request" $doctorProf $patient $targetHospital $recordId "$now")
+sig=$(./demo/sign $doctorPrivateKeyFile "request" $doctorProf $patient $targetHospital $recordId "$now")
+# echo $sig
 
 # doctor, hospital, patient, targetHospital, recordId, doctorProf, doctorTime, doctorSig
 generate_post_data()
@@ -34,7 +35,7 @@ EOF
 
 # echo $(generate_post_data)
 
-curl -isS \
+curl -sS \
 -H "Accept: application/json" \
 -H "Content-Type:application/json" \
 -X POST --data "$(generate_post_data)" "http://127.0.0.1:8080/apis/channels/mychannel/chaincodes/mycc"
