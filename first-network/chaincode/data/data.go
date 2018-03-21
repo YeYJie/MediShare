@@ -15,6 +15,7 @@ import (
 	// "time"
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	"github.com/hyperledger/fabric/protos/peer"
+	"encoding/json"
 )
 
 
@@ -175,8 +176,26 @@ func (t *SimpleAsset) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
 		return t.getHospitalPrivateKey(stub, args)
 	} else if function == "getHospitalPublicKey" {
 		return t.getHospitalPublicKey(stub, args)
+	} else if function == "json" {
+		return t.json(stub, args)
 	}
 
 	fmt.Println("invoke did not find func: " + function) //error
 	return shim.Error("Received unknown function invocation")
+}
+
+func (t *SimpleAsset) json(stub shim.ChaincodeStubInterface, args []string) peer.Response {
+
+	// return shim.Error(string(args[0]))
+	type jsonType struct {
+		Ye	string
+		Yong string
+	}
+	var temp jsonType
+	err := json.Unmarshal([]byte(args[0]), &temp)
+	if err != nil {
+		return shim.Error("failed to json.Unmarshal: " + err.Error())
+	}
+	// err = stub.PutState("json", []byte(temp.ye + temp.yong))
+	return shim.Success([]byte(temp.Ye + temp.Yong))
 }

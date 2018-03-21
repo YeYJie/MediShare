@@ -149,3 +149,10 @@ func (t *SimpleAsset) getTxTimestamp(stub shim.ChaincodeStubInterface) string {
 	txTimestamp := time.Unix(seconds, nanos).Format("2006-01-02 15:04:05")
 	return txTimestamp
 }
+
+
+func (t *SimpleAsset) getTxTimestampSecond(stub shim.ChaincodeStubInterface) string {
+
+	// TODO
+	return ""
+}
