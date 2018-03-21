@@ -15,6 +15,5 @@ first-network/crypto-config/*
 data/*
 first-network/docker-compose-cli.yaml
 first-network/docker-compose-e2e.yaml
-*.yaml
 demo/*Pri
 demo/*Prof

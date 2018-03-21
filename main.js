@@ -219,15 +219,15 @@ io.on('connection', function(socket){
 		console.log(cmd);
 		exec(cmd)
 			.then((result) => {
-				// var txid = result.stdout;
-				// cmd = './demo/getData.sh ' + txid;
-				// exec(cmd)
-				// 	.then((result) => {
-				// 		socket.emit('recordDetail', {recordDetail: result.stdout});
-				// 	})
-				// 	.catch((err) => {
-	   //      			console.error('ERROR: ', err);
-				// 	});
+                var txid = result.stdout;
+                cmd = './demo/getData.sh ' + txid;
+                exec(cmd)
+                 .then((result) => {
+                     socket.emit('recordDetail', {recordDetail: result.stdout});
+                 })
+                 .catch((err) => {
+                     console.error('ERROR: ', err);
+                 });
 			})
 			.catch((err) => {
 	        	console.error('ERROR: ', err);
