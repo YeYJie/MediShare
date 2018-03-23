@@ -209,6 +209,7 @@ router.post('/channels/:channelName/chaincodes', function(req, res) {
 // Invoke transaction on chaincode on target peers
 router.post('/channels/:channelName/chaincodes/:chaincodeName', function(req, res) {
     logger.debug('==================== INVOKE ON CHAINCODE ==================');
+    console.log(req.body)
     var peers = req.body.peers;
     var chaincodeName = req.params.chaincodeName;
     var channelName = req.params.channelName;
@@ -284,6 +285,48 @@ router.get('/channels/:channelName/chaincodes/:chaincodeName', function(req, res
             res.send(message);
         });
 });
+
+
+router.post('/channels/:channelName/chaincodes/:chaincodeName/post', function(req, res) {
+    logger.debug('==================== QUERY BY CHAINCODE POST==================');
+    var channelName = req.params.channelName;
+    var chaincodeName = req.params.chaincodeName;
+    let args = req.body.args;
+    let peer = req.body.peer;
+    let fcn = req.body.fcn;
+
+    logger.debug('channelName : ' + channelName);
+    logger.debug('chaincodeName : ' + chaincodeName);
+    logger.debug('fcn  : ' + fcn);
+    logger.debug('args : ' + args);
+
+    if (!chaincodeName) {
+        res.json(getErrorMessage('\'chaincodeName\''));
+        return;
+    }
+    if (!channelName) {
+        res.json(getErrorMessage('\'channelName\''));
+        return;
+    }
+    if (!fcn) {
+        res.json(getErrorMessage('\'fcn\''));
+        return;
+    }
+    if (!args) {
+        res.json(getErrorMessage('\'args\''));
+        return;
+    }
+    // args = args.replace(/'/g, '"');
+    // args = JSON.parse(args);
+    // logger.debug(args);
+
+    query.queryChaincode(peer, channelName, chaincodeName, fcn, args, req.username, req.orgname)
+        .then(function(message) {
+            res.send(message);
+        });
+});
+
+
 //  Query Get Block by BlockNumber
 router.get('/channels/:channelName/blocks/:blockId', function(req, res) {
     logger.debug('==================== GET BLOCK BY NUMBER ==================');

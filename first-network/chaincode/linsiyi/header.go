@@ -192,3 +192,43 @@ func BuildFileRequestRecord(fileRequestArgs *FileRequestArgs,
 	}
 	return fileRequestRecord
 }
+
+type FileQueryArgs struct {
+	QuertLauncher			string
+	FileName				string
+	Department				string
+	DepartmentBegin			string
+	DepartmentEnd			string
+	Uploader				string
+	UploaderBegin			string
+	UploaderEnd				string
+	QuertLauncherSig		string
+	QueryLauncherPKC		string
+}
+
+type FileMetaDataForQueryUse struct {
+	FileId 				string
+	NeedAuthorization	bool
+	FileVersion			string
+	FileName			string
+	FileSize			string
+	Uploader			string
+	Department			string
+}
+
+type FileQueryReply struct {
+	FileMetaDatas 	[]FileMetaDataForQueryUse
+}
+
+func BuildFileMetaDataForQueryUse(fileMetaData *FileMetaData) FileMetaDataForQueryUse {
+	fileMetaDataForQueryUse := FileMetaDataForQueryUse{
+		FileId 				: fileMetaData.FileId,
+		NeedAuthorization	: fileMetaData.NeedAuthorization,
+		FileVersion			: fileMetaData.FileVersion,
+		FileName			: fileMetaData.FileName,
+		FileSize			: fileMetaData.FileSize,
+		Uploader			: fileMetaData.Uploader,
+		Department			: fileMetaData.Department,
+	}
+	return fileMetaDataForQueryUse
+}

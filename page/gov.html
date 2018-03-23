@@ -40,6 +40,7 @@
 	<script src="/socket.io/socket.io.js"></script>
 	<script>
 
+
 	$(function () {
 		var socket = io();
 
@@ -87,6 +88,15 @@
 				});
 			}
 		});
+		socket.on('fileEntry', function(data) {
+			var entry = data.entry;
+			console.log(entry);
+			document.getElementById("fileContent").style.display = "block";
+		});
+
+		$('#fileContent-goback').click(function(){
+			document.getElementById("fileContent").style.display = "none";
+		})
 
 		$('#login-button').click(function(){
 			document.getElementById("outer-wrap").style.display = "none";
@@ -166,6 +176,7 @@
 	  	<div id="staffInfo" style="display: none;float:left;"></div>
 
 	  	<div id="fileList" style="display: none;float:right; width: 80%">
+	  		<ul id="fileList-ul"></ul>
 	  		<p><table id="fileList-table">
 				<tr>
 					<th>FileName</th>
@@ -220,6 +231,11 @@
 				</tr>
 	  		</table></p>
 	  		<button id="searchResult-goback">Go Back</button>
+	  	</div>
+
+	  	<div id="fileContent" style="display: none;">
+	  		<p id="fileContent-p"></p>
+	  		<p><button id="fileContent-goback">Go Back</button></p>
 	  	</div>
 
 		<div id="outer-wrap">

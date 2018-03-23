@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"crypto"
 	"crypto/rsa"
+	"crypto/sha1"
 	"crypto/sha256"
 	"crypto/x509"
 	"net/http"
@@ -16,28 +17,36 @@ import (
 	"github.com/hyperledger/fabric/protos/peer"
 )
 
+func hash(input string) string {
+	h := sha1.New()
+	h.Write([]byte(input))
+	bs := h.Sum(nil)
+	// fmt.Printf("%x\n", bs)
+	return hex.EncodeToString(bs)
+}
+
 // return (fileId, fileVersion, error)
 func (t *SimpleAsset) newFileId(stub shim.ChaincodeStubInterface,
 	fileName string) (string, string, error) {
 
 	returnedMajorVersion := 1
 
-	iter, err := stub.GetStateByPartialCompositeKey(fileName, nil)
+	iter, err := stub.GetStateByPartialCompositeKey("fileNameToFileId", []string{fileName})
 	if err != nil {
 		return "", "", err
 	}
 	for iter.HasNext() {
 		kv, _ := iter.Next()
 		_, attrib, _ := stub.SplitCompositeKey(kv.Key)
-		version := attrib[0]
+		version := attrib[1]
 		majorVersion, _ := strconv.Atoi(version[1:len(version)-2])
 		if majorVersion >= returnedMajorVersion {
 			returnedMajorVersion += 1
 		}
 	}
 	returnedVersion := "v" + strconv.Itoa(returnedMajorVersion) + ".0"
-	returnedFileId := fileName + returnedVersion
-	key, err := stub.CreateCompositeKey(fileName, []string{returnedVersion})
+	returnedFileId := hash(fileName + returnedVersion)
+	key, err := stub.CreateCompositeKey("fileNameToFileId", []string{fileName, returnedVersion})
 	if err != nil {
 		return "", "", err
 	}
@@ -149,10 +158,72 @@ func (t *SimpleAsset) fileUpload(stub shim.ChaincodeStubInterface, args []string
 	return shim.Success(nil)
 }
 
+func (t *SimpleAsset) getAllFileMetaData(stub shim.ChaincodeStubInterface, args []string) peer.Response {
+	// return shim.Success(nil)
+	iter, err := stub.GetStateByPartialCompositeKey("fileNameToFileId", []string{})
+	if err != nil {
+		return shim.Error("failed to GetStateByPartialCompositeKey: " + err.Error())
+	}
+
+	var fileQueryReply FileQueryReply
+	for iter.HasNext() {
+		kv, _ := iter.Next()
+		fileId := string(kv.Value)
+		fileMetaDataByte, err := stub.GetState(fileId)
+		if err != nil {
+			break;
+		}
+		var fileMetaData FileMetaData
+		err = json.Unmarshal(fileMetaDataByte, &fileMetaData)
+		if err != nil{
+			break;
+		}
+		fileQueryReply.FileMetaDatas = append(fileQueryReply.FileMetaDatas,
+				BuildFileMetaDataForQueryUse(&fileMetaData))
+	}
+
+	fileQueryReplyJson, err := json.Marshal(fileQueryReply)
+	if err != nil {
+		return shim.Error("failed to json.Marshal: " + err.Error())
+	}
+	return shim.Success(fileQueryReplyJson)
+}
 
 func (t *SimpleAsset) fileSearchByName(stub shim.ChaincodeStubInterface, args []string) peer.Response {
 
-	return shim.Success(nil)
+	var fileQueryArgs FileQueryArgs
+	err := json.Unmarshal([]byte(args[0]), &fileQueryArgs)
+	if err != nil {
+		return shim.Error("failed to json.Unmarshal: " + err.Error())
+	}
+
+	iter, err := stub.GetStateByPartialCompositeKey("fileNameToFileId", []string{fileQueryArgs.FileName})
+	if err != nil {
+		return shim.Error("failed to GetStateByPartialCompositeKey: " + err.Error())
+	}
+
+	var fileQueryReply FileQueryReply
+	for iter.HasNext() {
+		kv, _ := iter.Next()
+		fileId := string(kv.Value)
+		fileMetaDataByte, err := stub.GetState(fileId)
+		if err != nil {
+			break;
+		}
+		var fileMetaData FileMetaData
+		err = json.Unmarshal(fileMetaDataByte, &fileMetaData)
+		if err != nil{
+			break;
+		}
+		fileQueryReply.FileMetaDatas = append(fileQueryReply.FileMetaDatas,
+				BuildFileMetaDataForQueryUse(&fileMetaData))
+	}
+
+	fileQueryReplyJson, err := json.Marshal(fileQueryReply)
+	if err != nil {
+		return shim.Error("failed to json.Marshal: " + err.Error())
+	}
+	return shim.Success(fileQueryReplyJson)
 }
 
 
@@ -176,7 +247,51 @@ func (t *SimpleAsset) fileSearchByTime(stub shim.ChaincodeStubInterface, args []
 
 func (t *SimpleAsset) fileSearchByDepartmentAndTime(stub shim.ChaincodeStubInterface, args []string) peer.Response {
 
-	return shim.Success(nil)
+	var fileQueryArgs FileQueryArgs
+	err := json.Unmarshal([]byte(args[0]), &fileQueryArgs)
+	if err != nil {
+		return shim.Error("failed to json.Unmarshal: " + err.Error())
+	}
+
+	department := fileQueryArgs.Department
+	begin := fileQueryArgs.DepartmentBegin
+	end := fileQueryArgs.DepartmentEnd
+
+	startKey, err := stub.CreateCompositeKey("departmentTimeIndex", []string{department, begin})
+	if err != nil {
+		return shim.Error("failed to CreateCompositeKey: " + err.Error())
+	}
+	endKey, err := stub.CreateCompositeKey("departmentTimeIndex", []string{department, end})
+	if err != nil {
+		return shim.Error("failed to CreateCompositeKey: " + err.Error())
+	}
+
+	iter, err := stub.GetStateByRange(startKey, endKey)
+	if err != nil {
+		return shim.Error("failed to GetStateByRange: " + err.Error())
+	}
+	var fileQueryReply FileQueryReply
+	for iter.HasNext() {
+		kv, _ := iter.Next()
+		fileId := string(kv.Value)
+		fileMetaDataByte, err := stub.GetState(fileId)
+		if err != nil {
+			break;
+		}
+		var fileMetaData FileMetaData
+		err = json.Unmarshal(fileMetaDataByte, &fileMetaData)
+		if err != nil{
+			break;
+		}
+		fileQueryReply.FileMetaDatas = append(fileQueryReply.FileMetaDatas,
+				BuildFileMetaDataForQueryUse(&fileMetaData))
+	}
+
+	fileQueryReplyJson, err := json.Marshal(fileQueryReply)
+	if err != nil {
+		return shim.Error("failed to json.Marshal: " + err.Error())
+	}
+	return shim.Success(fileQueryReplyJson)
 }
 
 

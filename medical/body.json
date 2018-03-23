@@ -1,0 +1,5 @@
+{
+	"peers":["127.0.0.1:7051", "127.0.0.1:8051"],
+	"fcn":"fileUpload",
+	"args":["{\"UploadType\":\"publish\",\"FileName\":\"fileForPublish\",\"FileSize\":\"456\",\"FileChecksum\":\"checksumForPublish\",\"Uploader\":\"publisher\",\"UploadTime\":\"123\",\"UploaderSig\":\"publisherSig\",\"UploaderPKC\":\"publisherPKC\",\"Entry\":\"fileEntry\",\"EntryFormat\":\"fileEntryFormat\",\"Department\":\"department\",\"DepartmentSig\":\"departmentSig\",\"DepartmentPKC\":\"departmentPKC\"}"]
+}

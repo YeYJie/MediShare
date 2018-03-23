@@ -146,49 +146,72 @@ app.post('/chaincodelist',function(req,res){
 	statusMertics.getTxPerChaincode(ledgerMgr.getCurrChannel(),function (data) {
 		res.send(data)
 	})
-})
+});
 
 app.post('/changeChannel',function(req,res){
 	let channelName=req.body.channelName
 	ledgerMgr.changeChannel(channelName)
 	res.end()
-})
+});
 
 app.post('/curChannel',function(req,res){
 	res.send({'currentChannel':ledgerMgr.getCurrChannel()})
-})
+});
 
 app.post('/channellist',function(req,res){
 	res.send({'channelList':ledgerMgr.getChannellist()})
-})
+});
 
 app.get('/doctorPage', function(req, res){
 	res.sendFile(__dirname + '/page/doctor.html');
-})
+});
 
 app.get('/gov', function(req, res){
 	res.sendFile(__dirname + '/page/gov.html');
-})
+});
+
+// var hospital = require("./app/hospital.js");
+// var doctor = require("./app/doctor.js");
+// var patient = require("./app/patient.js");
+
+var exec = require('child-process-promise').exec;
+
+var department = "department";
 
 var io = require('socket.io')(http);
 io.on('connection', function(socket){
-	var id;
-
-	// socket.on('write', function(req){
-	// 	data = req.data;
-	// 	mongo.New("localhost:9999").Write(data);
-	// 	return "success"
-	// });
+	var id = "yeyongjie";
 
 	socket.on('login', function(req){
 		console.log(req);
 		id = req.id;
 		var pwd = req.pwd;
 		socketid = req.id;
-		socket.emit('fileList', {files:[{FileId:"fid1", FileName:"file1", FileVersion:"v1.0", FileSize:"2K", Department:"department1", Uploader:"uploader1", UploaderTime:"uploaderTime1", NeedAuthorization: true}, {FileId:"fid2", FileName:"file2", FileVersion:"v1.0", FileSize:"2K", Department:"department1", Uploader:"uploader1", UploaderTime:"uploaderTime1", NeedAuthorization: true}, {FileId:"fid3", FileName:"file3", FileVersion:"v1.0", FileSize:"2K", Department:"department1", Uploader:"uploader1", UploaderTime:"uploaderTime1", NeedAuthorization: true}, {FileId:"fid4", FileName:"file4", FileVersion:"v1.0", FileSize:"2K", Department:"department1", Uploader:"uploader1", UploaderTime:"uploaderTime1", NeedAuthorization: true}]});
+		// socket.emit('fileList', {files:[{FileId:"fid1", FileName:"file1", FileVersion:"v1.0", FileSize:"2K", Department:"department1", Uploader:"uploader1", UploaderTime:"uploaderTime1", NeedAuthorization: true}, {FileId:"fid2", FileName:"file2", FileVersion:"v1.0", FileSize:"2K", Department:"department1", Uploader:"uploader1", UploaderTime:"uploaderTime1", NeedAuthorization: true}, {FileId:"fid3", FileName:"file3", FileVersion:"v1.0", FileSize:"2K", Department:"department1", Uploader:"uploader1", UploaderTime:"uploaderTime1", NeedAuthorization: true}, {FileId:"fid4", FileName:"file4", FileVersion:"v1.0", FileSize:"2K", Department:"department1", Uploader:"uploader1", UploaderTime:"uploaderTime1", NeedAuthorization: true}]});
+
+
+		var cmd = './medical/getAllFileMetaData.sh';
+		console.log(cmd);
+		exec(cmd)
+			.then((result) => {
+				// console.log(result);
+				socket.emit('fileList', {files: JSON.parse(result.stdout).FileMetaDatas});
+			})
+			.catch((err) => {
+				console.log(err);
+			});
 	});
 	socket.on('requestFile', function(req){
 		var fileId = req.fileId;
+		var cmd = './medical/request.sh ' + fileId + ' ' + id + ' ' + department;
+		console.log(cmd);
+		exec(cmd)
+			.then((result) => {
+				var fileRequestReply = JSON.parse(result.stdout);
+				var entry = fileRequestReply.Entry;
+				console.log(entry);
+				socket.emit('fileEntry', {entry: entry});
+			})
 	});
 	socket.on('searchByName', function(req){
 		var name = req.name;
@@ -206,16 +229,7 @@ io.on('connection', function(socket){
 		var end = req.end;
 		socket.emit('searchResult', {files:[{FileId:"fid4", FileName:"file4", FileVersion:"v1.0", FileSize:"2K", Department:"department1", Uploader:"uploader1", UploaderTime:"uploaderTime1", NeedAuthorization: true}]});
 	});
-	socket.on('requestFile', function(req){
-		var fileId = req.fileId;
-	});
 });
-
-var hospital = require("./app/hospital.js");
-var doctor = require("./app/doctor.js");
-var patient = require("./app/patient.js");
-
-var exec = require('child-process-promise').exec;
 
 
 // var io = require('socket.io')(http);
@@ -283,7 +297,7 @@ var exec = require('child-process-promise').exec;
 
 var server = http.listen(port, function() {
 	console.log(`Please open Internet explorer to access ：http://${host}:${port}/`);
-	myEventListener.myRegisterEventListener('org1', "h1", hospital.hospitalHandler, null);
+	// myEventListener.myRegisterEventListener('org1', "h1", hospital.hospitalHandler, null);
 	// myEventListener.myRegisterEventListener('org1', "d1", doctor.doctorHandler);
 	// myEventListener.myRegisterEventListener('org1', "patient", patient.patientHandler);
 });
