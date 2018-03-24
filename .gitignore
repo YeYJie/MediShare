@@ -17,3 +17,5 @@ first-network/docker-compose-cli.yaml
 first-network/docker-compose-e2e.yaml
 demo/*Pri
 demo/*Prof
+*.png
+*.jpg

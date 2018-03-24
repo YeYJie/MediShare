@@ -2,8 +2,6 @@
 <html>
 	<head>
 		<style type="text/css">
-/*			.left-div{width: 40%; float: left};
-			.right-div{width: 60%; float: right};*/
 			table {
 			    font-family: arial, sans-serif;
 			    border-collapse: collapse;
@@ -44,16 +42,21 @@
 	$(function () {
 		var socket = io();
 
-		var buildRowHTML = function(fileName, fileVersion, fileSize, department, uploader,
+		var buildRowHTML = function(fileId, fileName, fileVersion, fileSize, department, uploader,
 							time, needAuthorization, buttonId) {
+			var date = new Date(parseInt(time) * 1000);
+			var y = date.getFullYear();
+			var m = date.getMonth() + 1;
+			var d = date.getDate();
 			return '<tr><td>' + fileName +'</td>'
 					+'<td>' + fileVersion +'</td>'
 					+'<td>' + fileSize +'</td>'
 					+'<td>' + department +'</td>'
 					+'<td>' + uploader +'</td>'
-					+'<td>' + time +'</td>'
+					+'<td>' + y + '-' + m + '-' + d +'</td>'
 					+'<td>' + needAuthorization +'</td>'
-					+'<td><button id="' + buttonId + '">Requset File</button></td></tr>'
+					+'<td><button id="' + buttonId + '" data-fileId="' + fileId
+					+ '" needAuthorization="' + needAuthorization + '">Requset File</button></td></tr>'
 		};
 
 		socket.on('fileList', function(data) {
@@ -61,14 +64,22 @@
 			for(var i = 0; i < data.files.length; ++i) {
 				console.log(data.files[i]);
 				var file = data.files[i];
-				var fileHTML = buildRowHTML(file.FileName, file.FileVersion, file.FileSize, file.Department,
-								file.Uploader, file.UploaderTime, file.NeedAuthorization,
+				var fileHTML = buildRowHTML(file.FileId, file.FileName, file.FileVersion, file.FileSize, file.Department,
+								file.Uploader, file.UploadTime, file.NeedAuthorization,
 								"fileList-request-button-"+file.FileId);
 				var row = document.getElementById("fileList-table").insertRow(1);
 				row.innerHTML = fileHTML;
 				$('#fileList-request-button-' + file.FileId).click(function(){
-					console.log('request file: ' + file.FileId);
-					socket.emit('requestFile', {fileId: file.FileId});
+					var needAuthorization = $(this).attr('needAuthorization');
+					var fileId = $(this).attr('data-fileId');
+					if(needAuthorization === "true") {
+						console.log("emit requestFileAuthorization " + fileId);
+						socket.emit('requestFileAuthorization', {fileId: fileId});
+					}
+					else {
+						console.log("emit requestFile " + fileId);
+						socket.emit('requestFile', {fileId: fileId});
+					}
 				});
 			}
 		});
@@ -77,14 +88,22 @@
 			for(var i = 0; i < data.files.length; ++i) {
 				console.log(data.files[i]);
 				var file = data.files[i];
-				var fileHTML = buildRowHTML(file.FileName, file.FileVersion, file.FileSize, file.Department,
-								file.Uploader, file.UploaderTime, file.NeedAuthorization,
+				var fileHTML = buildRowHTML(file.FileId, file.FileName, file.FileVersion, file.FileSize, file.Department,
+								file.Uploader, file.UploadTime, file.NeedAuthorization,
 								"searchResult-request-button-"+file.FileId);
 				var row = document.getElementById("searchResult-table").insertRow(1);
 				row.innerHTML = fileHTML;
 				$('#searchResult-request-button-' + file.FileId).click(function(){
-					console.log('request file: ' + file.FileId);
-					socket.emit('requestFile', {fileId: file.FileId});
+					var needAuthorization = $(this).attr('needAuthorization');
+					var fileId = $(this).attr('data-fileId');
+					if(needAuthorization === "true") {
+						console.log("emit requestFileAuthorization " + fileId);
+						socket.emit('requestFileAuthorization', {fileId: fileId});
+					}
+					else {
+						console.log("emit requestFile " + fileId);
+						socket.emit('requestFile', {fileId: fileId});
+					}
 				});
 			}
 		});
@@ -92,6 +111,8 @@
 			var entry = data.entry;
 			console.log(entry);
 			document.getElementById("fileContent").style.display = "block";
+			var fileContentHTML = '<img src="' + entry + '"/>'
+			document.getElementById("fileContent-p").innerHTML = fileContentHTML;
 		});
 
 		$('#fileContent-goback').click(function(){
@@ -127,6 +148,19 @@
 			$('#search-name').val("");
 			console.log('search-name: ' + name);
 			socket.emit('searchByName', {name: name});
+		})
+		$('#search-time-button').click(function(){
+			document.getElementById("search").style.display = "none";
+			document.getElementById("searchResult").style.display = "block";
+			var begin = $('#search-time-begin').val();
+			var end = $('#search-time-end').val();
+			$('#search-time-begin').val("");
+			$('#search-time-end').val("");
+			if(begin !== "")
+				console.log('search-time-begin: ' + begin);
+			if(end !== "")
+				console.log('search-time-end: ' + end);
+			socket.emit('searchByTime', {begin: begin, end:end});
 		})
 		$('#search-department-button').click(function(){
 			document.getElementById("search").style.display = "none";
@@ -167,7 +201,7 @@
 		})
 		$('#searchResult-goback').click(function(){
 			document.getElementById("searchResult").style.display = "none";
-			document.getElementById("fileList").style.display = "block";
+			document.getElementById("search").style.display = "block";
 			$("#searchResult-table").find("tr:gt(0)").remove();
 		})
 	});
@@ -199,6 +233,12 @@
   				<legend>By Name</legend>
   				<input type="text" id="search-name">
   				<button id="search-name-button">Search</button>
+  			</fieldset></p>
+    		<p><fieldset>
+  				<legend>By Time</legend>
+  				<input type="date" id="search-time-begin">
+  				<input type="date" id="search-time-end">
+  				<button id="search-time-button">Search</button>
   			</fieldset></p>
   			<p><fieldset>
   				<legend>By Department</legend>
@@ -233,7 +273,7 @@
 	  		<button id="searchResult-goback">Go Back</button>
 	  	</div>
 
-	  	<div id="fileContent" style="display: none;">
+	  	<div id="fileContent" style="display: none; position:fixed; width:100%; height:100%; background-color:#FFF;">
 	  		<p id="fileContent-p"></p>
 	  		<p><button id="fileContent-goback">Go Back</button></p>
 	  	</div>

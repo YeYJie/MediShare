@@ -197,11 +197,9 @@ type FileQueryArgs struct {
 	QuertLauncher			string
 	FileName				string
 	Department				string
-	DepartmentBegin			string
-	DepartmentEnd			string
 	Uploader				string
-	UploaderBegin			string
-	UploaderEnd				string
+	Begin 					string
+	End 					string
 	QuertLauncherSig		string
 	QueryLauncherPKC		string
 }
@@ -214,6 +212,7 @@ type FileMetaDataForQueryUse struct {
 	FileSize			string
 	Uploader			string
 	Department			string
+	UploadTime 			string
 }
 
 type FileQueryReply struct {
@@ -229,6 +228,7 @@ func BuildFileMetaDataForQueryUse(fileMetaData *FileMetaData) FileMetaDataForQue
 		FileSize			: fileMetaData.FileSize,
 		Uploader			: fileMetaData.Uploader,
 		Department			: fileMetaData.Department,
+		UploadTime 			: fileMetaData.UploadTime,
 	}
 	return fileMetaDataForQueryUse
 }

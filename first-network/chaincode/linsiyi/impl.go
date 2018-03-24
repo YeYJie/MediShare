@@ -13,6 +13,7 @@ import (
 	"crypto/sha256"
 	"crypto/x509"
 	"net/http"
+	"strings"
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	"github.com/hyperledger/fabric/protos/peer"
 )
@@ -44,6 +45,7 @@ func (t *SimpleAsset) newFileId(stub shim.ChaincodeStubInterface,
 			returnedMajorVersion += 1
 		}
 	}
+	iter.Close()
 	returnedVersion := "v" + strconv.Itoa(returnedMajorVersion) + ".0"
 	returnedFileId := hash(fileName + returnedVersion)
 	key, err := stub.CreateCompositeKey("fileNameToFileId", []string{fileName, returnedVersion})
@@ -138,34 +140,26 @@ func (t *SimpleAsset) fileUpload(stub shim.ChaincodeStubInterface, args []string
 		return shim.Error(err.Error())
 	}
 
-	// update indices
-	insertIndex := func(keyComponents []string, value string) {
-		if err != nil {
-			return
-		}
-		key, err := stub.CreateCompositeKey(keyComponents[0], keyComponents[1:])
-		if err != nil {
-			return
-		}
-		err = stub.PutState(key, []byte(value))
-	}
-	insertIndex([]string{"departmentTimeIndex", fileUploadArgs.Department, txTimestampSecond}, fileId)
-	insertIndex([]string{"uploaderTimeIndex", fileUploadArgs.Uploader, txTimestampSecond}, fileId)
-	insertIndex([]string{"timeIndex", txTimestampSecond}, fileId)
+	key := strings.Join([]string{"departmentTimeIndex", fileUploadArgs.Department, txTimestampSecond}, "$$")
+	err = stub.PutState(key, []byte(fileId))
+
+	key = strings.Join([]string{"uploaderTimeIndex", fileUploadArgs.Uploader, txTimestampSecond}, "$$")
+	err = stub.PutState(key, []byte(fileId))
+
+	key = strings.Join([]string{"timeIndex", txTimestampSecond}, "$$")
+	err = stub.PutState(key, []byte(fileId))
+
 	if err != nil {
 		return shim.Error(err.Error())
 	}
 	return shim.Success(nil)
 }
 
-func (t *SimpleAsset) getAllFileMetaData(stub shim.ChaincodeStubInterface, args []string) peer.Response {
-	// return shim.Success(nil)
-	iter, err := stub.GetStateByPartialCompositeKey("fileNameToFileId", []string{})
-	if err != nil {
-		return shim.Error("failed to GetStateByPartialCompositeKey: " + err.Error())
-	}
+func (t *SimpleAsset) iterToFileQueryReplyJson(stub shim.ChaincodeStubInterface,
+						iter shim.StateQueryIteratorInterface) []byte {
 
 	var fileQueryReply FileQueryReply
+
 	for iter.HasNext() {
 		kv, _ := iter.Next()
 		fileId := string(kv.Value)
@@ -181,11 +175,19 @@ func (t *SimpleAsset) getAllFileMetaData(stub shim.ChaincodeStubInterface, args 
 		fileQueryReply.FileMetaDatas = append(fileQueryReply.FileMetaDatas,
 				BuildFileMetaDataForQueryUse(&fileMetaData))
 	}
+	iter.Close()
+	fileQueryReplyJson, _ := json.Marshal(fileQueryReply)
+	return fileQueryReplyJson
+}
 
-	fileQueryReplyJson, err := json.Marshal(fileQueryReply)
+func (t *SimpleAsset) getAllFileMetaData(stub shim.ChaincodeStubInterface, args []string) peer.Response {
+
+	iter, err := stub.GetStateByPartialCompositeKey("fileNameToFileId", []string{})
 	if err != nil {
-		return shim.Error("failed to json.Marshal: " + err.Error())
+		return shim.Error("failed to GetStateByPartialCompositeKey: " + err.Error())
 	}
+
+	fileQueryReplyJson := t.iterToFileQueryReplyJson(stub, iter)
 	return shim.Success(fileQueryReplyJson)
 }
 
@@ -197,51 +199,96 @@ func (t *SimpleAsset) fileSearchByName(stub shim.ChaincodeStubInterface, args []
 		return shim.Error("failed to json.Unmarshal: " + err.Error())
 	}
 
-	iter, err := stub.GetStateByPartialCompositeKey("fileNameToFileId", []string{fileQueryArgs.FileName})
+	iter, err := stub.GetStateByPartialCompositeKey("fileNameToFileId",
+										[]string{fileQueryArgs.FileName})
 	if err != nil {
 		return shim.Error("failed to GetStateByPartialCompositeKey: " + err.Error())
+	}
+
+	fileQueryReplyJson := t.iterToFileQueryReplyJson(stub, iter)
+
+	return shim.Success(fileQueryReplyJson)
+}
+
+
+func (t *SimpleAsset) timeHelper(stub shim.ChaincodeStubInterface, begin string, end string) (int, int) {
+
+	resBegin := 0
+	if begin != "" {
+		resBegin, _ = strconv.Atoi(begin)
+	}
+	resEnd, _ := strconv.Atoi(t.getTxTimestampSecond(stub))
+	if end != "" {
+		resEnd, _ = strconv.Atoi(end)
+	}
+	if resBegin > resEnd {
+		resEnd = resBegin
+	}
+	return resBegin, resEnd
+}
+
+type Constraint func(string) bool
+
+func (t *SimpleAsset) someFuckingCommonCode(stub shim.ChaincodeStubInterface,
+				startKey string, endKey string, constraint Constraint) ([]byte, error) {
+
+	iter, err := stub.GetStateByRange(startKey, endKey)
+	if err != nil {
+		return []byte{}, err
 	}
 
 	var fileQueryReply FileQueryReply
 	for iter.HasNext() {
 		kv, _ := iter.Next()
-		fileId := string(kv.Value)
-		fileMetaDataByte, err := stub.GetState(fileId)
-		if err != nil {
-			break;
+
+		if constraint(kv.Key) {
+			fileId := string(kv.Value)
+			fileMetaDataByte, err := stub.GetState(fileId)
+			if err != nil {
+				break;
+			}
+			var fileMetaData FileMetaData
+			err = json.Unmarshal(fileMetaDataByte, &fileMetaData)
+			if err != nil{
+				break;
+			}
+			fileQueryReply.FileMetaDatas = append(fileQueryReply.FileMetaDatas,
+					BuildFileMetaDataForQueryUse(&fileMetaData))
 		}
-		var fileMetaData FileMetaData
-		err = json.Unmarshal(fileMetaDataByte, &fileMetaData)
-		if err != nil{
-			break;
-		}
-		fileQueryReply.FileMetaDatas = append(fileQueryReply.FileMetaDatas,
-				BuildFileMetaDataForQueryUse(&fileMetaData))
 	}
-
-	fileQueryReplyJson, err := json.Marshal(fileQueryReply)
-	if err != nil {
-		return shim.Error("failed to json.Marshal: " + err.Error())
-	}
-	return shim.Success(fileQueryReplyJson)
+	iter.Close()
+	fileQueryReplyJson, _ := json.Marshal(fileQueryReply)
+	return fileQueryReplyJson, nil
 }
-
-
-func (t *SimpleAsset) fileSearchByDepartment(stub shim.ChaincodeStubInterface, args []string) peer.Response {
-
-	return shim.Success(nil)
-}
-
-
-func (t *SimpleAsset) fileSearchByPublisher(stub shim.ChaincodeStubInterface, args []string) peer.Response {
-
-	return shim.Success(nil)
-}
-
 
 func (t *SimpleAsset) fileSearchByTime(stub shim.ChaincodeStubInterface, args []string) peer.Response {
 
-	return shim.Success(nil)
+	var fileQueryArgs FileQueryArgs
+	err := json.Unmarshal([]byte(args[0]), &fileQueryArgs)
+	if err != nil {
+		return shim.Error("failed to json.Unmarshal: " + err.Error())
+	}
+
+	begin, end := t.timeHelper(stub, fileQueryArgs.Begin, fileQueryArgs.End)
+
+	startKey := strings.Join([]string{"timeIndex", strconv.Itoa(begin)}, "$$")
+	endKey := strings.Join([]string{"timeIndex", strconv.Itoa(end)}, "$$")
+
+	timeConstraint := func(key string) bool {
+		keyComponents := strings.Split(key, "$$")
+		time, _ := strconv.Atoi(keyComponents[1])
+		if time > begin && time < end {
+			return true
+		}
+		return false
+	}
+
+	fileQueryReplyJson, err := t.someFuckingCommonCode(stub, startKey, endKey, timeConstraint)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	return shim.Success(fileQueryReplyJson)
 }
 
 
@@ -253,51 +300,59 @@ func (t *SimpleAsset) fileSearchByDepartmentAndTime(stub shim.ChaincodeStubInter
 		return shim.Error("failed to json.Unmarshal: " + err.Error())
 	}
 
-	department := fileQueryArgs.Department
-	begin := fileQueryArgs.DepartmentBegin
-	end := fileQueryArgs.DepartmentEnd
+	begin, end := t.timeHelper(stub, fileQueryArgs.Begin, fileQueryArgs.End)
 
-	startKey, err := stub.CreateCompositeKey("departmentTimeIndex", []string{department, begin})
-	if err != nil {
-		return shim.Error("failed to CreateCompositeKey: " + err.Error())
-	}
-	endKey, err := stub.CreateCompositeKey("departmentTimeIndex", []string{department, end})
-	if err != nil {
-		return shim.Error("failed to CreateCompositeKey: " + err.Error())
-	}
+	startKey := strings.Join([]string{"departmentTimeIndex", fileQueryArgs.Department, strconv.Itoa(begin)}, "$$")
+	endKey := strings.Join([]string{"departmentTimeIndex", fileQueryArgs.Department, strconv.Itoa(end)}, "$$")
 
-	iter, err := stub.GetStateByRange(startKey, endKey)
-	if err != nil {
-		return shim.Error("failed to GetStateByRange: " + err.Error())
-	}
-	var fileQueryReply FileQueryReply
-	for iter.HasNext() {
-		kv, _ := iter.Next()
-		fileId := string(kv.Value)
-		fileMetaDataByte, err := stub.GetState(fileId)
-		if err != nil {
-			break;
+	departmentConstraint := func(key string) bool {
+		keyComponents := strings.Split(key, "$$")
+		department := keyComponents[1]
+		time, _ := strconv.Atoi(keyComponents[2])
+		if department == fileQueryArgs.Department && time >= begin && time < end {
+			return true
 		}
-		var fileMetaData FileMetaData
-		err = json.Unmarshal(fileMetaDataByte, &fileMetaData)
-		if err != nil{
-			break;
-		}
-		fileQueryReply.FileMetaDatas = append(fileQueryReply.FileMetaDatas,
-				BuildFileMetaDataForQueryUse(&fileMetaData))
+		return false
 	}
 
-	fileQueryReplyJson, err := json.Marshal(fileQueryReply)
+	fileQueryReplyJson, err := t.someFuckingCommonShit(stub, startKey, endKey, departmentConstraint)
 	if err != nil {
-		return shim.Error("failed to json.Marshal: " + err.Error())
+		return shim.Error(err.Error())
 	}
+
 	return shim.Success(fileQueryReplyJson)
 }
 
 
-func (t *SimpleAsset) fileSearchByPublisherAndTime(stub shim.ChaincodeStubInterface, args []string) peer.Response {
+func (t *SimpleAsset) fileSearchByUploaderAndTime(stub shim.ChaincodeStubInterface, args []string) peer.Response {
 
-	return shim.Success(nil)
+	var fileQueryArgs FileQueryArgs
+	err := json.Unmarshal([]byte(args[0]), &fileQueryArgs)
+	if err != nil {
+		return shim.Error("failed to json.Unmarshal: " + err.Error())
+	}
+
+	begin, end := t.timeHelper(stub, fileQueryArgs.Begin, fileQueryArgs.End)
+
+	startKey := strings.Join([]string{"uploaderTimeIndex", fileQueryArgs.Uploader, strconv.Itoa(begin)}, "$$")
+	endKey := strings.Join([]string{"uploaderTimeIndex", fileQueryArgs.Uploader, strconv.Itoa(end)}, "$$")
+
+	uploaderConstraint := func(key string) bool {
+		keyComponents := strings.Split(key, "$$")
+		uploader := keyComponents[1]
+		time, _ := strconv.Atoi(keyComponents[2])
+		if uploader == fileQueryArgs.Uploader && time >= begin && time < end {
+			return true
+		}
+		return false
+	}
+
+	fileQueryReplyJson, err := t.someFuckingCommonShit(stub, startKey, endKey, uploaderConstraint)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	return shim.Success(fileQueryReplyJson)
 }
 
 
@@ -450,4 +505,14 @@ func (t *SimpleAsset) fileRequest(stub shim.ChaincodeStubInterface, args []strin
 		return shim.Error(err.Error())
 	}
 	return shim.Success(fileRequestReplyJson)
+}
+
+func (t *SimpleAsset) getAuthorisedRecord(stub shim.ChaincodeStubInterface, args []string) peer.Response {
+
+	txId := args[0];
+	recordByte, err := stub.GetState(txId)
+	if err != nil {
+		return shim.Error("failed to GetState: " + err.Error())
+	}
+	return shim.Success(recordByte)
 }

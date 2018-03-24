@@ -166,8 +166,35 @@ app.get('/doctorPage', function(req, res){
 	res.sendFile(__dirname + '/page/doctor.html');
 });
 
+
+
 app.get('/gov', function(req, res){
 	res.sendFile(__dirname + '/page/gov.html');
+});
+
+app.get('/fileEntry/:fileName', function(req, res) {
+	console.log('fileEntry get called');
+	var fileName = req.params.fileName;
+	res.sendFile(__dirname + '/page/' + fileName + '.png');
+});
+
+app.post('/acEntry', function(req, res) {
+	var accessControlRequest = req.body;
+	console.log('acEntry begin');
+	console.log(accessControlRequest);
+	console.log('acEntry end');
+	res.send({
+		"TxId" 						: accessControlRequest.TxId,
+		"FileId" 					: accessControlRequest.FileId,
+		"Success" 					: true,
+		"RequestLauncher" 			: accessControlRequest.RequestLauncher,
+		"RequestLauncherDepartment" : accessControlRequest.RequestLauncherDepartment,
+		"FileEntry" 				: "http://172.18.232.124:8080/fileEntry/pikachu",
+		"FileEntryFormat" 			: "REST FileEntryFormat",
+		"CacheControl" 				: "REST CacheControl",
+		"FileDepartmentSig" 		: "FileDepartmentSig",
+		"FileDepartmentPKC"			: "FileDepartmentPKC"
+	});
 });
 
 // var hospital = require("./app/hospital.js");
@@ -184,11 +211,8 @@ io.on('connection', function(socket){
 
 	socket.on('login', function(req){
 		console.log(req);
-		id = req.id;
+		// id = req.id;
 		var pwd = req.pwd;
-		socketid = req.id;
-		// socket.emit('fileList', {files:[{FileId:"fid1", FileName:"file1", FileVersion:"v1.0", FileSize:"2K", Department:"department1", Uploader:"uploader1", UploaderTime:"uploaderTime1", NeedAuthorization: true}, {FileId:"fid2", FileName:"file2", FileVersion:"v1.0", FileSize:"2K", Department:"department1", Uploader:"uploader1", UploaderTime:"uploaderTime1", NeedAuthorization: true}, {FileId:"fid3", FileName:"file3", FileVersion:"v1.0", FileSize:"2K", Department:"department1", Uploader:"uploader1", UploaderTime:"uploaderTime1", NeedAuthorization: true}, {FileId:"fid4", FileName:"file4", FileVersion:"v1.0", FileSize:"2K", Department:"department1", Uploader:"uploader1", UploaderTime:"uploaderTime1", NeedAuthorization: true}]});
-
 
 		var cmd = './medical/getAllFileMetaData.sh';
 		console.log(cmd);
@@ -213,21 +237,86 @@ io.on('connection', function(socket){
 				socket.emit('fileEntry', {entry: entry});
 			})
 	});
+	socket.on('requestFileAuthorization', function(req){
+		var cmd = './medical/requestAuthorization.sh ' + req.fileId + ' ' + id + ' ' + department;
+		console.log(cmd);
+		exec(cmd)
+			.then((result) => {
+				console.log('./medical/requestAuthorization.sh result: ');
+				console.log(result.stdout);
+				console.log('./medical/requestAuthorization.sh end');
+				var txid = result.stdout;
+				cmd = './medical/getAuthorisedRecord.sh ' + txid
+				exec(cmd)
+					.then((result) => {
+						console.log('./medical/getAuthorisedRecord.sh result');
+						console.log(result);
+						console.log('./medical/getAuthorisedRecord.sh result end');
+						var fileEntry = JSON.parse(result.stdout).FileEntry;
+						console.log(fileEntry);
+						socket.emit('fileEntry', {entry: fileEntry});
+					})
+			})
+	});
 	socket.on('searchByName', function(req){
 		var name = req.name;
-		socket.emit('searchResult', {files:[{FileId:"fid2", FileName:"file2", FileVersion:"v1.0", FileSize:"2K", Department:"department1", Uploader:"uploader1", UploaderTime:"uploaderTime1", NeedAuthorization: true}]});
+		if(name === "")
+			socket.emit('searchResult', {files:[]});
+		else {
+			var cmd = './medical/searchByName.sh ' + id + ' ' + name;
+			exec(cmd)
+				.then((result) => {
+					// console.log(result);
+					socket.emit('searchResult', {files: JSON.parse(result.stdout).FileMetaDatas});
+				})
+				.catch((err) => {
+					console.log(err);
+				});
+		}
+	});
+	socket.on('searchByTime', function(req){
+		var begin = (new Date(req.begin).valueOf() / 1000).toString();
+		var end = (new Date(req.end).valueOf() / 1000).toString();
+		var cmd = './medical/searchByTime.sh ' + id + ' ' + begin + ' ' + end;
+		console.log(cmd);
+		exec(cmd)
+			.then((result) => {
+				// console.log(result);
+				socket.emit('searchResult', {files: JSON.parse(result.stdout).FileMetaDatas});
+			})
+			.catch((err) => {
+				console.log(err);
+			});
 	});
 	socket.on('searchByDepartment', function(req){
 		var department = req.department;
-		var begin = req.begin;
-		var end = req.end;
-		socket.emit('searchResult', {files:[{FileId:"fid3", FileName:"file3", FileVersion:"v1.0", FileSize:"2K", Department:"department1", Uploader:"uploader1", UploaderTime:"uploaderTime1", NeedAuthorization: true}]});
+		var begin = (new Date(req.begin).valueOf() / 1000).toString();
+		var end = (new Date(req.end).valueOf() / 1000).toString();
+		var cmd = './medical/searchByDepartmentAndTime.sh ' + id + ' ' + department + ' ' + begin + ' ' + end;
+		console.log(cmd);
+		exec(cmd)
+			.then((result) => {
+				// console.log(result);
+				socket.emit('searchResult', {files: JSON.parse(result.stdout).FileMetaDatas});
+			})
+			.catch((err) => {
+				console.log(err);
+			});
 	});
 	socket.on('searchByUploader', function(req){
 		var uploader = req.uploader;
-		var begin = req.begin;
-		var end = req.end;
-		socket.emit('searchResult', {files:[{FileId:"fid4", FileName:"file4", FileVersion:"v1.0", FileSize:"2K", Department:"department1", Uploader:"uploader1", UploaderTime:"uploaderTime1", NeedAuthorization: true}]});
+		var begin = (new Date(req.begin).valueOf() / 1000).toString();
+		var end = (new Date(req.end).valueOf() / 1000).toString();
+		var cmd = './medical/searchByUploaderAndTime.sh ' + id + ' ' + uploader + ' ' + begin + ' ' + end;
+		console.log(cmd);
+		exec(cmd)
+			.then((result) => {
+				// console.log(result);
+				socket.emit('searchResult', {files: JSON.parse(result.stdout).FileMetaDatas});
+			})
+			.catch((err) => {
+				console.log(err);
+			});
 	});
 });
 

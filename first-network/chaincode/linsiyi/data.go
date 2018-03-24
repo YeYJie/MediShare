@@ -87,16 +87,12 @@ func (t *SimpleAsset) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
 		return t.fileUpload(stub, args)
 	} else if function == "fileSearchByName" {
 		return t.fileSearchByName(stub, args)
-	} else if function == "fileSearchByDepartment" {
-		return t.fileSearchByDepartment(stub, args)
-	} else if function == "fileSearchByPublisher" {
-		return t.fileSearchByPublisher(stub, args)
 	} else if function == "fileSearchByTime" {
 		return t.fileSearchByTime(stub, args)
 	} else if function == "fileSearchByDepartmentAndTime" {
 		return t.fileSearchByDepartmentAndTime(stub, args)
-	} else if function == "fileSearchByPublisherAndTime" {
-		return t.fileSearchByPublisherAndTime(stub, args)
+	} else if function == "fileSearchByUploaderAndTime" {
+		return t.fileSearchByUploaderAndTime(stub, args)
 	} else if function == "fileRequestAuthorization" {
 		return t.fileRequestAuthorization(stub, args)
 	} else if function == "fileRequest" {
@@ -105,6 +101,8 @@ func (t *SimpleAsset) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
 		return t.all(stub, args)
 	} else if function == "getAllFileMetaData" {
 		return t.getAllFileMetaData(stub, args)
+	} else if function == "getAuthorisedRecord" {
+		return t.getAuthorisedRecord(stub, args)
 	}
 
 	// for unit testing
