@@ -315,7 +315,7 @@ func (t *SimpleAsset) fileSearchByDepartmentAndTime(stub shim.ChaincodeStubInter
 		return false
 	}
 
-	fileQueryReplyJson, err := t.someFuckingCommonShit(stub, startKey, endKey, departmentConstraint)
+	fileQueryReplyJson, err := t.someFuckingCommonCode(stub, startKey, endKey, departmentConstraint)
 	if err != nil {
 		return shim.Error(err.Error())
 	}
@@ -347,7 +347,7 @@ func (t *SimpleAsset) fileSearchByUploaderAndTime(stub shim.ChaincodeStubInterfa
 		return false
 	}
 
-	fileQueryReplyJson, err := t.someFuckingCommonShit(stub, startKey, endKey, uploaderConstraint)
+	fileQueryReplyJson, err := t.someFuckingCommonCode(stub, startKey, endKey, uploaderConstraint)
 	if err != nil {
 		return shim.Error(err.Error())
 	}
