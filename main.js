@@ -197,6 +197,22 @@ app.post('/acEntry', function(req, res) {
 	});
 });
 
+const fileUpload = require('express-fileupload');
+app.use(fileUpload());
+
+app.post('/upload', function(req, res) {
+	console.log('upload begin');
+	// console.log(req);
+	console.log(req.body.uploadText);
+	var testFile = req.files.uploadFile;
+	testFile.mv('./medical/' + testFile.name, function(err){
+		if(err)
+    		return res.status(500).send(err);
+	});
+	console.log('upload end');
+	res.send("upload reply");
+});
+
 // var hospital = require("./app/hospital.js");
 // var doctor = require("./app/doctor.js");
 // var patient = require("./app/patient.js");

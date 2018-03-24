@@ -33,9 +33,10 @@
 	</head>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+	<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script> -->
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 	<script src="/socket.io/socket.io.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	<script>
 
 
@@ -140,6 +141,52 @@
 		})
 		$('#fileList-upload').click(function(){
 			// TODO
+			document.getElementById("fileList").style.display = "none";
+			document.getElementById("upload").style.display = "block";
+		})
+
+
+
+
+
+		$('#upload-button').click(function(){
+
+			console.log('upload-button click');
+
+			var formData = new FormData();
+			formData.append("uploadText", $('#uploadText').val());
+			formData.append('uploadFile', $('#uploadFile')[0].files[0]);
+
+			console.log(formData);
+
+			$.ajax({
+				type: "POST",
+				url: "/upload",
+				data: formData,
+				contentType: false,
+				processData: false,
+				success: function(text) {
+					// MvcUtil.showSuccessResponse(text, button);
+					console.log(text);
+					document.getElementById("fileList").style.display = "none";
+					document.getElementById("upload").style.display = "block";
+					return false;
+				},
+				error: function(xhr) {
+					// MvcUtil.showErrorResponse(xhr.responseText, button);
+				}
+			});
+
+			return false;
+		})
+
+
+
+
+
+		$('#upload-goback').click(function(){
+			document.getElementById("fileList").style.display = "block";
+			document.getElementById("upload").style.display = "none";
 		})
 		$('#search-name-button').click(function(){
 			document.getElementById("search").style.display = "none";
@@ -227,6 +274,24 @@
 	  		<p><button id="fileList-upload">Upload</button></p>
 	  		<p><button id="fileList-logout">Logout</button></p>
 	  	</div>
+
+
+
+
+
+
+
+	  	<div id="upload">
+	  		<form ref='uploadForm' id='uploadForm' action='/upload' method='post' encType="multipart/form-data">
+	  			<input type="text" id="uploadText">
+	  			<input type="file" name="sampleFile" id="uploadFile" />
+	  			<button id="upload-button">Submit</button>
+	  		</form>
+	  	</div>
+
+
+
+
 
 	  	<div id="search" style="display: none;float:right; width: 80%">
   			<p><fieldset>
