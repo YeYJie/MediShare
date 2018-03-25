@@ -1,179 +1,403 @@
 <!doctype html>
 <html>
-	<head>
-		<style type="text/css">
-/*			.left-div{width: 40%; float: left};
-			.right-div{width: 60%; float: right};*/
-		</style>
-	</head>
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-	<script src="/socket.io/socket.io.js"></script>
-	<script>
-
+   <head>
+	  <style type="text/css">
+		 table {
+		 font-family: arial, sans-serif;
+		 border-collapse: collapse;
+		 width: 100%;
+		 }
+		 td, th {
+		 border: 1px solid #dddddd;
+		 text-align: left;
+		 padding: 8px;
+		 }
+		 tr:nth-child(even) {
+		 background-color: #dddddd;
+		 }
+		 html,body{height: 100%}
+		 #outer-wrap{
+		 height: 100%;
+		 position: relative;
+		 }
+		 #login{
+		 width: 400px;
+		 height: 300px;
+		 position: absolute;
+		 top: 50%;
+		 left: 50%;
+		 margin-top: -150px;
+		 margin-left: -200px;
+		 }
+	  </style>
+   </head>
+   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+   <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+   <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script> -->
+   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+   <script src="/socket.io/socket.io.js"></script>
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+   <script></script>
+   <body>
+	  <div id="outer-wrap">
+		 <div id="login">
+			<p><input id="login-id" autocomplete="off" /></p>
+			<p><input id="login-pwd" autocomplete="off" /></p>
+			<p><button id="login-button">Login</button></p>
+			<p><button id="signup-button">Signin</button></p>
+		 </div>
+		 <div id="signup" style="display: none;">
+			<p>
+			<fieldset>
+			   <legend>Id</legend>
+			   <input type="text" name="id" id="signupId">
+			</fieldset>
+			</p>
+			<p>
+			<fieldset>
+			   <legend>Name</legend>
+			   <input type="text" name="name" id="signupName">
+			</fieldset>
+			</p>
+			<p>
+			<fieldset>
+			   <legend>Password</legend>
+			   <input type="text" name="pwd" id="signupPwd">
+			</fieldset>
+			</p>
+			<p>
+			<fieldset>
+			   <legend>Phone</legend>
+			   <input type="text" name="phone" id="signupPhone">
+			</fieldset>
+			</p>
+			<p>
+			<fieldset>
+			   <legend>Email</legend>
+			   <input type="text" name="email" id="signupEmail">
+			</fieldset>
+			</p>
+			<p>
+			<fieldset>
+			   <legend>Addr</legend>
+			   <input type="text" name="addr" id="signupAddr">
+			</fieldset>
+			</p>
+			<p><button id="signup-submit-button">Submit</button></p>
+			<p>
+			<fieldset>
+			   <legend>Id</legend>
+			   <input type="text" name="stateId" id="stateId">
+			</fieldset>
+			</p>
+			<p><button id="state-button">State</button></p>
+			<p><button id="signup-goback">Go Back</button></p>
+		 </div>
+		 <div id="signupState" style="display: none;">
+			<div id="signupStateDiv">Please Wait for Review</div>
+			<!-- <p><button id="signupState-download">Download Materials</button></p> -->
+			<p><button id="signupState-goback">Go Back</button></p>
+		 </div>
+	  </div>
+	  <div id="doctorInfo" style="display: none;">
+		 <div id="doctorInfoHeader"></div>
+		 <div id="doctorInfoDetail">
+<!-- 			<p>Name</p>
+			<p>Phone</p>
+			<p>Email</p>
+			<p>Addr</p> -->
+		 </div>
+		 <div id="doctorInfoEdit">
+			<p><button id="doctorInfoEdit-button">Edit</button></p>
+			<p><button id="doctorInfoEdit-logout-button">Logout</button></p>
+		 </div>
+	  </div>
+	  <div id="doctorEdit" style="display: none;">
+		 <p>
+		 <fieldset>
+			<legend>Id</legend>
+			123456789
+		 </fieldset>
+		 </p>
+		 <p>
+		 <fieldset>
+			<legend>Password</legend>
+			<input type="text" name="pwd" id="editPwd">
+		 </fieldset>
+		 </p>
+		 <p>
+		 <fieldset>
+			<legend>Phone</legend>
+			<input type="text" name="phone" id="editPhone">
+		 </fieldset>
+		 </p>
+		 <p>
+		 <fieldset>
+			<legend>Email</legend>
+			<input type="text" name="email" id="editEmail">
+		 </fieldset>
+		 </p>
+		 <p>
+		 <fieldset>
+			<legend>Addr</legend>
+			<input type="text" name="addr" id="editAddr">
+		 </fieldset>
+		 </p>
+		 <p><button id="doctorEdit-submit">Submit</button></p>
+	  </div>
+	  <div id="patientList" style="display: none;">
+		 <p>
+		 <h2>Patient List</h2>
+		 </p>
+<!-- 		 <p>patient1<button class="diagnose">Diagnose</button></p>
+		 <p>patient2<button class="diagnose">Diagnose</button></p>
+		 <p>patient3<button class="diagnose">Diagnose</button></p> -->
+	  </div>
+	  <div id="patientInfo" style="display: none;">
+		 <div id="patientInfoHeader"></div>
+		 <div id="patientInfoDetail">
+<!-- 			<p>Name</p>
+			<p>Phone</p>
+			<p>Email</p>
+			<p>Addr</p> -->
+		 </div>
+	  </div>
+	  <div id="patientRecords" style="display: none;">
+		 <div id="patientRecords-record">
+			<p><h2>Patient Records</h2></p>
+			<table id="patientRecords-table">
+				<tr>
+					<th>Hospital</th>
+					<th>Doctor</th>
+					<th>Time</th>
+					<th>Inspection</th>
+					<th></th>
+				</tr>
+			</table>
+		 </div>
+		 <div id="patientRecords-diagnose">
+			<p><button id="patientRecords-diagnose-button">Diagnose</button></p>
+			<p><button id="patientRecords-referral-button">Referral</button></p>
+			<p><button id="patientRecords-goback">Go Back</button></p>
+		 </div>
+	  </div>
+	  <div id="diagnose" style="display: none;">
+		 <p>
+		 <fieldset>
+			<legend>Inspection</legend>
+			<input type="text" name="inspection" id="diagnoseInspection">
+		 </fieldset>
+		 </p>
+		 <p>
+		 <fieldset>
+			<legend>Result</legend>
+			<input type="text" name="result" id="diagnoseResult">
+		 </fieldset>
+		 </p>
+		 <p>
+		 <fieldset>
+			<legend>Analysis</legend>
+			<input type="text" name="analysis" id="diagnoseAnalysis">
+		 </fieldset>
+		 </p>
+		 <p>
+		 <fieldset>
+			<legend>Prescription</legend>
+			<input type="text" name="prescription" id="diagnosePrescription">
+		 </fieldset>
+		 </p>
+		 <p><button id="diagnose-submit">Submit</button></p>
+		 <p><button id="diagnose-goback">Go Back</button></p>
+	  </div>
+	  <div id="referral" style="display: none;">
+		 <p><h2>Hospital List</h2></p>
+		 <p>hospital1<button class="referral-submit">Submit</button></p>
+		 <p>hospital2<button class="referral-submit">Submit</button></p>
+		 <p>hospital3<button class="referral-submit">Submit</button></p>
+		 <p><button id="referral-goback">Go Back</button></p>
+	  </div>
+   </body>
+   <script type="text/javascript">
 	$(function () {
 		var socket = io();
+		var id = "123456";
+
+		$(".diagnose").click(function(){
+			document.getElementById("doctorInfo").style.display = "none";
+			document.getElementById("patientInfo").style.display = "block";
+			document.getElementById("patientList").style.display = "none";
+			document.getElementById("patientRecords").style.display = "block";
+		});
+		$("#patientRecords-diagnose-button").click(function(){
+			document.getElementById("patientRecords").style.display = "none";
+			document.getElementById("diagnose").style.display = "block";
+		});
+		$("#patientRecords-referral-button").click(function(){
+			document.getElementById("patientRecords").style.display = "none";
+			document.getElementById("referral").style.display = "block";
+		});
+		$("#patientRecords-goback").click(function(){
+			document.getElementById("patientRecords").style.display = "none";
+			document.getElementById("patientInfo").style.display = "none";
+			document.getElementById("patientList").style.display = "block";
+			document.getElementById("doctorInfo").style.display = "block";
+			$("#patientRecords-table").find("tr:gt(0)").remove();
+		});
+
+		$("#diagnose-submit").click(function(){
+			document.getElementById("diagnose").style.display = "none";
+			document.getElementById("patientRecords").style.display = "block";
+		});
+		$("#diagnose-goback").click(function(){
+			document.getElementById("diagnose").style.display = "none";
+			document.getElementById("patientRecords").style.display = "block";
+		});
+
+		$(".referral-submit").click(function(){
+			document.getElementById("referral").style.display = "none";
+			document.getElementById("patientInfo").style.display = "none";
+			document.getElementById("doctorInfo").style.display = "block";
+			document.getElementById("patientList").style.display = "block";
+		});
+		$("#referral-goback").click(function(){
+			document.getElementById("referral").style.display = "none";
+			document.getElementById("patientRecords").style.display = "block";
+		});
+
+		$("#doctorInfoEdit-button").click(function(){
+			document.getElementById("patientList").style.display = "none";
+			document.getElementById("doctorInfo").style.display = "none";
+			document.getElementById("doctorEdit").style.display = "block";
+		});
+		$("#doctorInfoEdit-logout-button").click(function(){
+			document.getElementById("doctorInfo").style.display = "none";
+			document.getElementById("patientList").style.display = "none";
+			document.getElementById("outer-wrap").style.display = "block";
+		});
+		$("#doctorEdit-submit").click(function(){
+			// socket.emit('doctorEdit', {id: $('#editId'), pwd: $('#editPwd'), phone: $('#editPhone'), email: $('#editEmail'), addr: $('#editAddr')});
+			$('#editPwd').val();
+			$('#editPhone').val();
+			$('#editEmail').val();
+			$('#editAddr').val();
+			document.getElementById("doctorInfo").style.display = "block";
+			document.getElementById("patientList").style.display = "block";
+			document.getElementById("doctorEdit").style.display = "none";
+		});
 
 		$('#login-button').click(function(){
-			socket.emit('login', {id: $('#id').val(), pwd: $('#pwd').val()});
-			$('#id').val("");
-			$('#pwd').val("");
-		});
-		socket.on('loginSucess', function(data) {
-			console.log(data);
-			var doctor = data.doctor;
-			var hospital = data.hospital;
-
-			var doctorInfo = JSON.parse(data.doctorInfo).doctor;
-			var doctorInfoString = '<p>name : ' + doctorInfo.name + '</p>';
-			doctorInfoString += '<p>gender : ' + doctorInfo.gender + '</p>';
-			doctorInfoString += '<p>age : ' + doctorInfo.age + '</p>';
-			doctorInfoString += '<p>hospital : ' + doctorInfo.hospital + '</p>';
-			doctorInfoString += '<p>position : ' + doctorInfo.position + '</p>';
-			doctorInfoString += '<p>department : ' + doctorInfo.depatment + '</p>';
-			document.getElementById("doctorInfo").innerHTML = doctorInfoString;
-
-			$('#patientsList-ul').empty();
-			var patients = data.patients.split("\n");
-			for(var i = 0; i < patients.length; ++i) {
-				var formId = document.getElementById("patientsList-ul").getElementsByTagName("li").length + 1;
-				var patientHTML = '<li>' + patients[i] + '<button id="patient' + formId.toString()
-						+ '" data-patient="' + patients[i] + '">Get Patient Records</button></li>';
-				$('#patientsList-ul').append(patientHTML);
-				$('#patient'+formId.toString()).click(function(){
-					var patient = $(this).data('patient');
-					socket.emit('getPatientRecords', {doctor: doctor, hospital: hospital, patient: patient});
-					return false;
-				});
-			}
-
+			id = $('#login-id').val();
+			socket.emit('login', {id: id, pwd: $('#login-pwd').val()})
+			$('#login-id').val(""); $('#login-pwd').val("");
+			document.getElementById("outer-wrap").style.display = "none";
 			document.getElementById("doctorInfo").style.display = "block";
-			document.getElementById("patientInfo").style.display = "none";
-			document.getElementById("patientsList").style.display = "block";
-			document.getElementById("recordsList").style.display = "none";
-			document.getElementById("recordDetail").style.display = "none";
-			document.getElementById("login").style.display = "none";
+			document.getElementById("patientList").style.display = "block";
 		});
-		socket.on('patientRecords', function(data) {
-			console.log(data);
-			$('#recordsList-ul').empty();
-			var doctor = data.doctor;
-			var hospital = data.hospital;
-			var patient = data.patient;
-
-			var patientInfo = JSON.parse(data.patientInfo).patient;
-			var patientInfoString = '<p>name : ' + patientInfo.name + '</p>';
-			patientInfoString += '<p>gender : ' + patientInfo.gender + '</p>';
-			patientInfoString += '<p>nation : ' + patientInfo.nation + '</p>';
-			patientInfoString += '<p>age : ' + patientInfo.age + '</p>';
-			patientInfoString += '<p>tellphone : ' + patientInfo.tellphone + '</p>';
-			patientInfoString += '<p>date_of_birth : ' + patientInfo.date_of_birth + '</p>';
-			patientInfoString += '<p>address : ' + patientInfo.address + '</p>';
-			patientInfoString += '<p>profession : ' + patientInfo.profession + '</p>';
-			patientInfoString += '<p>marriage : ' + patientInfo.marriage + '</p>';
-			patientInfoString += '<p>guardian : ' + patientInfo.guardian + '</p>';
-			patientInfoString += '<p>guardian_tellphone : ' + patientInfo.guardian_tellphone + '</p>';
-			patientInfoString += '<p>relation : ' + patientInfo.relation + '</p>';
-			document.getElementById("patientInfo").innerHTML = patientInfoString;
-
-			var patientRecords = data.patientRecords.trim().split("\n");
-			for(var i = 0; i < patientRecords.length; ++i) {
-				var formId = document.getElementById("recordsList-ul").getElementsByTagName("li").length + 1;
-				var tokens = patientRecords[i].split(", ");
-				var targetHospital = tokens[0];
-				var recordId = tokens[2];
-				var recordHTML = '<li>' + patientRecords[i] + '<button id="record' + formId.toString()
-						+ '" data-targetHospital="' + targetHospital + '" data-recordId="' + recordId + '">Get Record Detail</button></li>';
-				$('#recordsList-ul').append(recordHTML);
-				$('#record'+formId.toString()).click(function(){
-					var targetHospital = $(this).data('targethospital');
-					var recordId = $(this).data('recordid').toString();
-					socket.emit('getRecordDetail', {doctor: doctor, hospital: hospital, patient: patient,
-									targetHospital: targetHospital, recordId: recordId});
-					return false;
-				});
-			}
-
-			document.getElementById("doctorInfo").style.display = "none";
-			document.getElementById("patientInfo").style.display = "block";
-			document.getElementById("patientsList").style.display = "none";
-			document.getElementById("recordsList").style.display = "block";
-			document.getElementById("recordDetail").style.display = "none";
+		$('#signup-button').click(function(){
 			document.getElementById("login").style.display = "none";
+			document.getElementById("signup").style.display = "block";
 		});
-		socket.on('recordDetail', function(data) {
-			console.log(data);
-			var recordDetail = JSON.parse(data.recordDetail).record;
-			var recordDetailString = '<p>diagnose : ' + recordDetail.diagnose + '</p>';
-			// recordDetailString += '<p>item_name : ' + recordDetail.item_name + '</p>';
-			recordDetailString += '<p>inspection_item : ' + recordDetail.inspection_item + '</p>';
-			recordDetailString += '<p>blood_routine_examination : ' + recordDetail.blood_routine_examination + '</p>';
-			recordDetailString += '<p>time : ' + recordDetail.time + '</p>';
-			recordDetailString += '<p>medicine : ' + recordDetail.medicine + '</p>';
-			recordDetailString += '<p>doctor_IDcard : ' + recordDetail.doctor_IDcard + '</p>';
-			if(recordDetail.item_name !== "None") {
-				recordDetailString += '<img src="http://sysundc:8666/medical/interface.cgi?scheme=sample_scheme&action=sample_medical_download&file_name='+recordDetail.item_name.slice(1,-1)+'" />'
-			}
-			document.getElementById("recordDetail-div").innerHTML = recordDetailString;
-
-
-			document.getElementById("doctorInfo").style.display = "none";
-			document.getElementById("patientInfo").style.display = "block";
-			document.getElementById("patientsList").style.display = "none";
-			document.getElementById("recordsList").style.display = "none";
-			document.getElementById("recordDetail").style.display = "block";
-			document.getElementById("login").style.display = "none";
-		});
-		$('#patientsList-goback').click(function(){
-			document.getElementById("doctorInfo").style.display = "none";
-			document.getElementById("patientsList").style.display = "none";
-			document.getElementById("recordsList").style.display = "none";
-			document.getElementById("recordDetail").style.display = "none";
+		$('#signup-goback').click(function(){
 			document.getElementById("login").style.display = "block";
+			document.getElementById("signup").style.display = "none";
 		});
-		$('#recordsList-goback').click(function(){
-			document.getElementById("doctorInfo").style.display = "block";
-			document.getElementById("patientInfo").style.display = "none";
-			document.getElementById("patientsList").style.display = "block";
-			document.getElementById("recordsList").style.display = "none";
-			document.getElementById("recordDetail").style.display = "none";
-			document.getElementById("login").style.display = "none";
+		$('#signup-submit-button').click(function(){
+			socket.emit('signup', {role: "doctor", id: $('#signupId').val(), name: $('#signupName').val(), pwd: $('#signupPwd').val(), phone: $('#signupPhone').val(), email: $('#signupEmail').val(), addr: $('#signupAddr').val()});
+			$('#signupId').val(); $('#signupName').val(); $('#signupPwd').val(); $('#signupPhone').val(); $('#signupEmail').val(); $('#signupAddr').val();
+			document.getElementById("signup").style.display = "none";
+			document.getElementById("signupState").style.display = "block";
 		});
-		$('#recordDetail-goback').click(function(){
+		$('#state-button').click(function() {
+			socket.emit('signupState', {role: "doctor", id: $('#stateId').val()});
+			$('#stateId').val('');
+			document.getElementById("signup").style.display = "none";
+			document.getElementById("signupState").style.display = "block";
+		});
+		$('#signupState-goback').click(function(){
+			document.getElementById("signupState").style.display = "none";
+			document.getElementById("login").style.display = "block";
+			document.getElementById('signupStateDiv').innerHTML = "Please Wait for Review";
+		});
+
+		socket.on('signUpSuccess', function(data){
+			var signUpSuccessHTML = '<p>Hello, ' + data.name + '</p>'
+					+ '<p>Your Private Key: ' + data.prikey + '</p>'
+					+ '<p>Your PKC: ' + data.pkc + '</p>';
+			console.log(signUpSuccessHTML);
+			document.getElementById('signupStateDiv').innerHTML = signUpSuccessHTML;
+		});
+		socket.on('doctorInfo', function(data){
+			console.log('doctorInfo', data);
+			var doctorInfo = JSON.parse(data.doctorInfo);
+			document.getElementById("doctorInfoHeader").innerHTML = '<img src="'+doctorInfo.header + '" />';
+			var doctorInfoDetailHTML = '<p>Name: ' + doctorInfo.name + '</p>';
+			doctorInfoDetailHTML += '<p>Phone: ' + doctorInfo.phone + '</p>';
+			doctorInfoDetailHTML += '<p>Email: ' + doctorInfo.email + '</p>';
+			doctorInfoDetailHTML += '<p>Addr: ' + doctorInfo.addr + '</p>';
+			document.getElementById("doctorInfoDetail").innerHTML = doctorInfoDetailHTML;
+		});
+		socket.on('doctorPatients', function(data){
+			console.log('doctorPatients', data);
+			var patients = data.patients;
+			console.log(patients);
+			var buildPatientHTML = function(patient) {
+				return '<p>' + patient.name + '<button id="patientList-'+patient.id
+				 +'" data-pid="'+patient.id+'">Diagnose</button>';
+			}
+			for(var i = 0; i < patients.length; i++) {
+				var patientHTML = buildPatientHTML(patients[i]);
+				// console.log(patientHTML);
+				$("#patientList").append(patientHTML);
+				$('#patientList-' + patients[i].id.toString()).click(function(){
+					var patientId = $(this).data('pid').toString();
+					console.log(patientId);
+					socket.emit('getPatientRecords', {patientId: patientId, doctorId: id});
+					document.getElementById("patientList").style.display = "none";
+					document.getElementById("patientRecords").style.display = "block";
+				});
+			}
+		});
+		socket.on('patientInfo', function(data){
+			console.log('patientInfo', data);
+			var patientInfo = JSON.parse(data.patientInfo);
+			document.getElementById("patientInfoHeader").innerHTML = '<img src="'+patientInfo.header + '" />';
+			var patientInfoDetailHTML = '<p>Name: ' + patientInfo.name + '</p>';
+			patientInfoDetailHTML += '<p>Phone: ' + patientInfo.phone + '</p>';
+			patientInfoDetailHTML += '<p>Email: ' + patientInfo.email + '</p>';
+			patientInfoDetailHTML += '<p>Addr: ' + patientInfo.addr + '</p>';
+			document.getElementById("patientInfoDetail").innerHTML = patientInfoDetailHTML;
 			document.getElementById("doctorInfo").style.display = "none";
 			document.getElementById("patientInfo").style.display = "block";
-			document.getElementById("patientsList").style.display = "none";
-			document.getElementById("recordsList").style.display = "block";
-			document.getElementById("recordDetail").style.display = "none";
-			document.getElementById("login").style.display = "none";
 		});
-	});
-</script>
-  <body>
-  <div style="width: 100%;">
-  	<div id="doctorInfo" style="display: none;float:left;"></div>
-  	<div id="patientInfo" style="display: none;float:left;"></div>
-  	<div id="patientsList" style="display: none;float:right; width: 80%">
-  		<ul id="patientsList-ul"></ul>
-  		<button id="patientsList-goback">Logout</button>
-  	</div>
-  	<div id="recordsList" style="display: none;float:right; width: 80%">
-  		<ul id="recordsList-ul"></ul>
-  		<button id="recordsList-goback">Go Back</button>
-  	</div>
-  	<div id="recordDetail" style="display: none;float:right; width: 80%">
-  		<div id="recordDetail-div"> </div>
-  		<button id="recordDetail-goback">Go Back</button>
-  	</div>
-  	<div id="login" style="position: relative;">
-  		<!-- <div style="position: absolute;top: 50%;left: 50%;height: 30%;width: 50%;margin: -15% 0 0 -25%;"> -->
-	  		<input id="id" autocomplete="off"></input>
-	  		<input id="pwd" autocomplete="off"></input>
-	  		<button id="login-button">Login</button>
-  		<!-- </div> -->
-  	</div>
-  	</div>
-  </body>
+		socket.on('patientRecords', function(data){
+			console.log('patientRecords', data);
+			var patientRecords = data.records;
+			var buildRecordHTML = function(record) {
+				var date = new Date(parseInt(record.RecordTime) * 1000);
+				var y = date.getFullYear();
+				var m = date.getMonth() + 1;
+				var d = date.getDate();
+				return '<tr><td>' + record.Hospital + '</td><td>' + record.Doctor
+					+ '</td><td>' + y + '-' + m + '-' + d + '</td><td>' + record.Inspection
+					+ '</td><td><button id="patientRecord-'+record.RecordId+'" data-rid="'
+					+ record.RecordId + '" data-pid="' + data.id + '" data-th="'
+					+ record.Hospital + '">Request Details</button></td>';
+			};
+			for(var i = 0; i < patientRecords.length; i++) {
+				var recordHTML = buildRecordHTML(patientRecords[i]);
+				var row = document.getElementById("patientRecords-table").insertRow(1);
+				row.innerHTML = recordHTML;
+				$("#patientRecord-"+patientRecords[i].RecordId).click(function(){
+					var rid = $(this).data('rid');
+					var pid = $(this).data('pid');
+					var targetHospital = $(this).data('th');
+					console.log([rid, pid, targetHospital]);
+					socket.emit('requestDetail', {rid: rid, did: id, pid: pid,
+											targetHospital: targetHospital});
+				});
+			}
+		})
+	})
+
+	 </script>
 </html>

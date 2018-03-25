@@ -79,6 +79,8 @@ type GetPatientRecordsArgs struct {
 	RequestTime		string
 	DoctorSig		string
 	DoctorPKC		string
+	Begin			string
+	End 			string
 }
 
 func (t *GetPatientRecordsArgs) GetDoctorProfContent() string {

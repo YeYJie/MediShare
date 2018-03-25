@@ -163,240 +163,222 @@ app.post('/channellist',function(req,res){
 });
 
 app.get('/doctorPage', function(req, res){
+	res.sendFile(__dirname + '/page/doctor.html-old');
+});
+
+app.get('/doc', function(req, res){
+	console.log('/doc');
 	res.sendFile(__dirname + '/page/doctor.html');
 });
 
-
-
-app.get('/gov', function(req, res){
-	res.sendFile(__dirname + '/page/gov.html');
+app.get('/patient', function(req, res){
+	console.log('/patient')
+	res.sendFile(__dirname + '/page/patient.html');
 });
 
-app.get('/fileEntry/:fileName', function(req, res) {
-	console.log('fileEntry get called');
-	var fileName = req.params.fileName;
-	res.sendFile(__dirname + '/page/' + fileName + '.png');
+app.get('/getDoctorInfo/:id', function(req, res){
+	id = req.params.id;
+	console.log('/getDoctorInfo/:id ', id);
+	res.send({ header: "http://172.18.232.124:8080/header/" + id.toString(),
+			name: "yeyongjie",
+			phone:"15521132718",
+			email:"394566396@qq.com",
+			addr:"sysundc"});
 });
 
-app.post('/acEntry', function(req, res) {
-	var accessControlRequest = req.body;
-	console.log('acEntry begin');
-	console.log(accessControlRequest);
-	console.log('acEntry end');
-	res.send({
-		"TxId" 						: accessControlRequest.TxId,
-		"FileId" 					: accessControlRequest.FileId,
-		"Success" 					: true,
-		"RequestLauncher" 			: accessControlRequest.RequestLauncher,
-		"RequestLauncherDepartment" : accessControlRequest.RequestLauncherDepartment,
-		"FileEntry" 				: "http://172.18.232.124:8080/fileEntry/pikachu",
-		"FileEntryFormat" 			: "REST FileEntryFormat",
-		"CacheControl" 				: "REST CacheControl",
-		"FileDepartmentSig" 		: "FileDepartmentSig",
-		"FileDepartmentPKC"			: "FileDepartmentPKC"
-	});
+app.get('/getPatientInfo/:id', function(req, res){
+	id = req.params.id;
+	console.log('/getPatientInfo/:id ', id);
+	res.send({ header: "http://172.18.232.124:8080/header/" + id.toString(),
+			name: "patientYe",
+			phone:"15521132718",
+			email:"sysuyyj@qq.com",
+			addr:"sysundc"});
 });
+
+app.get('/getDoctorsPatients/:id', function(req, res){
+	id = req.params.id;
+	console.log('/getDoctorsPatients/:id ', id);
+	res.send({patients: [{name: "patient1", id:1},
+			{name: "patient2", id:2}, {name: "patient3", id:3}]});
+});
+
+app.get('/header/:id', function(req, res){
+	id = req.params.id;
+	console.log('/header/:id ', id);
+	res.send("header");
+});
+
+// app.get('/gov', function(req, res){
+// 	res.sendFile(__dirname + '/page/gov.html');
+// });
+
+// app.get('/fileEntry/:fileName', function(req, res) {
+// 	console.log('fileEntry get called');
+// 	var fileName = req.params.fileName;
+// 	res.sendFile(__dirname + '/page/' + fileName + '.png');
+// });
+
+// app.post('/acEntry', function(req, res) {
+// 	var accessControlRequest = req.body;
+// 	console.log('acEntry begin');
+// 	console.log(accessControlRequest);
+// 	console.log('acEntry end');
+// 	res.send({
+// 		"TxId" 						: accessControlRequest.TxId,
+// 		"FileId" 					: accessControlRequest.FileId,
+// 		"Success" 					: true,
+// 		"RequestLauncher" 			: accessControlRequest.RequestLauncher,
+// 		"RequestLauncherDepartment" : accessControlRequest.RequestLauncherDepartment,
+// 		"FileEntry" 				: "http://172.18.232.124:8080/fileEntry/pikachu",
+// 		"FileEntryFormat" 			: "REST FileEntryFormat",
+// 		"CacheControl" 				: "REST CacheControl",
+// 		"FileDepartmentSig" 		: "FileDepartmentSig",
+// 		"FileDepartmentPKC"			: "FileDepartmentPKC"
+// 	});
+// });
 
 const fileUpload = require('express-fileupload');
 app.use(fileUpload());
 
-app.post('/upload', function(req, res) {
-	console.log('upload begin');
-	// console.log(req);
-	console.log(req.body.uploadText);
-	var testFile = req.files.uploadFile;
-	testFile.mv('./medical/' + testFile.name, function(err){
-		if(err)
-    		return res.status(500).send(err);
-	});
-	console.log('upload end');
-	res.send("upload reply");
-});
+// app.post('/upload', function(req, res) {
+// 	console.log('upload begin');
+// 	// console.log(req);
+// 	console.log(req.body.uploadText);
+// 	var testFile = req.files.uploadFile;
+// 	testFile.mv('./medical/' + testFile.name, function(err){
+// 		if(err)
+//     		return res.status(500).send(err);
+// 	});
+// 	console.log('upload end');
+// 	res.send("upload reply");
+// });
 
 // var hospital = require("./app/hospital.js");
 // var doctor = require("./app/doctor.js");
 // var patient = require("./app/patient.js");
 
 var exec = require('child-process-promise').exec;
+var asyncExec = function(cmd, callback) {
+	console.log(asyncExec, cmd);
+	exec(cmd)
+		.then((result) => {
+			callback(result);
+		})
+		.catch((err) => {
+			console.error('ERROR: ', err);
+		});
+};
 
-var department = "department";
+var hospital = config.hospital;
 
 var io = require('socket.io')(http);
 io.on('connection', function(socket){
-	var id = "yeyongjie";
+
+	/*
+	*	For both patient and doctor
+	*/
+	socket.on('signup', function(req) {
+		var role = req.role;
+		var id = req.id;
+		var name = req.name;
+		var pwd = req.pwd;
+		var phone = req.phone;
+		var email = req.email;
+		var addr = req.addr;
+		console.log('signup', [role, id, name, pwd, phone, email, addr]);
+		// TODO: do some database works
+		// TODO: generate prikey and pkc
+		var prikey = "prikey";
+		var pkc = "pkc";
+		socket.emit('signUpSuccess', {role: role, id: id, name: name, prikey: prikey, pkc: pkc});
+	});
+	socket.on('signupState', function(req) {
+		var role = req.role;
+		var id = req.id;
+		var name = "yeyongjie";
+		console.log('signupState', [role, id]);
+		var prikey = "prikey";
+		var pkc = "pkc";
+		socket.emit('signUpSuccess', {role: role, id: id, name: name, prikey: prikey, pkc: pkc});
+	});
+
+
+	/*
+	*	For Patient
+	*/
+	socket.on('register', function(req){
+		var id = req.id;
+		var keshi = req.keshi;
+		var doctor = req.doctor;
+		var time = req.time;
+		var sig = req.sig;
+		var pkc = req.pkc;
+		console.log('patient register', [id, keshi, doctor, time, sig, pkc]);
+		socket.emit('onRegister', {msg: "Please go to room 431"});
+	});
+	socket.on('deRegister', function(req){
+		var id = req.id;
+		var time = req.time;
+		var sig = req.sig;
+		var pkc = req.pkc;
+		console.log('patient deRegister', [id, time, sig, pkc]);
+	});
+
+
+	/*
+	*	For Doctor
+	*/
 
 	socket.on('login', function(req){
-		console.log(req);
-		// id = req.id;
+		var id = req.id;
 		var pwd = req.pwd;
+		console.log('login', [id, pwd]);
+		// myEventListener.myRegisterEventListener('org1', "d1", doctor.doctorHandler, socket);
+		var cmd = './bishe/getDoctorInfo.sh ' + id;
+		console.log(cmd);
+		asyncExec(cmd, function(result){
+			console.log('./bishe/getDoctorInfo.sh result: ', result.stdout);
+			socket.emit('doctorInfo', {id: id, hospital: hospital, doctorInfo: result.stdout});
+		})
+		cmd = './bishe/getDoctorsPatients.sh ' + id;
+		console.log(cmd);
+		asyncExec(cmd, function(result){
+			console.log('./bishe/getDoctorsPatients.sh result: ', result.stdout);
+			socket.emit('doctorPatients', {id: id, patients: JSON.parse(result.stdout).patients});
+		});
+	});
 
-		var cmd = './medical/getAllFileMetaData.sh';
+	socket.on('getPatientRecords', function(req){
+		var doctorId = req.doctorId;
+		var patientId = req.patientId;
+		console.log('getPatientRecords', [doctorId, patientId]);
+		var cmd = './bishe/getPatientInfo.sh ' + patientId;
 		console.log(cmd);
-		exec(cmd)
-			.then((result) => {
-				// console.log(result);
-				socket.emit('fileList', {files: JSON.parse(result.stdout).FileMetaDatas});
-			})
-			.catch((err) => {
-				console.log(err);
-			});
+		asyncExec(cmd, function(result){
+			console.log('./bishe/getPatientInfo.sh result: ', result.stdout);
+			socket.emit('patientInfo', {id: patientId, hospital: hospital, patientInfo: result.stdout});
+		})
+		var end = Math.floor(new Date() / 1000);
+		cmd = './bishe/getPatientRecords.sh ' + doctorId + ' ' + hospital + ' ' + patientId + ' 0 ' + end.toString();
+		asyncExec(cmd, function(result) {
+			console.log('./bishe/getPatientRecords.sh result: ', result.stdout);
+			socket.emit('patientRecords', {id: patientId, records: JSON.parse(result.stdout).Records});
+		});
 	});
-	socket.on('requestFile', function(req){
-		var fileId = req.fileId;
-		var cmd = './medical/request.sh ' + fileId + ' ' + id + ' ' + department;
-		console.log(cmd);
-		exec(cmd)
-			.then((result) => {
-				var fileRequestReply = JSON.parse(result.stdout);
-				var entry = fileRequestReply.Entry;
-				console.log(entry);
-				socket.emit('fileEntry', {entry: entry});
-			})
+	socket.on('requestDetail', function(req){
+		var rid = req.rid;
+		var did = req.did;
+		var pid = req.pid;
+		var targetHospital = req.targetHospital;
+		console.log('requestDetail', [rid, did, pid, targetHospital]);
+		var cmd = ['./bishe/requestDetail.sh', did, hospital, pid, targetHospital, rid].join(' ');
+		asyncExec(cmd, function(result) {
+			console.log(cmd, result.stdout);
+		});
 	});
-	socket.on('requestFileAuthorization', function(req){
-		var cmd = './medical/requestAuthorization.sh ' + req.fileId + ' ' + id + ' ' + department;
-		console.log(cmd);
-		exec(cmd)
-			.then((result) => {
-				console.log('./medical/requestAuthorization.sh result: ');
-				console.log(result.stdout);
-				console.log('./medical/requestAuthorization.sh end');
-				var txid = result.stdout;
-				cmd = './medical/getAuthorisedRecord.sh ' + txid
-				exec(cmd)
-					.then((result) => {
-						console.log('./medical/getAuthorisedRecord.sh result');
-						console.log(result);
-						console.log('./medical/getAuthorisedRecord.sh result end');
-						var fileEntry = JSON.parse(result.stdout).FileEntry;
-						console.log(fileEntry);
-						socket.emit('fileEntry', {entry: fileEntry});
-					})
-			})
-	});
-	socket.on('searchByName', function(req){
-		var name = req.name;
-		if(name === "")
-			socket.emit('searchResult', {files:[]});
-		else {
-			var cmd = './medical/searchByName.sh ' + id + ' ' + name;
-			exec(cmd)
-				.then((result) => {
-					// console.log(result);
-					socket.emit('searchResult', {files: JSON.parse(result.stdout).FileMetaDatas});
-				})
-				.catch((err) => {
-					console.log(err);
-				});
-		}
-	});
-	socket.on('searchByTime', function(req){
-		var begin = (new Date(req.begin).valueOf() / 1000).toString();
-		var end = (new Date(req.end).valueOf() / 1000).toString();
-		var cmd = './medical/searchByTime.sh ' + id + ' ' + begin + ' ' + end;
-		console.log(cmd);
-		exec(cmd)
-			.then((result) => {
-				// console.log(result);
-				socket.emit('searchResult', {files: JSON.parse(result.stdout).FileMetaDatas});
-			})
-			.catch((err) => {
-				console.log(err);
-			});
-	});
-	socket.on('searchByDepartment', function(req){
-		var department = req.department;
-		var begin = (new Date(req.begin).valueOf() / 1000).toString();
-		var end = (new Date(req.end).valueOf() / 1000).toString();
-		var cmd = './medical/searchByDepartmentAndTime.sh ' + id + ' ' + department + ' ' + begin + ' ' + end;
-		console.log(cmd);
-		exec(cmd)
-			.then((result) => {
-				// console.log(result);
-				socket.emit('searchResult', {files: JSON.parse(result.stdout).FileMetaDatas});
-			})
-			.catch((err) => {
-				console.log(err);
-			});
-	});
-	socket.on('searchByUploader', function(req){
-		var uploader = req.uploader;
-		var begin = (new Date(req.begin).valueOf() / 1000).toString();
-		var end = (new Date(req.end).valueOf() / 1000).toString();
-		var cmd = './medical/searchByUploaderAndTime.sh ' + id + ' ' + uploader + ' ' + begin + ' ' + end;
-		console.log(cmd);
-		exec(cmd)
-			.then((result) => {
-				// console.log(result);
-				socket.emit('searchResult', {files: JSON.parse(result.stdout).FileMetaDatas});
-			})
-			.catch((err) => {
-				console.log(err);
-			});
-	});
+
 });
-
-
-// var io = require('socket.io')(http);
-// io.on('connection', function(socket){
-// 	socket.on('login', function(req){
-// 		console.log('login');
-// 		console.log(req);
-// 		var id = req.id;
-// 		var pwd = req.pwd;
-// 		myEventListener.myRegisterEventListener('org1', "d1", doctor.doctorHandler, socket);
-// 		var cmd = './demo/getDoctorInfo.sh 57528415278297529';
-// 		exec(cmd)
-// 			.then((result) => {
-// 				socket.emit('loginSucess', {doctor: id, hospital: "h1", doctorInfo: result.stdout, patients: "p1\np2\np3"});
-// 			})
-// 			.catch((err) => {
-// 	        	console.error('ERROR: ', err);
-// 			});
-// 	});
-// 	socket.on('getPatientRecords', function(req){
-// 		console.log('getPatientRecords');
-// 		console.log(req);
-// 		var patientInfo = "";
-// 		var getPatientRecordsCmd = './demo/getPatientInfo.sh 428471868519595972';
-// 		exec(getPatientRecordsCmd).then((result) => {patientInfo = result.stdout;}).catch((err) => {});
-// 		var cmd = './demo/getPatientRecord.sh ./demo/doctorPri ' + req.doctor + ' ' + req.hospital
-// 						+ ' ' + req.patient + ' ./demo/doctorProf';
-// 		console.log(cmd);
-// 		exec(cmd)
-// 			.then((result) => {
-// 				socket.emit('patientRecords', {doctor: req.doctor, hospital: req.hospital, patient: req.patient,
-// 						patientInfo: patientInfo, patientRecords: result.stdout});
-// 			})
-// 			.catch((err) => {
-// 	        	console.error('ERROR: ', err);
-// 			});
-// 	});
-// 	socket.on('getRecordDetail', function(req){
-// 		console.log('getRecordDetail');
-// 		console.log(req);
-
-// 		var cmd = './demo/request.sh ./demo/doctorPri ' + req.doctor + ' ' + req.hospital
-// 				+ ' ' + req.patient + ' ' + req.targetHospital + ' ' + req.recordId
-// 				+ ' ./demo/doctorProf';
-// 		console.log(cmd);
-// 		exec(cmd)
-// 			.then((result) => {
-//                 var txid = result.stdout;
-//                 cmd = './demo/getData.sh ' + txid;
-//                 exec(cmd)
-//                  .then((result) => {
-//                      socket.emit('recordDetail', {recordDetail: result.stdout});
-//                  })
-//                  .catch((err) => {
-//                      console.error('ERROR: ', err);
-//                  });
-// 			})
-// 			.catch((err) => {
-// 	        	console.error('ERROR: ', err);
-// 			});
-// 	});
-// });
 
 // ============= start server =======================
 

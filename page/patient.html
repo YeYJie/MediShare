@@ -1,0 +1,257 @@
+<!doctype html>
+<html>
+   <head>
+	  <style type="text/css">
+		 table {
+		 font-family: arial, sans-serif;
+		 border-collapse: collapse;
+		 width: 100%;
+		 }
+		 td, th {
+		 border: 1px solid #dddddd;
+		 text-align: left;
+		 padding: 8px;
+		 }
+		 tr:nth-child(even) {
+		 background-color: #dddddd;
+		 }
+		 html,body{height: 100%}
+		 #outer-wrap{
+		 height: 100%;
+		 position: relative;
+		 }
+		 #center{
+		 width: 400px;
+		 height: 300px;
+		 position: absolute;
+		 top: 50%;
+		 left: 50%;
+		 margin-top: -150px;
+		 margin-left: -200px;
+		 }
+	  </style>
+   </head>
+   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+   <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+   <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script> -->
+   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+   <script src="/socket.io/socket.io.js"></script>
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+   <script>
+	$(function () {
+		var socket = io();
+		var id;
+		var prikey;
+
+		$("#register-button").click(function(){
+			document.getElementById("login").style.display = "none";
+			document.getElementById("onRegister").style.display = "block";
+			var keshi = $("input[name='keshi']:checked").val();
+			// console.log(keshi);
+			var doctor = $('input[name="'+keshi+'Doctor"]:checked').val();
+			// console.log(doctor);
+			id = $('#id').val();
+			socket.emit('register', {id: id, keshi: keshi, doctor: doctor});
+		})
+		$("#deRegister-button").click(function(){
+			document.getElementById("onRegister").style.display = "none";
+			document.getElementById("login").style.display = "block";
+			socket.emit('deRegister', {id: id});
+		})
+
+		$("#signup-button").click(function(){
+			document.getElementById("login").style.display = "none";
+			document.getElementById("signup").style.display = "block";
+		})
+
+		$('#signup-submit-button').click(function(){
+			socket.emit('signup', {role: "patient", id: $('#signupId').val(), name: $('#signupName').val(), pwd: $('#signupPwd').val(), phone: $('#signupPhone').val(), email: $('#signupEmail').val(), addr: $('#signupAddr').val()});
+			$('#signupId').val(); $('#signupPwd').val(); $('#signupPhone').val(); $('#signupEmail').val(); $('#signupAddr').val();
+			document.getElementById("signup").style.display = "none";
+			document.getElementById("signupState").style.display = "block";
+		})
+		$('#signup-goback').click(function(){
+			document.getElementById("login").style.display = "block";
+			document.getElementById("signup").style.display = "none";
+		})
+		$('#state-button').click(function() {
+			socket.emit('signupState', {role: "patient", id: $('#stateId').val()});
+			$('#stateId').val('');
+			document.getElementById("signup").style.display = "none";
+			document.getElementById("signupState").style.display = "block";
+		})
+		$('#signupState-goback').click(function(){
+			document.getElementById("signupState").style.display = "none";
+			document.getElementById("login").style.display = "block";
+			document.getElementById('signupStateDiv').innerHTML = "Please Wait for Review";
+		})
+
+		function doctorDiv(keshi) {
+			document.getElementById("neikeDoctor").style.display = "none";
+			document.getElementById("waikeDoctor").style.display = "none";
+			document.getElementById("erbihoukeDoctor").style.display = "none";
+			document.getElementById(keshi+"Doctor").style.display = "block";
+		}
+
+		$("#neike").click(function(){
+			// console.log("neike");
+			doctorDiv("neike");
+		})
+		$("#waike").click(function(){
+			// console.log("waike");
+			doctorDiv("waike");
+		})
+		$("#erbihouke").click(function(){
+			// console.log("erbihouke");
+			doctorDiv("erbihouke");
+		})
+
+
+		socket.on('onRegister', function(data){
+			console.log(data.msg);
+			$("#onRegisterMsg").text(data.msg);
+		});
+		socket.on('signUpSuccess', function(data){
+			var signUpSuccessHTML = '<p>Hello, ' + data.name + '</p>'
+					+ '<p>Your Private Key: ' + data.prikey + '</p>'
+					+ '<p>Your PKC: ' + data.pkc + '</p>';
+			console.log(signUpSuccessHTML);
+			document.getElementById('signupStateDiv').innerHTML = signUpSuccessHTML;
+		})
+	});
+   </script>
+   <body>
+	  <div id="outer-wrap">
+		 <div id="center">
+			<div id="login">
+			   <div id="pki">
+				  <p>
+				  <fieldset>
+					 <legend>private key</legend>
+					 <input type="text" name="privateKey" id="prikey">
+				  </fieldset>
+				  </p>
+				  <p>
+				  <fieldset>
+					 <legend>pkc</legend>
+					 <input type="text" name="pkc" id="pkc">
+				  </fieldset>
+				  </p>
+				  <p>
+				  <fieldset>
+					 <legend>Id</legend>
+					 <input type="text" name="id" id="id">
+				  </fieldset>
+				  </p>
+			   </div>
+			   <div id="keshi">
+				  <label class="radio-inline">
+				  <input type="radio" name="keshi" value="neike" id="neike"> nei ke
+				  </label>
+				  <label class="radio-inline">
+				  <input type="radio" name="keshi" value="waike" id="waike"> wai ke
+				  </label>
+				  <label class="radio-inline">
+				  <input type="radio" name="keshi" value="erbihouke" id="erbihouke"> er bi hou ke
+				  </label>
+			   </div>
+			   <div id="neikeDoctor" style="display: none;">
+				  <label class="radio-inline">
+				  <input type="radio" name="neikeDoctor" value="anyone" id="neike-anyone" checked> Anyone
+				  </label>
+				  <label class="radio-inline">
+				  <input type="radio" name="neikeDoctor" value="zhangsan" id="neike-zhangsan"> Zhang shan
+				  </label>
+				  <label class="radio-inline">
+				  <input type="radio" name="neikeDoctor" value="lisi" id="neike-lisi"> Li si
+				  </label>
+			   </div>
+			   <div id="waikeDoctor" style="display: none;">
+				  <label class="radio-inline">
+				  <input type="radio" name="waikeDoctor" value="anyone" id="waike-anyone" checked> Anyone
+				  </label>
+				  <label class="radio-inline">
+				  <input type="radio" name="waikeDoctor" value="zhangsan" id="waike-zhangsan"> Zhang shan
+				  </label>
+				  <label class="radio-inline">
+				  <input type="radio" name="waikeDoctor" value="lisi" id="waike-lisi"> Li si
+				  </label>
+			   </div>
+			   <div id="erbihoukeDoctor" style="display: none;">
+				  <label class="radio-inline">
+				  <input type="radio" name="erbihoukeDoctor" value="anyone" id="erbihouke-anyone" checked> Anyone
+				  </label>
+				  <label class="radio-inline">
+				  <input type="radio" name="erbihoukeDoctor" value="zhangsan" id="erbihouke-zhangsan"> Zhang shan
+				  </label>
+				  <label class="radio-inline">
+				  <input type="radio" name="erbihoukeDoctor" value="lisi" id="erbihouke-lisi"> Li si
+				  </label>
+			   </div>
+			   <div id="register">
+				  <p><button id="register-button">Register</button></p>
+				  <p><button id="signup-button">Sign Up</button></p>
+			   </div>
+			</div>
+			<div id="onRegister" style="display: none;">
+			   <p>
+			   <h2 id="onRegisterMsg">no msg</h2>
+			   </p>
+			   <p><button id="deRegister-button">deRegister</button></p>
+			</div>
+			<div id="signup" style="display: none;">
+			   <p>
+			   <fieldset>
+				  <legend>Id</legend>
+				  <input type="text" name="id" id="signupId">
+			   </fieldset>
+			   </p>
+			   <p>
+			   <fieldset>
+				  <legend>Name</legend>
+				  <input type="text" name="name" id="signupName">
+			   </fieldset>
+			   </p>
+			   <p>
+			   <fieldset>
+				  <legend>Password</legend>
+				  <input type="text" name="pwd" id="signupPwd">
+			   </fieldset>
+			   </p>
+			   <p>
+			   <fieldset>
+				  <legend>Phone</legend>
+				  <input type="text" name="phone" id="signupPhone">
+			   </fieldset>
+			   </p>
+			   <p>
+			   <fieldset>
+				  <legend>Email</legend>
+				  <input type="text" name="email" id="signupEmail">
+			   </fieldset>
+			   </p>
+			   <p>
+			   <fieldset>
+				  <legend>Addr</legend>
+				  <input type="text" name="addr" id="signupAddr">
+			   </fieldset>
+			   </p>
+			   <p><button id="signup-submit-button">Submit</button></p>
+			   <p>
+			   <fieldset>
+				  <legend>Id</legend>
+				  <input type="text" name="stateId" id="stateId">
+			   </fieldset>
+			   </p>
+			   <p><button id="state-button">State</button></p>
+			   <p><button id="signup-goback">Go Back</button></p>
+			</div>
+			<div id="signupState" style="display: none;">
+			   <div id="signupStateDiv">Please Wait for Review</div>
+			   <!-- <p><button id="signupState-download">Download Materials</button></p> -->
+			   <p><button id="signupState-goback">Go Back</button></p>
+			</div>
+		 </div>
+	  </div>
+   </body>
+</html>
