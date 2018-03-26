@@ -41,6 +41,7 @@
 	$(function () {
 		var socket = io();
 		var id;
+		var did;
 		var prikey;
 
 		$("#register-button").click(function(){
@@ -56,7 +57,10 @@
 		$("#deRegister-button").click(function(){
 			document.getElementById("onRegister").style.display = "none";
 			document.getElementById("login").style.display = "block";
-			socket.emit('deRegister', {id: id});
+			$("#onRegisterMsg").text("Wait for Register");
+			socket.emit('deRegister', {id: id, did: did,
+				time: (Math.floor(new Date() / 1000)).toString(),
+				sig: "deRegisterSig", pkc: "patientPKC"});
 		})
 
 		$("#signup-button").click(function(){
@@ -109,6 +113,7 @@
 
 		socket.on('onRegister', function(data){
 			console.log(data.msg);
+			did = data.did;
 			$("#onRegisterMsg").text(data.msg);
 		});
 		socket.on('signUpSuccess', function(data){
@@ -125,24 +130,9 @@
 		 <div id="center">
 			<div id="login">
 			   <div id="pki">
-				  <p>
-				  <fieldset>
-					 <legend>private key</legend>
-					 <input type="text" name="privateKey" id="prikey">
-				  </fieldset>
-				  </p>
-				  <p>
-				  <fieldset>
-					 <legend>pkc</legend>
-					 <input type="text" name="pkc" id="pkc">
-				  </fieldset>
-				  </p>
-				  <p>
-				  <fieldset>
-					 <legend>Id</legend>
-					 <input type="text" name="id" id="id">
-				  </fieldset>
-				  </p>
+				  <!-- <p><fieldset><legend>private key</legend><input type="text" name="privateKey" id="prikey"></fieldset></p> -->
+				  <!-- <p><fieldset><legend>pkc</legend><input type="text" name="pkc" id="pkc"></fieldset></p> -->
+				  <p><fieldset><legend>Id</legend><input type="text" name="id" id="id"></fieldset></p>
 			   </div>
 			   <div id="keshi">
 				  <label class="radio-inline">
@@ -195,54 +185,19 @@
 			</div>
 			<div id="onRegister" style="display: none;">
 			   <p>
-			   <h2 id="onRegisterMsg">no msg</h2>
+			   <h2 id="onRegisterMsg">Wait for Register</h2>
 			   </p>
 			   <p><button id="deRegister-button">deRegister</button></p>
 			</div>
 			<div id="signup" style="display: none;">
-			   <p>
-			   <fieldset>
-				  <legend>Id</legend>
-				  <input type="text" name="id" id="signupId">
-			   </fieldset>
-			   </p>
-			   <p>
-			   <fieldset>
-				  <legend>Name</legend>
-				  <input type="text" name="name" id="signupName">
-			   </fieldset>
-			   </p>
-			   <p>
-			   <fieldset>
-				  <legend>Password</legend>
-				  <input type="text" name="pwd" id="signupPwd">
-			   </fieldset>
-			   </p>
-			   <p>
-			   <fieldset>
-				  <legend>Phone</legend>
-				  <input type="text" name="phone" id="signupPhone">
-			   </fieldset>
-			   </p>
-			   <p>
-			   <fieldset>
-				  <legend>Email</legend>
-				  <input type="text" name="email" id="signupEmail">
-			   </fieldset>
-			   </p>
-			   <p>
-			   <fieldset>
-				  <legend>Addr</legend>
-				  <input type="text" name="addr" id="signupAddr">
-			   </fieldset>
-			   </p>
+			   <p><fieldset><legend>Id</legend><input type="text" name="id" id="signupId"></fieldset></p>
+			   <p><fieldset><legend>Name</legend><input type="text" name="name" id="signupName"></fieldset></p>
+			   <p><fieldset><legend>Password</legend><input type="text" name="pwd" id="signupPwd"></fieldset></p>
+			   <p><fieldset><legend>Phone</legend><input type="text" name="phone" id="signupPhone"></fieldset></p>
+			   <p><fieldset><legend>Email</legend><input type="text" name="email" id="signupEmail"></fieldset></p>
+			   <p><fieldset><legend>Addr</legend><input type="text" name="addr" id="signupAddr"></fieldset></p>
 			   <p><button id="signup-submit-button">Submit</button></p>
-			   <p>
-			   <fieldset>
-				  <legend>Id</legend>
-				  <input type="text" name="stateId" id="stateId">
-			   </fieldset>
-			   </p>
+			   <p><fieldset><legend>Id</legend><input type="text" name="stateId" id="stateId"></fieldset></p>
 			   <p><button id="state-button">State</button></p>
 			   <p><button id="signup-goback">Go Back</button></p>
 			</div>

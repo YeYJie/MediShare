@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	// "fmt"
 	"strconv"
 	// "crypto"
 	// "crypto/rsa"
@@ -14,36 +14,36 @@ import (
 	// "encoding/hex"
 	"time"
 	"github.com/hyperledger/fabric/core/chaincode/shim"
-	"github.com/hyperledger/fabric/protos/peer"
+	// "github.com/hyperledger/fabric/protos/peer"
 )
 
-func (t *SimpleAsset) debugImpl(str string) {
-	fmt.Printf("%s\n", str)
-}
+// func (t *SimpleAsset) debugImpl(str string) {
+// 	fmt.Printf("%s\n", str)
+// }
 
-func (t *SimpleAsset) debug(format string, a ...interface{}) {
-	t.debugImpl(fmt.Sprintf(format, a...))
-}
+// func (t *SimpleAsset) debug(format string, a ...interface{}) {
+// 	t.debugImpl(fmt.Sprintf(format, a...))
+// }
 
-func (t *SimpleAsset) echo(stub shim.ChaincodeStubInterface, args []string) peer.Response {
+// func (t *SimpleAsset) echo(stub shim.ChaincodeStubInterface, args []string) peer.Response {
 
-	return shim.Success([]byte(args[0] + help()))
-}
+// 	return shim.Success([]byte(args[0] + help()))
+// }
 
-func (t *SimpleAsset) sleep(stub shim.ChaincodeStubInterface, args []string) peer.Response {
-	duration := byteArrayToInt([]byte(args[0]))
-	time.Sleep(time.Duration(duration) * time.Second)
-	return shim.Success(nil)
-}
+// func (t *SimpleAsset) sleep(stub shim.ChaincodeStubInterface, args []string) peer.Response {
+// 	duration := byteArrayToInt([]byte(args[0]))
+// 	time.Sleep(time.Duration(duration) * time.Second)
+// 	return shim.Success(nil)
+// }
 
-func byteArrayToInt(arr []byte) int {
-	ret, _ := strconv.Atoi(string(arr))
-	return ret
-}
+// func byteArrayToInt(arr []byte) int {
+// 	ret, _ := strconv.Atoi(string(arr))
+// 	return ret
+// }
 
-func intToByteArray(num int) []byte {
-	return []byte(strconv.Itoa(num))
-}
+// func intToByteArray(num int) []byte {
+// 	return []byte(strconv.Itoa(num))
+// }
 
 // func (t *SimpleAsset) triggerEvent(stub shim.ChaincodeStubInterface, args []string) peer.Response {
 

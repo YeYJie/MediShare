@@ -3,8 +3,7 @@
 Hospital=$1
 Doctor=$2
 Patient=$3
-RecordId=$4
-Inspection=$5
+Inspection=$4
 HospitalTime=$(date +'%s')
 HospitalSig="hospitalSig"
 HospitalPKC="hospitalPKC"
@@ -12,7 +11,7 @@ HospitalPKC="hospitalPKC"
 args='{
 	"peers":["127.0.0.1:7051", "127.0.0.1:8051"],
 	"fcn":"newRecord",
-	"args":["{\"Hospital\":\"'$Hospital'\",\"Doctor\":\"'$Doctor'\",\"Patient\":\"'$Patient'\",\"RecordId\":\"'$RecordId'\",\"Inspection\":\"'$Inspection'\",\"HospitalTime\":\"'$HospitalTime'\",\"HospitalSig\":\"'$HospitalSig'\",\"HospitalPKC\":\"'$HospitalPKC'\"}"]
+	"args":["{\"Hospital\":\"'$Hospital'\",\"Doctor\":\"'$Doctor'\",\"Patient\":\"'$Patient'\",\"Inspection\":\"'$Inspection'\",\"HospitalTime\":\"'$HospitalTime'\",\"HospitalSig\":\"'$HospitalSig'\",\"HospitalPKC\":\"'$HospitalPKC'\"}"]
 }
 '
 

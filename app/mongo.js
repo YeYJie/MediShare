@@ -19,7 +19,7 @@ function DBconnect(url) {
 	var deferred = Q.defer();
 	if(_dbConnection === null) {
 		MongoClient.connect(url, function(err, db) {
-			if(err) 
+			if(err)
 				deferred.reject(err);
 			else {
 				_dbConnection = db;
@@ -153,16 +153,16 @@ function insertIndex(doctor, txid, patient) {
 	return deferred.promise;
 }
 
-function insertData(patient, payload) {
+function insertData(data) {
 	var deferred = Q.defer();
 	DBconnect(url)
 	.then(
 		(db) => {
-			DBinsertOne(db, "data", { patient: patient, payload: payload })
+			DBinsertOne(db, "data", data)
 			.then(
 				(result) => { deferred.resolve(result); },
 				(reason) => { deferred.reject(new Error("insertData DBinsertOne fails : " + reason)); }
-			);	
+			);
 		},
 		(reason) => {
 			deferred.reject(new Error("insertData DBconnect fails : " + reason));
@@ -171,29 +171,17 @@ function insertData(patient, payload) {
 	return deferred.promise;
 }
 
-// test
-// var doctor = "d1"
-// var txid = "123456"
-// var patient = "jie"
-
-// insertIndex(doctor, txid, patient)
-// .then(
-// 	(result) => {
-// 		find(doctor, txid)
-// 		.then(
-// 			(data) => {
-// 				console.log(data);
-// 				deleteIndex(txid).then((res) => {}, (err)=>{});
-// 			},
-// 			(reason) => { console.log(reason); }
-// 		);
-// 	},
-// 	(reason) => {
-// 		console.log(reason);
-// 	}
-// );
-
-// insertData("yeyongjie", "xxxxxxxxx").then((result)=>{}, (err)=>{});
+// var data = {did: "123",
+// 			pid: "1",
+// 			rid: "6843541684324",
+// 			inspection: "xuechanggui",
+// 			result: "jieguo",
+// 			analysis: "yidianfenxi",
+// 			prescription: "fufanggancaopian",
+// 			files: ["f1", "f2"]
+// 		};
+// console.log(data);
+// insertData(data).then((result)=>{console.log("insert success", result);}, (err)=>{});
 
 
 exports.find = find;

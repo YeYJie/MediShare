@@ -174,12 +174,12 @@ func (t *SimpleAsset) deRegister(stub shim.ChaincodeStubInterface, args []string
 	return shim.Success(nil)
 }
 
-func (t *SimpleAsset) getRecordId(stub shim.ChaincodeStubInterface,
-			patient string, doctor string, hospital string,
-			hospitalRecordId string, hospitalTime string) string {
+// func (t *SimpleAsset) getRecordId(stub shim.ChaincodeStubInterface,
+// 			patient string, doctor string, hospital string,
+// 			hospitalRecordId string, hospitalTime string) string {
 
-	return hash(patient + doctor + hospital + hospitalRecordId + hospitalTime)
-}
+// 	return hash(patient + doctor + hospital + hospitalRecordId + hospitalTime)
+// }
 
 func (t *SimpleAsset) newRecord(stub shim.ChaincodeStubInterface, args []string) peer.Response {
 
@@ -195,8 +195,9 @@ func (t *SimpleAsset) newRecord(stub shim.ChaincodeStubInterface, args []string)
 		return shim.Error("failed to verify hospital signature: " + err.Error())
 	}
 
-	recordId := t.getRecordId(stub, newRecordArgs.Patient, newRecordArgs.Doctor,
-				newRecordArgs.Hospital, newRecordArgs.RecordId, newRecordArgs.HospitalTime)
+	// recordId := t.getRecordId(stub, newRecordArgs.Patient, newRecordArgs.Doctor,
+	// 			newRecordArgs.Hospital, newRecordArgs.RecordId, newRecordArgs.HospitalTime)
+	recordId := stub.GetTxID()
 
 	err = stub.PutState(recordId, []byte(args[0]))
 	if err != nil {
@@ -224,7 +225,7 @@ func (t *SimpleAsset) newRecord(stub shim.ChaincodeStubInterface, args []string)
 		Hospital		: newRecordArgs.Hospital,
 		Doctor			: newRecordArgs.Doctor,
 		Patient			: newRecordArgs.Patient,
-		RecordId		: newRecordArgs.RecordId,
+		RecordId		: recordId,
 		Inspection		: newRecordArgs.Inspection,
 		HospitalTime	: newRecordArgs.HospitalTime,
 	}

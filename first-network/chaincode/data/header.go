@@ -59,7 +59,7 @@ type NewRecordArgs struct {
 	Hospital		string
 	Doctor			string
 	Patient			string
-	RecordId		string
+	// RecordId		string
 	Inspection		string
 	HospitalTime	string
 	HospitalSig		string
