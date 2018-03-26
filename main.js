@@ -209,54 +209,17 @@ app.get('/header/:id', function(req, res){
 	res.send("header");
 });
 
-// app.get('/gov', function(req, res){
-// 	res.sendFile(__dirname + '/page/gov.html');
-// });
+app.get('/requestDetail/:txid', function(req, res){
+	txid = req.params.txid;
+	console.log('/requestDetail/:txid ', txid);
+	res.send({a: "123456", b: "456789"});
+});
 
-// app.get('/fileEntry/:fileName', function(req, res) {
-// 	console.log('fileEntry get called');
-// 	var fileName = req.params.fileName;
-// 	res.sendFile(__dirname + '/page/' + fileName + '.png');
-// });
 
-// app.post('/acEntry', function(req, res) {
-// 	var accessControlRequest = req.body;
-// 	console.log('acEntry begin');
-// 	console.log(accessControlRequest);
-// 	console.log('acEntry end');
-// 	res.send({
-// 		"TxId" 						: accessControlRequest.TxId,
-// 		"FileId" 					: accessControlRequest.FileId,
-// 		"Success" 					: true,
-// 		"RequestLauncher" 			: accessControlRequest.RequestLauncher,
-// 		"RequestLauncherDepartment" : accessControlRequest.RequestLauncherDepartment,
-// 		"FileEntry" 				: "http://172.18.232.124:8080/fileEntry/pikachu",
-// 		"FileEntryFormat" 			: "REST FileEntryFormat",
-// 		"CacheControl" 				: "REST CacheControl",
-// 		"FileDepartmentSig" 		: "FileDepartmentSig",
-// 		"FileDepartmentPKC"			: "FileDepartmentPKC"
-// 	});
-// });
 
 const fileUpload = require('express-fileupload');
 app.use(fileUpload());
 
-// app.post('/upload', function(req, res) {
-// 	console.log('upload begin');
-// 	// console.log(req);
-// 	console.log(req.body.uploadText);
-// 	var testFile = req.files.uploadFile;
-// 	testFile.mv('./medical/' + testFile.name, function(err){
-// 		if(err)
-//     		return res.status(500).send(err);
-// 	});
-// 	console.log('upload end');
-// 	res.send("upload reply");
-// });
-
-// var hospital = require("./app/hospital.js");
-// var doctor = require("./app/doctor.js");
-// var patient = require("./app/patient.js");
 
 var exec = require('child-process-promise').exec;
 var asyncExec = function(cmd, callback) {
@@ -375,18 +338,38 @@ io.on('connection', function(socket){
 		var cmd = ['./bishe/requestDetail.sh', did, hospital, pid, targetHospital, rid].join(' ');
 		asyncExec(cmd, function(result) {
 			console.log(cmd, result.stdout);
+			// var txid = result.stdout;
+			if(result.stdout.indexOf(' ') >= 0) {
+				console.log('requestDetail failed');
+			} else {
+				var txid = result.stdout;
+
+				var targetHospitalIpPort = "http://172.18.232.124:8080"
+
+				cmd = 'curl -sS ' + targetHospitalIpPort + '/requestDetail/' + txid;
+				console.log(cmd);
+				asyncExec(cmd, function(result){
+					console.log(cmd, result.stdout);
+					socket.emit('recordDetail', {did: did, pid:pid, txid: txid, targetHospital: targetHospital, recordDetail: result.stdout});
+				});
+			}
 		});
 	});
 
 });
 
+
+
+var eventCallback = function(event) {
+	var e = JSON.parse(event.payload);
+	console.log("eventCallback: ", [e.TxId, e.EventType, e.Payload]);
+};
+
 // ============= start server =======================
 
 var server = http.listen(port, function() {
 	console.log(`Please open Internet explorer to access ：http://${host}:${port}/`);
-	// myEventListener.myRegisterEventListener('org1', "h1", hospital.hospitalHandler, null);
-	// myEventListener.myRegisterEventListener('org1', "d1", doctor.doctorHandler);
-	// myEventListener.myRegisterEventListener('org1', "patient", patient.patientHandler);
+	myEventListener.myRegisterEventListener('org1', "event", eventCallback, null);
 });
 
 

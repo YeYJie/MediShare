@@ -396,7 +396,10 @@
 											targetHospital: targetHospital});
 				});
 			}
-		})
+		});
+		socket.on('recordDetail', function(data){
+			console.log('recordDetail', data);
+		});
 	})
 
 	 </script>

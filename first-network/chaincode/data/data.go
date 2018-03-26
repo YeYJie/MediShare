@@ -12,10 +12,10 @@ import (
 	// "errors"
 	// "encoding/pem"
 	// "encoding/hex"
+	"encoding/json"
 	// "time"
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	"github.com/hyperledger/fabric/protos/peer"
-	"encoding/json"
 )
 
 
@@ -58,6 +58,25 @@ func (t *SimpleAsset) all(stub shim.ChaincodeStubInterface, args []string) peer.
 	res = t.appendkv(stub, iter, res)
 
 	return shim.Success([]byte(res))
+}
+
+func (t *SimpleAsset) clear(stub shim.ChaincodeStubInterface, args []string) peer.Response {
+	iter, _ := stub.GetStateByRange("", "")
+	for iter.HasNext() {
+		kv, _ := iter.Next()
+		stub.DelState(kv.Key)
+	}
+	iter, _ = stub.GetStateByPartialCompositeKey("onRegister", []string{})
+	for iter.HasNext() {
+		kv, _ := iter.Next()
+		stub.DelState(kv.Key)
+	}
+	iter, _ = stub.GetStateByPartialCompositeKey("deRegister", []string{})
+	for iter.HasNext() {
+		kv, _ := iter.Next()
+		stub.DelState(kv.Key)
+	}
+	return shim.Success(nil)
 }
 
 func (t *SimpleAsset) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
@@ -149,6 +168,10 @@ func (t *SimpleAsset) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
 		return t.getPatientRecords(stub, args)
 	}
 
+	if function == "clear" {
+		return t.clear(stub, args)
+	}
+
 	fmt.Println("invoke did not find func: " + function) //error
 	return shim.Error("Received unknown function invocation")
 }
@@ -167,4 +190,20 @@ func (t *SimpleAsset) json(stub shim.ChaincodeStubInterface, args []string) peer
 	}
 	// err = stub.PutState("json", []byte(temp.ye + temp.yong))
 	return shim.Success([]byte(temp.Ye + temp.Yong))
+}
+
+func (t *SimpleAsset) eventHelper(stub shim.ChaincodeStubInterface, eventType string, payload string) {
+
+	type Event struct {
+		TxId 		string
+		EventType 	string
+		Payload 	string
+	}
+	ev := Event {
+		TxId 		: stub.GetTxID(),
+		EventType 	: eventType,
+		Payload 	: payload,
+	}
+	evJson, _ := json.Marshal(ev)
+	stub.SetEvent("event", evJson)
 }

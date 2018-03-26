@@ -88,6 +88,26 @@ func (t *SimpleAsset) register(stub shim.ChaincodeStubInterface, args []string) 
 		return shim.Error("failed to stub.PutState onRegister: " + err.Error())
 	}
 
+	type RegisterEvent struct {
+		Patient			string
+		Doctor			string
+		Hospital		string
+		PatientTime		string
+		HospitalTime	string
+	}
+	registerEvent := RegisterEvent {
+		Patient			: registerArgs.Patient,
+		Doctor			: registerArgs.Doctor,
+		Hospital		: registerArgs.Hospital,
+		PatientTime		: registerArgs.PatientTime,
+		HospitalTime	: registerArgs.HospitalTime,
+	}
+	registerEventJson, err := json.Marshal(registerEvent)
+	if err != nil {
+		return shim.Error("failed to json.Marshal: " + err.Error())
+	}
+	t.eventHelper(stub, "register", string(registerEventJson))
+
 	return shim.Success(nil)
 }
 
@@ -133,6 +153,24 @@ func (t *SimpleAsset) deRegister(stub shim.ChaincodeStubInterface, args []string
 		return shim.Error("failed to PutState deRegister: " + err.Error())
 	}
 
+	type DeRegisterEvent struct {
+		Patient			string
+		Doctor			string
+		Hospital		string
+		PatientTime		string
+	}
+	deRegisterEvent := DeRegisterEvent {
+		Patient			: deRegisterArgs.Patient,
+		Doctor			: deRegisterArgs.Doctor,
+		Hospital		: deRegisterArgs.Hospital,
+		PatientTime		: deRegisterArgs.PatientTime,
+	}
+	deRegisterEventJson, err := json.Marshal(deRegisterEvent)
+	if err != nil {
+		return shim.Error("failed to json.Marshal: " + err.Error())
+	}
+	t.eventHelper(stub, "deRegister", string(deRegisterEventJson))
+
 	return shim.Success(nil)
 }
 
@@ -173,6 +211,28 @@ func (t *SimpleAsset) newRecord(stub shim.ChaincodeStubInterface, args []string)
 	if err != nil {
 		return shim.Error("failed to insertIndex: " + err.Error())
 	}
+
+	type NewRecordEvent struct {
+		Hospital		string
+		Doctor			string
+		Patient			string
+		RecordId		string
+		Inspection		string
+		HospitalTime	string
+	}
+	newRecordEvent := NewRecordEvent {
+		Hospital		: newRecordArgs.Hospital,
+		Doctor			: newRecordArgs.Doctor,
+		Patient			: newRecordArgs.Patient,
+		RecordId		: newRecordArgs.RecordId,
+		Inspection		: newRecordArgs.Inspection,
+		HospitalTime	: newRecordArgs.HospitalTime,
+	}
+	newRecordEventJson, err := json.Marshal(newRecordEvent)
+	if err != nil {
+		return shim.Error("failed to json.Marshal: " + err.Error())
+	}
+	t.eventHelper(stub, "newRecord", string(newRecordEventJson))
 
 	return shim.Success(nil)
 }
@@ -231,30 +291,29 @@ func (t *SimpleAsset) requestDetail(stub shim.ChaincodeStubInterface, args []str
 		return shim.Error("failed to insertIndex: " + err.Error())
 	}
 
-	type RequestGrant struct {
+	type RequestGrantEvent struct {
 		RequestDoctor		string
 		RequestHospital		string
 		Patient				string
 		TargetHospital		string
 		RecordId			string
-		TxId 				string
+		RequestTime 		string
 	}
 
-	requestGrant := RequestGrant{
+	requestGrant := RequestGrantEvent{
 		RequestDoctor		: requestDetailArgs.Doctor,
 		RequestHospital		: requestDetailArgs.Hospital,
 		Patient				: requestDetailArgs.Patient,
 		TargetHospital		: requestDetailArgs.TargetHospital,
 		RecordId			: requestDetailArgs.RecordId,
-		TxId 				: stub.GetTxID(),
+		RequestTime 		: requestDetailArgs.RequestTime,
 	}
 	requestGrantJson, err := json.Marshal(requestGrant)
 	if err != nil {
 		return shim.Error("failed to json.Marshal: " + err.Error())
 	}
 
-	stub.SetEvent(requestDetailArgs.TargetHospital, requestGrantJson)
-	stub.SetEvent(requestDetailArgs.Doctor, requestGrantJson)
+	t.eventHelper(stub, "requestGrant", string(requestGrantJson))
 
 	return shim.Success(nil)
 }
@@ -303,11 +362,6 @@ func (t *SimpleAsset) getPatientRecords(stub shim.ChaincodeStubInterface, args [
 		return shim.Error("failed to verify doctor prof: " + err.Error())
 	}
 
-	// iter, err := stub.GetStateByPartialCompositeKey("index4",
-	// 						[]string{getPatientRecordsArgs.Patient})
-	// if err != nil {
-	// 	return shim.Error("failed to GetStateByPartialCompositeKey index4: " + err.Error())
-	// }
 	startKey := strings.Join([]string{"index4", getPatientRecordsArgs.Patient,
 						getPatientRecordsArgs.Begin}, "$$")
 	endKey := strings.Join([]string{"index4", getPatientRecordsArgs.Patient,
