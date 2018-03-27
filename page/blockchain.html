@@ -1,0 +1,90 @@
+<!doctype html>
+<html>
+   <head>
+	  <style type="text/css">
+		 table {
+		 font-family: arial, sans-serif;
+		 border-collapse: collapse;
+		 width: 100%;
+		 }
+		 td, th {
+		 border: 1px solid #dddddd;
+		 text-align: left;
+		 padding: 8px;
+		 }
+		 tr:nth-child(even) {
+		 background-color: #dddddd;
+		 }
+		 html,body{height: 100%}
+	  </style>
+   </head>
+   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+   <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+   <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script> -->
+   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+   <script src="/socket.io/socket.io.js"></script>
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+   <script>
+	$(function () {
+		var socket = io();
+
+		socket.emit('watch', {});
+
+		var buildRow = function(tid, timestamp, etype, payload) {
+			var payloadHTML;
+			if(etype === "register") {
+				payloadHTML = '<p>Patient: ' + payload.Patient + '</p>'
+							+ '<p>Doctor: ' + payload.Doctor + '</p>'
+							+ '<p>Hospital: ' + payload.Hospital + '</p>'
+							+ '<p>Time: ' + payload.HospitalTime + '</p>';
+			}
+			else if(etype === "deRegister") {
+				payloadHTML = '<p>Patient: ' + payload.Patient + '</p>'
+							+ '<p>Doctor: ' + payload.Doctor + '</p>'
+							+ '<p>Hospital: ' + payload.Hospital + '</p>'
+							+ '<p>Time: ' + payload.PatientTime + '</p>';
+			}
+			else if(etype === "newRecord") {
+				payloadHTML = '<p>Hospital: ' + payload.Hospital + '</p>'
+							+ '<p>Doctor: ' + payload.Doctor + '</p>'
+							+ '<p>Patient: ' + payload.Patient + '</p>'
+							+ '<p>RecordId: ' + payload.RecordId + '</p>'
+							+ '<p>Inspection: ' + payload.Inspection + '</p>'
+							+ '<p>Time: ' + payload.HospitalTime + '</p>';
+			}
+			else if(etype === "requestGrant") {
+				payloadHTML = '<p>RequestDoctor: ' +  payload.RequestDoctor + '</p>'
+							+ '<p>RequestHospital: ' +  payload.RequestHospital + '</p>'
+							+ '<p>Patient: ' +  payload.Patient + '</p>'
+							+ '<p>TargetHospital: ' +  payload.TargetHospital + '</p>'
+							+ '<p>RecordId: ' +  payload.RecordId + '</p>'
+							+ '<p>RequestTime: ' +  payload.RequestTime + '</p>';
+			}
+			return '<tr><td>' + tid + '</td>'
+					+ '<td>' + timestamp + '</td>'
+					+ '<td>' + etype + '</td>'
+					+ '<td>' + payloadHTML + '</td></tr>'
+		};
+
+		socket.on('event', function(data){
+			var rowHTML = buildRow(data.TxId, data.Timestamp, data.EventType, JSON.parse(data.Payload));
+			var table = document.getElementById('table');
+			var rowCount = table.rows.length;
+			var row = table.insertRow(rowCount);
+			row.innerHTML = rowHTML;
+		});
+	});
+   </script>
+   <body>
+   		<div id="tx">
+   			<table id="table">
+   				<tr>
+   					<th>TxID</th>
+   					<th>Timestamp</th>
+   					<th>Event Type</th>
+   					<th>Payload</th>
+   				</tr>
+   			</table>
+   		</div>
+   </body>
+</html>

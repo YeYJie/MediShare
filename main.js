@@ -70,6 +70,8 @@ patientIdToName["1"] = "patient1";
 patientIdToName["2"] = "patient2";
 patientIdToName["3"] = "patient3";
 
+var eventWatcher = [];
+
 var register = function(pid, keshi, dname) {
 	if(dname === "anyone") {
 		dname = "zhangsan";
@@ -108,6 +110,11 @@ app.get('/doc', function(req, res){
 app.get('/patient', function(req, res){
 	console.log('/patient')
 	res.sendFile(__dirname + '/page/patient.html');
+});
+
+app.get('/blockchain', function(req, res){
+	console.log('/blockchain')
+	res.sendFile(__dirname + '/page/blockchain.html');
 });
 
 app.get('/getDoctorInfo/:id', function(req, res){
@@ -262,6 +269,13 @@ var io = require('socket.io')(http);
 io.on('connection', function(socket){
 
 	/*
+	*	For event watcher
+	*/
+	socket.on('watch', function(req) {
+		eventWatcher.push(socket);
+	});
+
+	/*
 	*	For both patient and doctor
 	*/
 	socket.on('signup', function(req) {
@@ -408,6 +422,10 @@ var eventCallback = function(event) {
 	var socket = doctorSocket["123"];
 	if(socket)
 		socket.emit("event", e);
+
+	for(var i = 0; i < eventWatcher.length; i++) {
+		eventWatcher[i].emit('event', e);
+	}
 
 	if(e.EventType === "requestGrant") {
 		var payload = JSON.parse(e.Payload);

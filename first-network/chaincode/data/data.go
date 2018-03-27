@@ -198,11 +198,13 @@ func (t *SimpleAsset) eventHelper(stub shim.ChaincodeStubInterface, eventType st
 		TxId 		string
 		EventType 	string
 		Payload 	string
+		Timestamp	string
 	}
 	ev := Event {
 		TxId 		: stub.GetTxID(),
 		EventType 	: eventType,
 		Payload 	: payload,
+		Timestamp	: t.getTxTimestamp(stub),
 	}
 	evJson, _ := json.Marshal(ev)
 	stub.SetEvent("event", evJson)
