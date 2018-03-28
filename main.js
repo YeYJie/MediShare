@@ -22,7 +22,8 @@ var statusMertics=require('./service/metricservice.js')
 
 var channelsRouter=require('./router/channels.js')
 
-app.use(express.static(path.join(__dirname,'explorer_client')));
+// app.use(express.static(path.join(__dirname,'explorer_client')));
+app.use(express.static('css'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/apis',channelsRouter)
@@ -102,9 +103,18 @@ app.get('/doctorPage', function(req, res){
 	res.sendFile(__dirname + '/page/doctor.html-old');
 });
 
+// app.get('/doc', function(req, res){
+// 	console.log('/doc');
+// 	res.sendFile(__dirname + '/page/doctor.html');
+// });
+// app.get('/gov', function(req, res){
+// 	console.log('/doc');
+// 	res.sendFile(__dirname + '/page/gov.html');
+// });
+
 app.get('/doc', function(req, res){
 	console.log('/doc');
-	res.sendFile(__dirname + '/page/doctor.html');
+	res.sendFile(__dirname + '/page/doc.html');
 });
 
 app.get('/patient', function(req, res){
