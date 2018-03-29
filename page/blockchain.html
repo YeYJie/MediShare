@@ -1,7 +1,13 @@
 <!doctype html>
 <html>
    <head>
+       <meta charset="utf-8">
+       <meta http-equiv="X-UA-Compatible" content="IE=edge">
+       <meta name="viewport" content="width=device-width, initial-scale=1">
+       <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+
 	  <style type="text/css">
+      /* body{} */
 		 table {
 		 font-family: arial, sans-serif;
 		 border-collapse: collapse;
@@ -15,12 +21,11 @@
 		 tr:nth-child(even) {
 		 background-color: #dddddd;
 		 }
-		 html,body{height: 100%}
+		 html,body{height: 100%; font-size: 15px;}
 	  </style>
    </head>
    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-   <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script> -->
    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
    <script src="/socket.io/socket.io.js"></script>
    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -73,10 +78,200 @@
 			var row = table.insertRow(rowCount);
 			row.innerHTML = rowHTML;
 		});
+
+
+        $("#search-button").click(function(){
+            document.getElementById("tx").style.display = "none";
+            document.getElementById("search-button-div").style.display = "none";
+            document.getElementById("search-goback-div").style.display = "block";
+            document.getElementById("search-div").style.display = "block";
+        });
+        $("#search-goback").click(function(){
+            document.getElementById("tx").style.display = "block";
+            document.getElementById("search-button-div").style.display = "block";
+            document.getElementById("search-goback-div").style.display = "none";
+            document.getElementById("search-div").style.display = "none";
+            document.getElementById("search-result").style.display = "none";
+        })
+
+
+var processTime = function(id, isBegin) {
+  var v = $(id).val();
+  $(id).val("");
+  var i = Math.floor(new Date(v).valueOf() / 1000).toString();
+  if(i !== "NaN")
+    return i.toString();
+  if(isBegin)
+    return "0";
+  else
+    return Math.floor(new Date().valueOf() / 1000).toString();
+};
+
+$('#search-time-button').click(function(){
+  document.getElementById("search-div").style.display = "none";
+  document.getElementById("search-result").style.display = "block";
+  var t = document.getElementById("tType");
+  var type = t.options[t.selectedIndex].value;
+  if(type === "") {
+    alert("请选择记录类型");
+    return;
+  }
+  t.value = "";
+  var begin = processTime('#search-time-begin', true);
+  var end = processTime('#search-time-end', false);
+  if(parseInt(begin) > parseInt(end)) begin = end;
+  console.log("search-time", [type, begin, end]);
+  socket.emit('search-time', {type: type, begin: begin, end: end});
+})
+$('#search-patient-button').click(function(){
+  document.getElementById("search-div").style.display = "none";
+  document.getElementById("search-result").style.display = "block";
+  var patient = $('#search-patient').val();
+  if(patient === "") return;
+  $('#search-patient').val("");
+  var t = document.getElementById("pType");
+  var type = t.options[t.selectedIndex].value;
+  if(type === "") {
+    alert("请选择记录类型");
+    return;
+  }
+  t.value = "";
+  var begin = processTime('#search-patient-begin', true);
+  var end = processTime('#search-patient-end', false);
+  if(parseInt(begin) > parseInt(end)) begin = end;
+  console.log("search-patient", [patient, type, begin, end]);
+  socket.emit('search-patient', {patient: patient, type: type, begin: begin, end: end});
+})
+$('#search-doctor-button').click(function(){
+  document.getElementById("search-div").style.display = "none";
+  document.getElementById("search-result").style.display = "block";
+  var doctor = $('#search-doctor').val();
+  if(doctor === "") return;
+  $('#search-doctor').val("");
+  var t = document.getElementById("dType");
+  var type = t.options[t.selectedIndex].value;
+  if(type === "") {
+    alert("请选择记录类型");
+    return;
+  }
+  t.value = "";
+  var begin = processTime('#search-doctor-begin', true);
+  var end = processTime('#search-doctor-end', false);
+  if(parseInt(begin) > parseInt(end)) begin = end;
+  console.log("search-doctor", [doctor, type, begin, end]);
+  socket.emit('search-doctor', {doctor: doctor, type: type, begin: begin, end: end});
+})
+$('#search-hospital-button').click(function(){
+  document.getElementById("search-div").style.display = "none";
+  document.getElementById("search-result").style.display = "block";
+  var hospital = $('#search-hospital').val();
+  if(hospital === "") return;
+  $('#search-hospital').val("");
+  var t = document.getElementById("hType");
+  var type = t.options[t.selectedIndex].value;
+  if(type === "") {
+    alert("请选择记录类型");
+    return;
+  }
+  t.value = "";
+  var begin = processTime('#search-hospital-begin', true);
+  var end = processTime('#search-hospital-end', false);
+  if(parseInt(begin) > parseInt(end)) begin = end;
+  console.log("search-hospital", [hospital, type, begin, end]);
+  socket.emit('search-hospital', {hospital: hospital, type: type, begin: begin, end: end});
+})
+
+var timeToString = function(t) {
+      var date = new Date(parseInt(t) * 1000);
+      var y = date.getFullYear();
+      var m = date.getMonth() + 1;
+      var d = date.getDate();
+      return y.toString() + '-' + m.toString() + '-' + d.toString();
+}
+
+var renderRegister = function(items) {
+  var tableHTML = '<table><thead><th>病人</th><th>挂号医生</th><th>挂号医院</th><th>挂号时间</th></thead><tbody>';
+  if(items)
+{  for(var i = 0; i < items.length;  i++) {
+    var item = JSON.parse(items[i]);
+    tableHTML += '<th>' + item.Patient + '</th>';
+    tableHTML += '<th>' + item.Doctor + '</th>';
+    tableHTML += '<th>' + item.Hospital + '</th>';
+    tableHTML += '<th>' + timeToString(item.HospitalTime) + '</th>';
+  }}
+  tableHTML += '</tbody></table>';
+  document.getElementById("search-result-div").innerHTML = tableHTML;
+};
+
+var renderRecord = function(items) {
+  var tableHTML = '<table><thead><th>医院</th><th>诊断医生</th><th>病人</th><th>诊断时间</th><th>检查项目</th></thead><tbody>';
+if(items){  for(var i = 0; i < items.length;  i++) {
+    var item = JSON.parse(items[i]);
+    tableHTML += '<th>' + item.Hospital + '</th>';
+    tableHTML += '<th>' + item.Doctor + '</th>';
+    tableHTML += '<th>' + item.Patient + '</th>';
+    tableHTML += '<th>' + timeToString(item.HospitalTime) + '</th>';
+    tableHTML += '<th>' + item.Inspection + '</th>';
+  }}
+  tableHTML += '</tbody></table>';
+  document.getElementById("search-result-div").innerHTML = tableHTML;
+};
+
+var renderRequest = function(items) {
+  var tableHTML = '<table><thead><th>医生</th><th>医院</th><th>病人</th><th>目标医院</th><th>记录Id</th><th>请求时间</th></thead><tbody>';
+if(items){  for(var i = 0; i < items.length;  i++) {
+    var item = JSON.parse(items[i]);
+    tableHTML += '<th>' + item.Doctor + '</th>';
+    tableHTML += '<th>' + item.Hospital + '</th>';
+    tableHTML += '<th>' + item.Patient + '</th>';
+    tableHTML += '<th>' + item.TargetHospital + '</th>';
+    tableHTML += '<th>' + item.RecordId + '</th>';
+    tableHTML += '<th>' + timeToString(item.RequestTime) + '</th>';
+  }}
+  tableHTML += '</tbody></table>';
+  document.getElementById("search-result-div").innerHTML = tableHTML;
+};
+
+  socket.on('search-time', function(data) {
+    console.log(data);
+    if(data.type === "register")
+      renderRegister(JSON.parse(data.result).Items);
+    else if(data.type === "record")
+      renderRecord(JSON.parse(data.result).Items);
+    else if(data.type === "request")
+      renderRequest(JSON.parse(data.result).Items);
+  });
+  socket.on('search-patient', function(data) {
+    console.log(data);
+    if(data.type === "register")
+      renderRegister(JSON.parse(data.result).Items);
+    else if(data.type === "record")
+      renderRecord(JSON.parse(data.result).Items);
+  });
+  socket.on('search-doctor', function(data) {
+    console.log(data);
+    if(data.type === "register")
+      renderRegister(JSON.parse(data.result).Items);
+    else if(data.type === "record")
+      renderRecord(JSON.parse(data.result).Items);
+    else if(data.type === "request")
+      renderRequest(JSON.parse(data.result).Items);
+  });
+  socket.on('search-hospital', function(data) {
+    console.log(data);
+    if(data.type === "register")
+      renderRegister(JSON.parse(data.result).Items);
+    else if(data.type === "record")
+      renderRecord(JSON.parse(data.result).Items);
+    else if(data.type === "grant")
+      renderRequest(JSON.parse(data.result).Items);
+  });
+
 	});
    </script>
    <body>
-   		<div id="tx">
+
+   		<div id="tx" style="display: block;">
    			<table id="table">
    				<tr>
    					<th>TxID</th>
@@ -86,5 +281,101 @@
    				</tr>
    			</table>
    		</div>
+
+        <div id="search-button-div" style="position: fixed; right: 50px; bottom: 0px; height: 100px; width: 100px;">
+            <button id="search-button" class="btn btn-primary btn-lg btn-block">查询</button>
+        </div>
+        <div id="search-goback-div" style="position: fixed; right: 50px; bottom: 0px; height: 100px; width: 100px; display: none;">
+            <button id="search-goback" class="btn btn-primary btn-lg btn-block">返回</button>
+        </div>
+
+
+        <div id="search-div" style="display: none;">
+        <div class="container">
+            <div class="row">
+                <div style="height: 20vh;"></div>
+
+                <div id="search" class="col-md-12">
+
+                  <div style="height: 15vh;"></div>
+                  <h2>按时间查找</h2>
+                      <!-- <h2>By Time</h2> -->
+                    <div style="height: 1vh;"></div>
+                    <div class="row">
+                        <div class="col-md-2"><select id="tType" required class="form-control">
+                        <option value="" disabled selected hidden>请选择记录类型</option>
+                        <option value="register">挂号记录</option>
+                        <option value="record">病历记录</option>
+                        <option value="request">授权记录</option>
+                        </select></div>
+                        <div class="col-md-2"><input class="form-control" type="date" id="search-time-begin"></div>
+                        <div class="col-md-2"><input class="form-control" type="date" id="search-time-end"></div>
+                        <div class="col-md-2 col-md-offset-2"><button id="search-time-button" class="btn btn-primary btn-block">查找</button></div>
+                    </div>
+
+                    <div style="height: 3vh;"></div>
+                    <h2>按病人查找</h2>
+                    <!-- <h2>By Patient</h2> -->
+                    <div style="height: 1vh;"></div>
+                    <div class="row">
+                      <div class="col-md-2"><input type="text" id="search-patient" class="form-control"></div>
+                      <div class="col-md-2"><select id="pType" class="form-control" required>
+                        <option value="" disabled selected hidden>请选择记录类型</option>
+                            <option value="register">挂号记录</option>
+                            <option value="record">病历记录</option>
+                        </select></div>
+                      <div class="col-md-2"><input type="date" id="search-patient-begin"  class="form-control"></div>
+                      <div class="col-md-2"><input type="date" id="search-patient-end"  class="form-control"></div>
+                      <div class="col-md-2"><button id="search-patient-button" class="btn btn-primary btn-block">查找</button></div>
+                    </div>
+
+                    <div style="height: 3vh;"></div>
+                    <h2>按医生查找</h2>
+                    <!-- <h2>By Doctor</h2> -->
+                    <div style="height: 1vh;"></div>
+                    <div class="row">
+                      <div class="col-md-2"><input type="text" id="search-doctor"  class="form-control"></div>
+                      <div class="col-md-2"><select id="dType"  class="form-control" required>
+                        <option value="" disabled selected hidden>请选择记录类型</option>
+                            <option value="request">请求记录</option>
+                            <option value="register">挂号记录</option>
+                            <option value="record">病历记录</option>
+                        </select></div>
+                      <div class="col-md-2"><input type="date" id="search-doctor-begin"  class="form-control"></div>
+                      <div class="col-md-2"><input type="date" id="search-doctor-end"  class="form-control"></div>
+                      <div class="col-md-2"><button id="search-doctor-button" class="btn btn-primary btn-block">查找</button></div>
+                    </div>
+
+                    <div style="height: 3vh;"></div>
+                    <h2>按医院查找</h2>
+                    <!-- <h2>By Hospital</h2> -->
+                    <div style="height: 1vh;"></div>
+                    <div class="row">
+                      <div class="col-md-2"><input type="text" id="search-hospital" class="form-control"></div>
+                      <div class="col-md-2"><select id="hType" class="form-control" required>
+                        <option value="" disabled selected hidden>请选择记录类型</option>
+                            <option value="grant">授权记录</option>
+                            <option value="register">挂号记录</option>
+                            <option value="record">病历记录</option>
+                        </select></div>
+                      <div class="col-md-2"><input type="date" id="search-hospital-begin" class="form-control"></div>
+                      <div class="col-md-2"><input type="date" id="search-hospital-end" class="form-control"></div>
+                      <div class="col-md-2"><button id="search-hospital-button" class="btn btn-primary btn-block">查找</button></div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+                </div>
+
+        <div id="search-result" style="display: none;">
+        <div class="container">
+        <div id="search-result-div">
+        </div>
+
+        </div>
+        </div>
    </body>
 </html>

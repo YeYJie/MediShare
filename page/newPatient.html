@@ -1,0 +1,185 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Dashboard Template for Bootstrap</title>
+
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+
+    <link href="dashboard.css" rel="stylesheet">
+    <link href="signin.css" rel="stylesheet">
+
+
+  </head>
+
+  <body>
+
+    <div class="container-fluid">
+
+          <div class="row" id="before-login">
+            <div style="height: 10vh;"></div>
+              <div class="col-md-4 col-md-offset-4">
+                <div class="panel panel-login">
+
+                  <div class="panel-heading">
+                    <div class="row">
+                      <div class="col-xs-6">
+                        <a href="#" class="active" id="login-form-link">基本信息</a>
+                      </div>
+                      <div class="col-xs-6">
+                        <a href="#" id="keshi-form-link">科室</a>
+                      </div>
+                    </div>
+                    <hr>
+                  </div>
+
+                  <div class="panel-body">
+                    <div class="row">
+                      <div class="col-lg-12">
+
+                        <div id="login-form" style="display: block;">
+                          <div class="form-group">
+                            <input type="text" name="username" id="login-id" tabindex="1" class="form-control" placeholder="ID" value="">
+                          </div>
+                          <!-- <div class="form-group">
+                            <input type="password" name="password" id="login-pwd" tabindex="2" class="form-control" placeholder="Password">
+                          </div> -->
+                          <div class="form-group">
+                            <textarea class="form-control" name="prikey" rows="8" cols="80" placeholder="私钥"></textarea>
+                          </div>
+                          <div class="form-group">
+                            <textarea class="form-control" name="prikey" rows="8" cols="80" placeholder="公钥证书"></textarea>
+                          </div>
+                          <!-- <div class="form-group">
+                            <div class="row">
+                              <div class="col-sm-6 col-sm-offset-3">
+                              <button id="login-button" class="btn btn-lg btn-primary btn-block" type="submit">Login</button>
+                              </div>
+                            </div>
+                          </div> -->
+                        </div>
+
+                        <div id="keshi-form" style="display: none;">
+
+                            <div id="keshi">
+                     				  <label class="radio-inline">
+                     				  <input type="radio" name="keshi" value="neike" id="neike"> 内科
+                     				  </label>
+                     				  <label class="radio-inline">
+                     				  <input type="radio" name="keshi" value="waike" id="waike"> 外科
+                     				  </label>
+                     				  <label class="radio-inline">
+                     				  <input type="radio" name="keshi" value="erbihouke" id="erbihouke"> 耳鼻喉科
+                     				  </label>
+                     			   </div>
+                     			   <div id="neikeDoctor" style="display: none;">
+                     				  <label class="radio-inline">
+                     				  <input type="radio" name="neikeDoctor" value="anyone" id="neike-anyone" checked> 系统分配
+                     				  </label>
+                     				  <label class="radio-inline">
+                     				  <input type="radio" name="neikeDoctor" value="zhangsan" id="neike-zhangsan"> 张三
+                     				  </label>
+                     				  <label class="radio-inline">
+                     				  <input type="radio" name="neikeDoctor" value="lisi" id="neike-lisi"> 李四
+                     				  </label>
+                     			   </div>
+                     			   <div id="waikeDoctor" style="display: none;">
+                     				  <label class="radio-inline">
+                     				  <input type="radio" name="waikeDoctor" value="anyone" id="waike-anyone" checked> 系统分配
+                     				  </label>
+                     				  <label class="radio-inline">
+                     				  <input type="radio" name="waikeDoctor" value="zhangsan" id="waike-zhangsan"> 王五
+                     				  </label>
+                     				  <label class="radio-inline">
+                     				  <input type="radio" name="waikeDoctor" value="lisi" id="waike-lisi"> 阿萨姆
+                     				  </label>
+                     			   </div>
+                     			   <div id="erbihoukeDoctor" style="display: none;">
+                     				  <label class="radio-inline">
+                     				  <input type="radio" name="erbihoukeDoctor" value="anyone" id="erbihouke-anyone" checked> 系统分配
+                     				  </label>
+                     				  <label class="radio-inline">
+                     				  <input type="radio" name="erbihoukeDoctor" value="zhangsan" id="erbihouke-zhangsan"> 蒙牛
+                     				  </label>
+                     				  <label class="radio-inline">
+                     				  <input type="radio" name="erbihoukeDoctor" value="lisi" id="erbihouke-lisi"> 哥德尔
+                     				  </label>
+                     			   </div>
+
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+          </div>
+
+
+    </div>
+
+
+    <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+
+  </body>
+   <script src="/socket.io/socket.io.js"></script>
+
+   <script type="text/javascript">
+
+
+  $(function () {
+
+    $('#login-form-link').click(function(e) {
+    $("#login-form").delay(100).fadeIn(100);
+    $("#register-form").fadeOut(100);
+    $('#register-form-link').removeClass('active');
+    $(this).addClass('active');
+    e.preventDefault();
+  });
+  $('#keshi-form-link').click(function(e) {
+    $("#keshi-form").delay(100).fadeIn(100);
+    $("#login-form").fadeOut(100);
+    $('#login-form-link').removeClass('active');
+    $(this).addClass('active');
+    e.preventDefault();
+  });
+
+    var socket = io();
+
+    function doctorDiv(keshi) {
+        document.getElementById("neikeDoctor").style.display = "none";
+        document.getElementById("waikeDoctor").style.display = "none";
+        document.getElementById("erbihoukeDoctor").style.display = "none";
+        document.getElementById(keshi+"Doctor").style.display = "block";
+        $('input[name='+keshi+'Doctor]').val("anyone");
+    }
+
+    $("#neike").click(function(){
+        // console.log("neike");
+        doctorDiv("neike");
+    })
+    $("#waike").click(function(){
+        // console.log("waike");
+        doctorDiv("waike");
+    })
+    $("#erbihouke").click(function(){
+        // console.log("erbihouke");
+        doctorDiv("erbihouke");
+    })
+
+
+  })
+
+   </script>
+
+
+</html>

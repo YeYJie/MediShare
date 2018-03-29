@@ -166,6 +166,14 @@ func (t *SimpleAsset) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
 		return t.requestDetail(stub, args)
 	} else if function == "getPatientRecords" {
 		return t.getPatientRecords(stub, args)
+	} else if function == "searchByTime" {
+		return t.searchByTime(stub, args)
+	} else if function == "searchByPatient" {
+		return t.searchByPatient(stub, args)
+	} else if function == "searchByDoctor" {
+		return t.searchByDoctor(stub, args)
+	} else if function == "searchByHospital" {
+		return t.searchByHospital(stub, args)
 	}
 
 	if function == "clear" {

@@ -1,7 +1,7 @@
 package main
 
 import (
-	// "errors"
+	"errors"
 	"strings"
 	"crypto/sha1"
 	"encoding/hex"
@@ -74,6 +74,7 @@ func (t *SimpleAsset) register(stub shim.ChaincodeStubInterface, args []string) 
 	err = t.insertIndex(stub, err, []string{"index1", registerArgs.Patient, txTimestamp}, registertId)
 	err = t.insertIndex(stub, err, []string{"index2", registerArgs.Doctor, txTimestamp}, registertId)
 	err = t.insertIndex(stub, err, []string{"index3", registerArgs.Hospital, txTimestamp}, registertId)
+	err = t.insertIndex(stub, err, []string{"index9", txTimestamp}, registertId)
 	if err != nil {
 		return shim.Error("failed to insertIndex: " + err.Error())
 	}
@@ -209,6 +210,7 @@ func (t *SimpleAsset) newRecord(stub shim.ChaincodeStubInterface, args []string)
 	err = t.insertIndex(stub, err, []string{"index4", newRecordArgs.Patient, txTimestamp}, recordId)
 	err = t.insertIndex(stub, err, []string{"index5", newRecordArgs.Doctor, txTimestamp}, recordId)
 	err = t.insertIndex(stub, err, []string{"index6", newRecordArgs.Hospital, txTimestamp}, recordId)
+	err = t.insertIndex(stub, err, []string{"index10", txTimestamp}, recordId)
 	if err != nil {
 		return shim.Error("failed to insertIndex: " + err.Error())
 	}
@@ -288,6 +290,9 @@ func (t *SimpleAsset) requestDetail(stub shim.ChaincodeStubInterface, args []str
 
 	err = t.insertIndex(stub, err, []string{"index7", requestDetailArgs.Doctor, txTimestamp}, requestId)
 	err = t.insertIndex(stub, err, []string{"index8", requestDetailArgs.Patient, txTimestamp}, requestId)
+	err = t.insertIndex(stub, err, []string{"index11", txTimestamp}, requestId)
+	err = t.insertIndex(stub, err, []string{"index12", requestDetailArgs.TargetHospital, txTimestamp},
+		requestId)
 	if err != nil {
 		return shim.Error("failed to insertIndex: " + err.Error())
 	}
@@ -386,4 +391,110 @@ func (t *SimpleAsset) getPatientRecords(stub shim.ChaincodeStubInterface, args [
 		return shim.Error("failed to json.Marshal: " + err.Error())
 	}
 	return shim.Success(getPatientRecordsReplyJson)
+}
+
+
+
+func (t *SimpleAsset) searchCommon(stub shim.ChaincodeStubInterface,
+							startKey string, endKey string) ([]byte, error) {
+
+	iter, err := stub.GetStateByRange(startKey, endKey)
+	if err != nil {
+		return []byte{}, errors.New("failed to GetStateByRange: " + err.Error())
+	}
+	type SearchReply struct {
+		Items 	[]string
+	}
+	var searchReply SearchReply
+	for iter.HasNext() {
+		kv, _ := iter.Next()
+		temp, err := stub.GetState(string(kv.Value))
+		if err != nil {
+			break;
+		}
+		searchReply.Items = append(searchReply.Items, string(temp))
+	}
+	searchReplyJson, err := json.Marshal(searchReply)
+	if err != nil {
+		return []byte{}, errors.New("failed to json.Marshal: " + err.Error())
+	}
+	return searchReplyJson, nil
+}
+
+func (t *SimpleAsset) searchByTime(stub shim.ChaincodeStubInterface, args []string) peer.Response {
+
+	tType, begin, end := args[0], args[1], args[2]
+	var index string
+	if tType == "register" {
+		index = "index9"
+	} else if tType == "record" {
+		index = "index10"
+	} else if tType == "request" {
+		index = "index11"
+	}
+	startKey := strings.Join([]string{index, begin}, "$$")
+	endKey := strings.Join([]string{index, end}, "$$")
+	searchReplyJson, err := t.searchCommon(stub, startKey, endKey)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+	return shim.Success(searchReplyJson)
+}
+
+func (t *SimpleAsset) searchByPatient(stub shim.ChaincodeStubInterface, args []string) peer.Response {
+
+	patient, pType, begin, end := args[0], args[1], args[2], args[3]
+	var index string
+	if pType == "register" {
+		index = "index1"
+	} else if pType == "record" {
+		index = "index4"
+	}
+	startKey := strings.Join([]string{index, patient, begin}, "$$")
+	endKey := strings.Join([]string{index, patient, end}, "$$")
+	searchReplyJson, err := t.searchCommon(stub, startKey, endKey)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+	return shim.Success(searchReplyJson)
+}
+
+func (t *SimpleAsset) searchByDoctor(stub shim.ChaincodeStubInterface, args []string) peer.Response {
+
+	doctor, dType, begin, end := args[0], args[1], args[2], args[3]
+	var index string
+	if dType == "register" {
+		index = "index2"
+	} else if dType == "record" {
+		index = "index5"
+	} else if dType == "request" {
+		index = "index7"
+	}
+	startKey := strings.Join([]string{index, doctor, begin}, "$$")
+	endKey := strings.Join([]string{index, doctor, end}, "$$")
+	searchReplyJson, err := t.searchCommon(stub, startKey, endKey)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+	return shim.Success(searchReplyJson)
+}
+
+func (t *SimpleAsset) searchByHospital(stub shim.ChaincodeStubInterface, args []string) peer.Response {
+
+	hospital, hType, begin, end := args[0], args[1], args[2], args[3]
+	var index string
+	if hType == "register" {
+		index = "index3"
+	} else if hType == "record" {
+		index = "index6"
+	} else if hType == "grant" {
+		index = "index12"
+	}
+	startKey := strings.Join([]string{index, hospital, begin}, "$$")
+	endKey := strings.Join([]string{index, hospital, end}, "$$")
+	searchReplyJson, err := t.searchCommon(stub, startKey, endKey)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+	return shim.Success(searchReplyJson)
 }

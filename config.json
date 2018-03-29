@@ -1,7 +1,7 @@
 {
    "host":"localhost",
    "port":"8080",
-   "hospital":"shengzhongyi",
+   "hospital":"省中医",
    "channelsList": ["mychannel"],
    "GOPATH":"../artifacts",
    "keyValueStore":"/tmp/fabric-client-kvs",

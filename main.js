@@ -60,22 +60,22 @@ var patientSocket = new Map;
 var doctorPatients = new Map;
 
 var doctorNameToId = new Map;
-doctorNameToId["zhangsan"] = "123";
-doctorNameToId["lisi"] = "456";
+doctorNameToId["张三"] = "123";
+doctorNameToId["李四"] = "456";
 var doctorIdToName = new Map;
-doctorIdToName["123"] = "zhangsan";
-doctorIdToName["456"] = "lisi";
+doctorIdToName["123"] = "张三";
+doctorIdToName["456"] = "李四";
 
 var patientIdToName = new Map;
-patientIdToName["1"] = "patient1";
-patientIdToName["2"] = "patient2";
-patientIdToName["3"] = "patient3";
+patientIdToName["1"] = "叶永杰";
+patientIdToName["2"] = "张国庆";
+patientIdToName["3"] = "王翠花";
 
 var eventWatcher = [];
 
 var register = function(pid, keshi, dname) {
 	if(dname === "anyone") {
-		dname = "zhangsan";
+		dname = "张三";
 	}
 	var doctorId = doctorNameToId[dname];
 	if(util.isArray(doctorPatients[doctorId])) {
@@ -122,6 +122,11 @@ app.get('/patient', function(req, res){
 	res.sendFile(__dirname + '/page/patient.html');
 });
 
+app.get('/newPatient', function(req, res){
+	console.log('/newPatient')
+	res.sendFile(__dirname + '/page/newPatient.html');
+});
+
 app.get('/blockchain', function(req, res){
 	console.log('/blockchain')
 	res.sendFile(__dirname + '/page/blockchain.html');
@@ -131,7 +136,7 @@ app.get('/getDoctorInfo/:id', function(req, res){
 	id = req.params.id;
 	console.log('/getDoctorInfo/:id ', id);
 	res.send({ header: "http://172.18.232.124:8080/header/" + id.toString(),
-			name: "yeyongjie",
+			name: "张医生",
 			phone:"15521132718",
 			email:"394566396@qq.com",
 			addr:"sysundc"});
@@ -141,7 +146,7 @@ app.get('/getPatientInfo/:id', function(req, res){
 	id = req.params.id;
 	console.log('/getPatientInfo/:id ', id);
 	res.send({ header: "http://172.18.232.124:8080/header/" + id.toString(),
-			name: "patientYe",
+			name: "叶永杰",
 			phone:"15521132718",
 			email:"sysuyyj@qq.com",
 			addr:"sysundc"});
@@ -346,6 +351,10 @@ io.on('connection', function(socket){
 		});
 	});
 
+	socket.on('keshiAndDoctor', function(req){
+		// socket.emit('keshiAndDoctor', {"内科": ["张三", "李四"], "外科": [""]})
+	});
+
 
 	/*
 	*	For Doctor
@@ -421,6 +430,39 @@ io.on('connection', function(socket){
 		});
 	});
 
+	socket.on('search-time', function(req) {
+		console.log("search-time", [req.type, req.begin, req.end]);
+		var cmd = ['./bishe/searchTime.sh', req.type, req.begin, req.end].join(' ');
+		asyncExec(cmd, function(result){
+			console.log(result.stdout);
+			socket.emit('search-time', {type: req.type, result: result.stdout});
+		});
+	});
+	socket.on('search-patient', function(req) {
+		console.log("search-patient", [req.patient, req.type, req.begin, req.end]);
+		var cmd = ['./bishe/searchPatient.sh', req.patient, req.type, req.begin, req.end].join(' ');
+		asyncExec(cmd, function(result){
+			console.log(result.stdout);
+			socket.emit('search-patient', {type: req.type, result: result.stdout});
+		});
+	});
+	socket.on('search-doctor', function(req) {
+		console.log("search-doctor", [req.doctor, req.type, req.begin, req.end]);
+		var cmd = ['./bishe/searchDoctor.sh', req.doctor, req.type, req.begin, req.end].join(' ');
+		asyncExec(cmd, function(result){
+			console.log(result.stdout);
+			socket.emit('search-doctor', {type: req.type, result: result.stdout});
+		});
+	});
+	socket.on('search-hospital', function(req) {
+		console.log("search-hospital", [req.hospital, req.type, req.begin, req.end]);
+		var cmd = ['./bishe/searchHospital.sh', req.hospital, req.type, req.begin, req.end].join(' ');
+		asyncExec(cmd, function(result){
+			console.log(result.stdout);
+			socket.emit('search-hospital', {type: req.type, result: result.stdout});
+		});
+	});
+
 });
 
 
@@ -467,8 +509,3 @@ var server = http.listen(port, function() {
 	console.log(`Please open Internet explorer to access ：http://${host}:${port}/`);
 	myEventListener.myRegisterEventListener('org1', "event", eventCallback, null);
 });
-
-
-
-
-

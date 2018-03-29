@@ -5,8 +5,6 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="">
 
     <title>Dashboard Template for Bootstrap</title>
 
@@ -48,10 +46,10 @@
                   <div class="panel-heading">
                     <div class="row">
                       <div class="col-xs-6">
-                        <a href="#" class="active" id="login-form-link">Login</a>
+                        <a href="#" class="active" id="login-form-link">登录</a>
                       </div>
                       <div class="col-xs-6">
-                        <a href="#" id="register-form-link">Register</a>
+                        <a href="#" id="register-form-link">注册</a>
                       </div>
                     </div>
                     <hr>
@@ -71,7 +69,7 @@
                           <div class="form-group">
                             <div class="row">
                               <div class="col-sm-6 col-sm-offset-3">
-                              <button id="login-button" class="btn btn-lg btn-primary btn-block" type="submit">Login</button>
+                              <button id="login-button" class="btn btn-lg btn-primary btn-block" type="submit">登录</button>
                               </div>
                             </div>
                           </div>
@@ -151,7 +149,7 @@
                   <div class="row">
                   <ul id="doctorInfoEdit" class="nav nav-sidebar">
                         <!-- <li><a><button id="doctorInfoEdit-button" class="btn btn-default btn-lg btn-block">Edit</button></a></li> -->
-                        <li><a><button id="doctorInfoEdit-logout-button" class="btn btn-default btn-lg btn-block">Logout</button></a></li>
+                        <li><a><button id="doctorInfoEdit-logout-button" class="btn btn-default btn-lg btn-block">登出</button></a></li>
                   </ul>
                   </div>
 
@@ -174,10 +172,10 @@
 
 
     <div id="patientList" style="display: block;">
-      <h1 class="page-header">Patient List</h1>
+      <h1 class="page-header">挂号病人</h1>
         <table id="patientList-table" class="table table-striped">
         <thead>
-            <th>Patient Name</th>
+            <th>姓名</th>
             <th></th>
         </thead>
         <tbody>
@@ -189,22 +187,22 @@
 
     <div id="patientRecords" style="display: none;">
      <div id="patientRecords-record">
-      <h1 class="page-header">Patient Records</h1>
+      <h1 class="page-header">病历记录</h1>
       <table id="patientRecords-table" class="table table-striped">
       <thead>
-          <th>Hospital</th>
-          <th>Doctor</th>
-          <th>Time</th>
-          <th>Inspection</th>
+          <th>医院</th>
+          <th>医生</th>
+          <th>时间</th>
+          <th>检查项目</th>
           <th></th>
       </thead>
       <tbody></tbody>
       </table>
      </div>
      <div id="patientRecords-diagnose">
-      <p><button id="patientRecords-diagnose-button" class="btn btn-lg btn-default btn-block">Diagnose</button></p>
-      <p><button id="patientRecords-referral-button" class="btn btn-lg btn-default btn-block">Referral</button></p>
-      <p><button id="patientRecords-goback" class="btn btn-lg btn-default btn-block">Go Back</button></p>
+      <p><button id="patientRecords-diagnose-button" class="btn btn-lg btn-default btn-block">诊疗</button></p>
+      <!-- <p><button id="patientRecords-referral-button" class="btn btn-lg btn-default btn-block">Referral</button></p> -->
+      <p><button id="patientRecords-goback" class="btn btn-lg btn-default btn-block">返回</button></p>
      </div>
     </div>
 
@@ -212,23 +210,23 @@
 
     <div id="diagnose" style="display: none;">
       <h1 class="page-header">Diagnose</h1>
-     <p><fieldset><legend>Inspection</legend><textarea class="form-control" row="5" name="inspection" id="diagnoseInspection"></textarea></fieldset></p>
-     <p><fieldset><legend>Result</legend><textarea class="form-control" row="5" name="result" id="diagnoseResult"></textarea></fieldset></p>
-     <p><fieldset><legend>Analysis</legend><textarea class="form-control" row="5" name="analysis" id="diagnoseAnalysis"></textarea></fieldset></p>
-     <p><fieldset><legend>Prescription</legend><textarea class="form-control" row="5" name="prescription" id="diagnosePrescription"></textarea></fieldset></p>
+     <p><fieldset><legend>检查项目</legend><textarea class="form-control" row="5" name="inspection" id="diagnoseInspection"></textarea></fieldset></p>
+     <p><fieldset><legend>检查结果</legend><textarea class="form-control" row="5" name="result" id="diagnoseResult"></textarea></fieldset></p>
+     <p><fieldset><legend>诊疗意见</legend><textarea class="form-control" row="5" name="analysis" id="diagnoseAnalysis"></textarea></fieldset></p>
+     <p><fieldset><legend>处方</legend><textarea class="form-control" row="5" name="prescription" id="diagnosePrescription"></textarea></fieldset></p>
 
-     <p><fieldset><legend>Attachment</legend></fieldset></p>
+     <p><fieldset><legend>附件</legend></fieldset></p>
      <p><fieldset><input type="file" name="sampleFile" id="uploadFile" multiple/></fieldset></p>
      <p><fieldset><legend> </legend></fieldset></p>
-     <p><button id="diagnose-submit" class="btn btn-lg btn-default btn-block">Submit</button></p>
-     <p><button id="diagnose-goback" class="btn btn-lg btn-default btn-block">Go Back</button></p>
+     <p><button id="diagnose-submit" class="btn btn-lg btn-default btn-block">提交</button></p>
+     <p><button id="diagnose-goback" class="btn btn-lg btn-default btn-block">返回</button></p>
     </div>
 
 
     <div id="recordDetail" style="display: none;">
-      <h1 class="page-header">Record Detail</h1>
+      <h1 class="page-header">记录详情</h1>
       <div id="recordDetail-div"></div>
-      <p><button id="recordDetail-goback" class="btn btn-lg btn-default btn-block">Go Back</button></p>
+      <p><button id="recordDetail-goback" class="btn btn-lg btn-default btn-block">返回</button></p>
     </div>
 
 
@@ -415,15 +413,15 @@
       console.log('doctorInfo', data);
       var doctorInfo = JSON.parse(data.doctorInfo);
       document.getElementById("doctorInfoHeader").innerHTML = '<li><a><img src="'+doctorInfo.header + '" /></a></li>';
-      var doctorInfoDetailHTML = '<li><a>Name: ' + doctorInfo.name + '</a></li>';
-      doctorInfoDetailHTML += '<li><a>Phone: ' + doctorInfo.phone + '</a></li>';
-      doctorInfoDetailHTML += '<li><a>Email: ' + doctorInfo.email + '</a></li>';
-      doctorInfoDetailHTML += '<li><a>Addr: ' + doctorInfo.addr + '</a></li>';
+      var doctorInfoDetailHTML = '<li><a>姓名: ' + doctorInfo.name + '</a></li>';
+      doctorInfoDetailHTML += '<li><a>电话: ' + doctorInfo.phone + '</a></li>';
+      doctorInfoDetailHTML += '<li><a>邮箱: ' + doctorInfo.email + '</a></li>';
+      doctorInfoDetailHTML += '<li><a>住址: ' + doctorInfo.addr + '</a></li>';
       document.getElementById("doctorInfoDetail").innerHTML = doctorInfoDetailHTML;
     });
     var buildPatientHTML = function(patient) {
       return '<tr><td>' + patient.name + '</td><td><button id="patientList-'+patient.id
-       +'" data-pid="'+patient.id+'" class="btn btn-default btn-lg btn-block">Diagnose</button></td></tr>';
+       +'" data-pid="'+patient.id+'" class="btn btn-default btn-lg btn-block">诊疗</button></td></tr>';
     };
     socket.on('doctorPatients', function(data){
       console.log('doctorPatients', data);
@@ -448,10 +446,10 @@
       console.log('patientInfo', data);
       var patientInfo = JSON.parse(data.patientInfo);
       document.getElementById("patientInfoHeader").innerHTML = '<img src="'+patientInfo.header + '" />';
-      var patientInfoDetailHTML = '<li><a>Name: ' + patientInfo.name + '</a></li>';
-      patientInfoDetailHTML += '<li><a>Phone: ' + patientInfo.phone + '</a></li>';
-      patientInfoDetailHTML += '<li><a>Email: ' + patientInfo.email + '</a></li>';
-      patientInfoDetailHTML += '<li><a>Addr: ' + patientInfo.addr + '</a></li>';
+      var patientInfoDetailHTML = '<li><a>姓名: ' + patientInfo.name + '</a></li>';
+      patientInfoDetailHTML += '<li><a>电话: ' + patientInfo.phone + '</a></li>';
+      patientInfoDetailHTML += '<li><a>邮箱: ' + patientInfo.email + '</a></li>';
+      patientInfoDetailHTML += '<li><a>住址: ' + patientInfo.addr + '</a></li>';
       document.getElementById("patientInfoDetail").innerHTML = patientInfoDetailHTML;
       document.getElementById("doctorInfo").style.display = "none";
       document.getElementById("patientInfo").style.display = "block";
@@ -469,7 +467,7 @@
           + '</td><td>' + y + '-' + m + '-' + d + '</td><td>' + record.Inspection
           + '</td><td><button id="patientRecord-'+record.RecordId+'" data-rid="'
           + record.RecordId + '" data-pid="' + data.id + '" data-th="'
-          + record.Hospital + '" class="btn btn-default btn-lg btn-block">Request Details</button></td>';
+          + record.Hospital + '" class="btn btn-default btn-lg btn-block">查看细节</button></td>';
       };
       if(!patientRecords) return;
       for(var i = 0; i < patientRecords.length; i++) {
@@ -491,18 +489,18 @@
 
       var detail = JSON.parse(data.recordDetail);
       console.log(detail);
-      recordDetailHTML = '<p><fieldset><legend>Inspection</legend>'+detail.inspection+'</fieldset></p>';
-      recordDetailHTML += '<p></p><p><fieldset><legend>Result</legend>'+detail.result+'</fieldset></p>';
-      recordDetailHTML += '<p><fieldset><legend>Analysis</legend>'+detail.analysis+'</fieldset></p>';
-      recordDetailHTML += '<p><fieldset><legend>Prescription</legend>'+detail.prescription+'</fieldset></p>';
-      recordDetailHTML += '<p><fieldset><legend>Attachment</legend>';
+      recordDetailHTML = '<p><fieldset><legend>检查项目</legend>'+detail.inspection+'</fieldset></p>';
+      recordDetailHTML += '<p></p><p><fieldset><legend>检查结果</legend>'+detail.result+'</fieldset></p>';
+      recordDetailHTML += '<p><fieldset><legend>诊疗意见</legend>'+detail.analysis+'</fieldset></p>';
+      recordDetailHTML += '<p><fieldset><legend>处方</legend>'+detail.prescription+'</fieldset></p>';
+      recordDetailHTML += '<p><fieldset><legend>附件</legend>';
       var files = detail.files;
       if(files.length > 0) {
         for(var i = 0; i < files.length; i++) {
           recordDetailHTML += '<p><img src="http://172.18.232.124:8080/file/'+files[i]+'" /></p>';
         }
       } else {
-        recordDetailHTML += '<p>No Attachment</p>';
+        recordDetailHTML += '<p>无附件</p>';
       }
       recordDetailHTML += '</fieldset></p>';
       document.getElementById("recordDetail-div").innerHTML = recordDetailHTML;
