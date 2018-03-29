@@ -54,37 +54,39 @@ var asyncExec = function(cmd, callback) {
 		});
 };
 
+var doctorIdToName = new Map;
+doctorIdToName["14301036"] = "张三";
+doctorIdToName["14301037"] = "李四";
+doctorIdToName["14301038"] = "王五";
+doctorIdToName["14301039"] = "李六";
+doctorIdToName["14301040"] = "叶七";
+var patientIdToName = new Map;
+patientIdToName["24301030"] = "王勇";
+patientIdToName["24301031"] = "张静";
+patientIdToName["24301032"] = "李杰";
+patientIdToName["24301033"] = "李桂英";
+patientIdToName["24301034"] = "张艳";
+patientIdToName["24301035"] = "张秀英";
+patientIdToName["24301036"] = "张伟";
+
 
 var doctorSocket = new Map;
 var patientSocket = new Map;
 var doctorPatients = new Map;
 
-var doctorNameToId = new Map;
-doctorNameToId["张三"] = "123";
-doctorNameToId["李四"] = "456";
-var doctorIdToName = new Map;
-doctorIdToName["123"] = "张三";
-doctorIdToName["456"] = "李四";
-
-var patientIdToName = new Map;
-patientIdToName["1"] = "叶永杰";
-patientIdToName["2"] = "张国庆";
-patientIdToName["3"] = "王翠花";
-
 var eventWatcher = [];
 
-var register = function(pid, keshi, dname) {
-	if(dname === "anyone") {
-		dname = "张三";
+var register = function(pid, did) {
+	if(did === "0") {
+		did = "14301036";
 	}
-	var doctorId = doctorNameToId[dname];
-	if(util.isArray(doctorPatients[doctorId])) {
-		doctorPatients[doctorId].push(pid);
+	if(util.isArray(doctorPatients[did])) {
+		doctorPatients[did].push(pid);
 	} else {
-		doctorPatients[doctorId] = [pid];
+		doctorPatients[did] = [pid];
 	}
-	console.log(register, [pid, keshi, dname], doctorPatients[doctorId]);
-	return doctorId;
+	console.log(register, [pid, did], doctorPatients[did]);
+	return did;
 };
 var deRegister = function(pid, did) {
 	var patients = doctorPatients[did];
@@ -135,21 +137,39 @@ app.get('/blockchain', function(req, res){
 app.get('/getDoctorInfo/:id', function(req, res){
 	id = req.params.id;
 	console.log('/getDoctorInfo/:id ', id);
-	res.send({ header: "http://172.18.232.124:8080/header/" + id.toString(),
-			name: "张医生",
-			phone:"15521132718",
-			email:"394566396@qq.com",
-			addr:"sysundc"});
+	// res.send({ header: "http://172.18.232.124:8080/header/" + id.toString(),
+	// 		name: "张医生",
+	// 		phone:"15521132718",
+	// 		email:"394566396@qq.com",
+	// 		addr:"sysundc"});
+	MongoClient.connect(MongoURL, function(err, db) {
+		if (err) throw err;
+		var dbo = db.db("mydb");
+		dbo.collection("doctor").findOne({id: id}, {header: 0, prikey: 0, pkc: 0},  function(err, mres) {
+			if (err) throw err;
+			res.send(mres);
+			db.close();
+		});
+	});
 });
 
 app.get('/getPatientInfo/:id', function(req, res){
 	id = req.params.id;
 	console.log('/getPatientInfo/:id ', id);
-	res.send({ header: "http://172.18.232.124:8080/header/" + id.toString(),
-			name: "叶永杰",
-			phone:"15521132718",
-			email:"sysuyyj@qq.com",
-			addr:"sysundc"});
+	// res.send({ header: "http://172.18.232.124:8080/header/" + id.toString(),
+	// 		name: "叶永杰",
+	// 		phone:"15521132718",
+	// 		email:"sysuyyj@qq.com",
+	// 		addr:"sysundc"});
+	MongoClient.connect(MongoURL, function(err, db) {
+		if (err) throw err;
+		var dbo = db.db("mydb");
+		dbo.collection("patient").findOne({id: id}, {header: 0, prikey: 0, pkc: 0},  function(err, mres) {
+			if (err) throw err;
+			res.send(mres);
+			db.close();
+		});
+	});
 });
 
 app.get('/getDoctorsPatients/:id', function(req, res){
@@ -158,11 +178,12 @@ app.get('/getDoctorsPatients/:id', function(req, res){
 	// res.send({patients: [{name: "patient1", id:1},
 	// 		{name: "patient2", id:2}, {name: "patient3", id:3}]});
 	var patients = doctorPatients[id];
-	if(!util.isArray(patients))
+	if(!patients || !util.isArray(patients))
 		res.send({patients:[]});
 	var temp = [];
 	for(var i = 0; i < patients.length; i++) {
 		temp[i] = {name: patientIdToName[patients[i]], id: patients[i]};
+		// temp[i] = {name: "", id: patients[i]};
 	}
 	res.send({patients: temp});
 });
@@ -170,7 +191,8 @@ app.get('/getDoctorsPatients/:id', function(req, res){
 app.get('/header/:id', function(req, res){
 	id = req.params.id;
 	console.log('/header/:id ', id);
-	res.send("header");
+	// res.send("header");
+	res.sendFile(__dirname + '/header/' + id + '.png');
 });
 
 app.get('/requestDetail/:txid', function(req, httpRes){
@@ -201,7 +223,16 @@ app.get('/requestDetail/:txid', function(req, httpRes){
 
 app.get('/getPatientNameFromId/:pid', function(req, res){
 	var pid = req.params.pid;
-	res.send(patientIdToName[pid]);
+	// res.send(patientIdToName[pid]);
+	MongoClient.connect(MongoURL, function(err, db) {
+		if (err) throw err;
+		var dbo = db.db("mydb");
+		dbo.collection("patient").findOne({id: pid}, {name: 1},  function(err, mres) {
+			if (err) throw err;
+			res.send(mres.name);
+			db.close();
+		});
+	});
 });
 
 app.get('/file/:fileName', function(req, res){
@@ -323,15 +354,14 @@ io.on('connection', function(socket){
 	*	For Patient
 	*/
 	socket.on('register', function(req){
-		var pid = req.id;
-		var keshi = req.keshi;
-		var doctor = req.doctor;
+		var pid = req.pid;
+		var did = req.did;
 		var time = req.time;
 		var sig = req.sig;
 		var pkc = req.pkc;
 		patientSocket[pid] = socket;
-		var did = register(pid, keshi, doctor);
-		console.log('patient register', [pid, keshi, doctor, time, sig, pkc]);
+		var did = register(pid, did);
+		console.log('patient register', [pid, did, time, sig, pkc]);
 		var cmd = ['./bishe/register.sh', pid, did, hospital].join(' ');
 		asyncExec(cmd, function(result){
 			socket.emit('onRegister', {did:did , msg: "Please go to room 431"});
@@ -344,7 +374,7 @@ io.on('connection', function(socket){
 		var sig = req.sig;
 		var pkc = req.pkc;
 		deRegister(pid, did);
-		console.log('patient deRegister', [pid, time, sig, pkc]);
+		console.log('patient deRegister', [pid, did, time, sig, pkc]);
 		var cmd = ['./bishe/deRegister.sh', pid, did, hospital].join(' ');
 		asyncExec(cmd, function(result){
 			console.log("patient deRegister success");
@@ -352,7 +382,7 @@ io.on('connection', function(socket){
 	});
 
 	socket.on('keshiAndDoctor', function(req){
-		// socket.emit('keshiAndDoctor', {"内科": ["张三", "李四"], "外科": [""]})
+		socket.emit('keshiAndDoctor', {"内科": ["张三", "李四"], "外科": ["王五", "李六", "叶七"], "康复科": ["林八"]});
 	});
 
 
@@ -364,7 +394,8 @@ io.on('connection', function(socket){
 		var id = req.id;
 		var pwd = req.pwd;
 		console.log('login', [id, pwd]);
-		doctorSocket[id] = socket;
+		// doctorSocket[id] = socket;
+		eventWatcher.push(socket);
 		// myEventListener.myRegisterEventListener('org1', "d1", doctor.doctorHandler, socket);
 		var cmd = './bishe/getDoctorInfo.sh ' + id;
 		console.log(cmd);
@@ -471,9 +502,9 @@ var eventCallback = function(event) {
 	var e = JSON.parse(event.payload);
 	if(!e) return;
 	console.log("eventCallback: ", [e.TxId, e.EventType, e.Payload]);
-	var socket = doctorSocket["123"];
-	if(socket)
-		socket.emit("event", e);
+	// var socket = doctorSocket["123"];
+	// if(socket)
+	// 	socket.emit("event", e);
 
 	for(var i = 0; i < eventWatcher.length; i++) {
 		eventWatcher[i].emit('event', e);

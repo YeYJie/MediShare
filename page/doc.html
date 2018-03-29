@@ -27,7 +27,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand">Project name</a>
+          <a class="navbar-brand" id="hospital-name">Project name</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <form class="navbar-form navbar-right">
@@ -366,7 +366,7 @@
     });
 
     $('#login-button').click(function(){
-      globalDid = $('#login-id').val();
+      globalDid = $('#login-id').val().toString();
       socket.emit('login', {id: globalDid, pwd: $('#login-pwd').val()})
       $('#login-id').val(""); $('#login-pwd').val("");
       // document.getElementById("outer-wrap").style.display = "none";
@@ -412,12 +412,15 @@
     socket.on('doctorInfo', function(data){
       console.log('doctorInfo', data);
       var doctorInfo = JSON.parse(data.doctorInfo);
-      document.getElementById("doctorInfoHeader").innerHTML = '<li><a><img src="'+doctorInfo.header + '" /></a></li>';
+      document.getElementById("doctorInfoHeader").innerHTML = '<li><a><img src="/header/'+doctorInfo.id + '" /></a></li>';
       var doctorInfoDetailHTML = '<li><a>姓名: ' + doctorInfo.name + '</a></li>';
+      doctorInfoDetailHTML += '<li><a>科室: ' + doctorInfo.keshi + '</a></li>';
+      doctorInfoDetailHTML += '<li><a>职位: ' + doctorInfo.position + '</a></li>';
       doctorInfoDetailHTML += '<li><a>电话: ' + doctorInfo.phone + '</a></li>';
       doctorInfoDetailHTML += '<li><a>邮箱: ' + doctorInfo.email + '</a></li>';
       doctorInfoDetailHTML += '<li><a>住址: ' + doctorInfo.addr + '</a></li>';
       document.getElementById("doctorInfoDetail").innerHTML = doctorInfoDetailHTML;
+      document.getElementById("hospital-name").innerHTML = data.hospital;
     });
     var buildPatientHTML = function(patient) {
       return '<tr><td>' + patient.name + '</td><td><button id="patientList-'+patient.id
@@ -445,7 +448,7 @@
     socket.on('patientInfo', function(data){
       console.log('patientInfo', data);
       var patientInfo = JSON.parse(data.patientInfo);
-      document.getElementById("patientInfoHeader").innerHTML = '<img src="'+patientInfo.header + '" />';
+      document.getElementById("patientInfoHeader").innerHTML = '<img src="/header/'+patientInfo.id + '" />';
       var patientInfoDetailHTML = '<li><a>姓名: ' + patientInfo.name + '</a></li>';
       patientInfoDetailHTML += '<li><a>电话: ' + patientInfo.phone + '</a></li>';
       patientInfoDetailHTML += '<li><a>邮箱: ' + patientInfo.email + '</a></li>';

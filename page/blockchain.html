@@ -35,19 +35,28 @@
 
 		socket.emit('watch', {});
 
+var timeToString = function(t) {
+      var date = new Date(parseInt(t) * 1000);
+      var y = date.getFullYear();
+      var m = date.getMonth() + 1;
+      var d = date.getDate();
+      // return y.toString() + '-' + m.toString() + '-' + d.toString() + date.getHours().toString ;
+      return [y.toString(), m.toString(), d.toString()].join('-') + ' ' + [date.getHours().toString(), date.getMinutes().toString(), date.getSeconds().toString()].join(':')
+}
+
 		var buildRow = function(tid, timestamp, etype, payload) {
 			var payloadHTML;
 			if(etype === "register") {
 				payloadHTML = '<p>Patient: ' + payload.Patient + '</p>'
 							+ '<p>Doctor: ' + payload.Doctor + '</p>'
 							+ '<p>Hospital: ' + payload.Hospital + '</p>'
-							+ '<p>Time: ' + payload.HospitalTime + '</p>';
+							+ '<p>Time: ' + timeToString(payload.HospitalTime) + '</p>';
 			}
 			else if(etype === "deRegister") {
 				payloadHTML = '<p>Patient: ' + payload.Patient + '</p>'
 							+ '<p>Doctor: ' + payload.Doctor + '</p>'
 							+ '<p>Hospital: ' + payload.Hospital + '</p>'
-							+ '<p>Time: ' + payload.PatientTime + '</p>';
+							+ '<p>Time: ' + timeToString(payload.PatientTime) + '</p>';
 			}
 			else if(etype === "newRecord") {
 				payloadHTML = '<p>Hospital: ' + payload.Hospital + '</p>'
@@ -55,7 +64,7 @@
 							+ '<p>Patient: ' + payload.Patient + '</p>'
 							+ '<p>RecordId: ' + payload.RecordId + '</p>'
 							+ '<p>Inspection: ' + payload.Inspection + '</p>'
-							+ '<p>Time: ' + payload.HospitalTime + '</p>';
+							+ '<p>Time: ' + timeToString(payload.HospitalTime) + '</p>';
 			}
 			else if(etype === "requestGrant") {
 				payloadHTML = '<p>RequestDoctor: ' +  payload.RequestDoctor + '</p>'
@@ -63,7 +72,7 @@
 							+ '<p>Patient: ' +  payload.Patient + '</p>'
 							+ '<p>TargetHospital: ' +  payload.TargetHospital + '</p>'
 							+ '<p>RecordId: ' +  payload.RecordId + '</p>'
-							+ '<p>RequestTime: ' +  payload.RequestTime + '</p>';
+							+ '<p>RequestTime: ' +  timeToString(payload.RequestTime) + '</p>';
 			}
 			return '<tr><td>' + tid + '</td>'
 					+ '<td>' + timestamp + '</td>'
@@ -181,23 +190,17 @@ $('#search-hospital-button').click(function(){
   socket.emit('search-hospital', {hospital: hospital, type: type, begin: begin, end: end});
 })
 
-var timeToString = function(t) {
-      var date = new Date(parseInt(t) * 1000);
-      var y = date.getFullYear();
-      var m = date.getMonth() + 1;
-      var d = date.getDate();
-      return y.toString() + '-' + m.toString() + '-' + d.toString();
-}
+
 
 var renderRegister = function(items) {
   var tableHTML = '<table><thead><th>病人</th><th>挂号医生</th><th>挂号医院</th><th>挂号时间</th></thead><tbody>';
   if(items)
 {  for(var i = 0; i < items.length;  i++) {
     var item = JSON.parse(items[i]);
-    tableHTML += '<th>' + item.Patient + '</th>';
+    tableHTML += '<tr><th>' + item.Patient + '</th>';
     tableHTML += '<th>' + item.Doctor + '</th>';
     tableHTML += '<th>' + item.Hospital + '</th>';
-    tableHTML += '<th>' + timeToString(item.HospitalTime) + '</th>';
+    tableHTML += '<th>' + timeToString(item.HospitalTime) + '</th></tr>';
   }}
   tableHTML += '</tbody></table>';
   document.getElementById("search-result-div").innerHTML = tableHTML;
@@ -207,11 +210,11 @@ var renderRecord = function(items) {
   var tableHTML = '<table><thead><th>医院</th><th>诊断医生</th><th>病人</th><th>诊断时间</th><th>检查项目</th></thead><tbody>';
 if(items){  for(var i = 0; i < items.length;  i++) {
     var item = JSON.parse(items[i]);
-    tableHTML += '<th>' + item.Hospital + '</th>';
+    tableHTML += '<tr><th>' + item.Hospital + '</th>';
     tableHTML += '<th>' + item.Doctor + '</th>';
     tableHTML += '<th>' + item.Patient + '</th>';
     tableHTML += '<th>' + timeToString(item.HospitalTime) + '</th>';
-    tableHTML += '<th>' + item.Inspection + '</th>';
+    tableHTML += '<th>' + item.Inspection + '</th></tr>';
   }}
   tableHTML += '</tbody></table>';
   document.getElementById("search-result-div").innerHTML = tableHTML;
@@ -221,12 +224,12 @@ var renderRequest = function(items) {
   var tableHTML = '<table><thead><th>医生</th><th>医院</th><th>病人</th><th>目标医院</th><th>记录Id</th><th>请求时间</th></thead><tbody>';
 if(items){  for(var i = 0; i < items.length;  i++) {
     var item = JSON.parse(items[i]);
-    tableHTML += '<th>' + item.Doctor + '</th>';
+    tableHTML += '<tr><th>' + item.Doctor + '</th>';
     tableHTML += '<th>' + item.Hospital + '</th>';
     tableHTML += '<th>' + item.Patient + '</th>';
     tableHTML += '<th>' + item.TargetHospital + '</th>';
     tableHTML += '<th>' + item.RecordId + '</th>';
-    tableHTML += '<th>' + timeToString(item.RequestTime) + '</th>';
+    tableHTML += '<th>' + timeToString(item.RequestTime) + '</th></tr>';
   }}
   tableHTML += '</tbody></table>';
   document.getElementById("search-result-div").innerHTML = tableHTML;

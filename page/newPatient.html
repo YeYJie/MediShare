@@ -5,13 +5,8 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="">
-
-    <title>Dashboard Template for Bootstrap</title>
 
     <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-
     <link href="dashboard.css" rel="stylesheet">
     <link href="signin.css" rel="stylesheet">
 
@@ -20,108 +15,127 @@
 
   <body>
 
-    <div class="container-fluid">
+      <div class="container-fluid">
 
-          <div class="row" id="before-login">
-            <div style="height: 10vh;"></div>
-              <div class="col-md-4 col-md-offset-4">
-                <div class="panel panel-login">
+      <div id="onRegister" style="display: none;">
+<!--          <p>
+         <h2 id="onRegisterMsg">Wait for Register</h2>
+         </p>
+         <p><button id="deRegister-button">deRegister</button></p> -->
+         <div class="row">
+          <div class="col-md-6 col-md-offset-3">
+            <h2 id="onRegisterMsg">Wait for Register</h2>
+          </div>
+         </div>
+         <div class="row">
+         <div class="col-md-6 col-md-offset-3">
+           <button class="form-control" id="deRegister-button">deRegister</button>
+         </div>
+         </div>
+      </div>
 
-                  <div class="panel-heading">
-                    <div class="row">
-                      <div class="col-xs-6">
-                        <a href="#" class="active" id="login-form-link">基本信息</a>
+            <div class="row" id="before-register">
+              <div style="height: 10vh;"></div>
+                <div class="col-md-4 col-md-offset-4">
+                  <div class="panel panel-login">
+                    <div class="panel-heading">
+                      <div class="row">
+                        <div class="col-xs-6">
+                          <a href="#" class="active" id="login-form-link">挂号</a>
+                        </div>
+                        <div class="col-xs-6">
+                          <a href="#" id="register-form-link">注册</a>
+                        </div>
                       </div>
-                      <div class="col-xs-6">
-                        <a href="#" id="keshi-form-link">科室</a>
-                      </div>
+                      <hr>
                     </div>
-                    <hr>
-                  </div>
+                    <div class="panel-body">
+                      <div class="row">
+                        <div class="col-lg-12">
 
-                  <div class="panel-body">
-                    <div class="row">
-                      <div class="col-lg-12">
 
-                        <div id="login-form" style="display: block;">
-                          <div class="form-group">
-                            <input type="text" name="username" id="login-id" tabindex="1" class="form-control" placeholder="ID" value="">
-                          </div>
-                          <!-- <div class="form-group">
-                            <input type="password" name="password" id="login-pwd" tabindex="2" class="form-control" placeholder="Password">
-                          </div> -->
-                          <div class="form-group">
-                            <textarea class="form-control" name="prikey" rows="8" cols="80" placeholder="私钥"></textarea>
-                          </div>
-                          <div class="form-group">
-                            <textarea class="form-control" name="prikey" rows="8" cols="80" placeholder="公钥证书"></textarea>
-                          </div>
-                          <!-- <div class="form-group">
-                            <div class="row">
-                              <div class="col-sm-6 col-sm-offset-3">
-                              <button id="login-button" class="btn btn-lg btn-primary btn-block" type="submit">Login</button>
+                          <div id="login-form" style="display: block;">
+                            <div class="form-group">
+                              <input type="text" name="username" id="login-id" tabindex="1" class="form-control" placeholder="Id" value="">
+                            </div>
+                            <div class="form-group">
+                              <input type="password" name="password" id="login-pwd" tabindex="2" class="form-control" placeholder="Password">
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <a>内科</a>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input type="radio" name="doctor" value="14301036">  张三
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input type="radio" name="doctor" value="14301037">  李四
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <a>外科</a>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input type="radio" name="doctor" value="14301038">  王五
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input type="radio" name="doctor" value="14301039">  李六
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input type="radio" name="doctor" value="14301040">  叶七
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                              <div class="row">
+                                <div class="col-sm-6 col-sm-offset-3">
+                                <button id="login-button" class="btn btn-lg btn-primary btn-block" type="submit">挂号</button>
+                                </div>
                               </div>
                             </div>
-                          </div> -->
-                        </div>
+                          </div>
 
-                        <div id="keshi-form" style="display: none;">
 
-                            <div id="keshi">
-                     				  <label class="radio-inline">
-                     				  <input type="radio" name="keshi" value="neike" id="neike"> 内科
-                     				  </label>
-                     				  <label class="radio-inline">
-                     				  <input type="radio" name="keshi" value="waike" id="waike"> 外科
-                     				  </label>
-                     				  <label class="radio-inline">
-                     				  <input type="radio" name="keshi" value="erbihouke" id="erbihouke"> 耳鼻喉科
-                     				  </label>
-                     			   </div>
-                     			   <div id="neikeDoctor" style="display: none;">
-                     				  <label class="radio-inline">
-                     				  <input type="radio" name="neikeDoctor" value="anyone" id="neike-anyone" checked> 系统分配
-                     				  </label>
-                     				  <label class="radio-inline">
-                     				  <input type="radio" name="neikeDoctor" value="zhangsan" id="neike-zhangsan"> 张三
-                     				  </label>
-                     				  <label class="radio-inline">
-                     				  <input type="radio" name="neikeDoctor" value="lisi" id="neike-lisi"> 李四
-                     				  </label>
-                     			   </div>
-                     			   <div id="waikeDoctor" style="display: none;">
-                     				  <label class="radio-inline">
-                     				  <input type="radio" name="waikeDoctor" value="anyone" id="waike-anyone" checked> 系统分配
-                     				  </label>
-                     				  <label class="radio-inline">
-                     				  <input type="radio" name="waikeDoctor" value="zhangsan" id="waike-zhangsan"> 王五
-                     				  </label>
-                     				  <label class="radio-inline">
-                     				  <input type="radio" name="waikeDoctor" value="lisi" id="waike-lisi"> 阿萨姆
-                     				  </label>
-                     			   </div>
-                     			   <div id="erbihoukeDoctor" style="display: none;">
-                     				  <label class="radio-inline">
-                     				  <input type="radio" name="erbihoukeDoctor" value="anyone" id="erbihouke-anyone" checked> 系统分配
-                     				  </label>
-                     				  <label class="radio-inline">
-                     				  <input type="radio" name="erbihoukeDoctor" value="zhangsan" id="erbihouke-zhangsan"> 蒙牛
-                     				  </label>
-                     				  <label class="radio-inline">
-                     				  <input type="radio" name="erbihoukeDoctor" value="lisi" id="erbihouke-lisi"> 哥德尔
-                     				  </label>
-                     			   </div>
+
+                          <div id="register-form" style="display: none;">
+                            <div class="form-group">
+                              <input type="text" id="signupId" class="form-control" placeholder="Username" value="">
+                            </div>
+                            <div class="form-group">
+                              <input type="password" id="signupPwd" class="form-control" placeholder="Password">
+                            </div>
+                            <div class="form-group">
+                              <input type="password" id="confirm-password" class="form-control" placeholder="Confirm Password">
+                            </div>
+                            <div class="form-group">
+                              <input type="email" id="signupEmail" class="form-control" placeholder="Email Address" value="">
+                            </div>
+                            <div class="form-group">
+                              <input type="text" id="signupPhone" class="form-control" placeholder="Phone" value="">
+                            </div>
+                            <div class="form-group">
+                              <input type="text" id="signupAddr" class="form-control" placeholder="Address" value="">
+                            </div>
+                            <div class="form-group">
+                              <div class="row">
+                                <div class="col-sm-6 col-sm-offset-3">
+                                  <button id="signup-button" class="btn btn-lg btn-primary btn-block" type="submit">病人注册</button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
 
                         </div>
-
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-          </div>
-
-
+            </div>
     </div>
 
 
@@ -138,44 +152,52 @@
 
   $(function () {
 
-    $('#login-form-link').click(function(e) {
-    $("#login-form").delay(100).fadeIn(100);
-    $("#register-form").fadeOut(100);
-    $('#register-form-link').removeClass('active');
-    $(this).addClass('active');
-    e.preventDefault();
-  });
-  $('#keshi-form-link').click(function(e) {
-    $("#keshi-form").delay(100).fadeIn(100);
-    $("#login-form").fadeOut(100);
-    $('#login-form-link').removeClass('active');
-    $(this).addClass('active');
-    e.preventDefault();
-  });
+
+      $('#login-form-link').click(function(e) {
+      $("#login-form").delay(100).fadeIn(100);
+      $("#register-form").fadeOut(100);
+      $('#register-form-link').removeClass('active');
+      $(this).addClass('active');
+      e.preventDefault();
+    });
+    $('#register-form-link').click(function(e) {
+      $("#register-form").delay(100).fadeIn(100);
+      $("#login-form").fadeOut(100);
+      $('#login-form-link').removeClass('active');
+      $(this).addClass('active');
+      e.preventDefault();
+    });
 
     var socket = io();
 
-    function doctorDiv(keshi) {
-        document.getElementById("neikeDoctor").style.display = "none";
-        document.getElementById("waikeDoctor").style.display = "none";
-        document.getElementById("erbihoukeDoctor").style.display = "none";
-        document.getElementById(keshi+"Doctor").style.display = "block";
-        $('input[name='+keshi+'Doctor]').val("anyone");
-    }
+    var globalDid;
+    var globalPid;
 
-    $("#neike").click(function(){
-        // console.log("neike");
-        doctorDiv("neike");
-    })
-    $("#waike").click(function(){
-        // console.log("waike");
-        doctorDiv("waike");
-    })
-    $("#erbihouke").click(function(){
-        // console.log("erbihouke");
-        doctorDiv("erbihouke");
-    })
+    $("#login-button").click(function(){
+      var pid = $("#login-id").val(); $("#login-id").val("");
+      var pwd = $("#login-pwd").val(); $("#login-pwd").val("");
+      var did = $('input[name="doctor"]:checked').val();
+      globalPid = pid; globalDid = did;
+      console.log([pid, pwd, did]);
+      socket.emit('register', {pid: pid, did: did, pwd: pwd});
+      document.getElementById("before-register").style.display = "none";
+      document.getElementById("onRegister").style.display = "block";
+    });
 
+    socket.on('onRegister', function(data){
+      console.log(data.msg);
+      did = data.did;
+      $("#onRegisterMsg").text(data.msg);
+    });
+
+    $("#deRegister-button").click(function(){
+      document.getElementById("onRegister").style.display = "none";
+      document.getElementById("before-register").style.display = "block";
+      $("#onRegisterMsg").text("Wait for Register");
+      socket.emit('deRegister', {id: globalPid, did: globalDid,
+        time: (Math.floor(new Date() / 1000)).toString(),
+        sig: "deRegisterSig", pkc: "patientPKC"});
+    })
 
   })
 
