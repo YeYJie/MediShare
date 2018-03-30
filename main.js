@@ -33,10 +33,14 @@ var sql=require('./db/mysqlservice.js')
 
 var myEventListener = require('./app/myEventListener.js')
 
-var config = require('./config.json');
-var host = process.env.HOST || config.host;
-var port = process.env.PORT || config.port;
-var hospital = config.hospital;
+// var config = require('./config.json');
+var host = process.env.HOST;
+var port = process.env.PORT;
+var hospital = process.env.HOSPITAL;
+var hospitalName = process.env.HNAME;
+var dbname = process.env.DBNAME;
+
+console.log([host, port, hospital, hospitalName, dbname]);
 
 // var mongodb = require('./app/mongo.js');
 var MongoClient = require('mongodb').MongoClient;
@@ -124,10 +128,10 @@ app.get('/patient', function(req, res){
 	res.sendFile(__dirname + '/page/patient.html');
 });
 
-app.get('/newPatient', function(req, res){
-	console.log('/newPatient')
-	res.sendFile(__dirname + '/page/newPatient.html');
-});
+// app.get('/newPatient', function(req, res){
+// 	console.log('/newPatient')
+// 	res.sendFile(__dirname + '/page/newPatient.html');
+// });
 
 app.get('/blockchain', function(req, res){
 	console.log('/blockchain')
@@ -144,7 +148,7 @@ app.get('/getDoctorInfo/:id', function(req, res){
 	// 		addr:"sysundc"});
 	MongoClient.connect(MongoURL, function(err, db) {
 		if (err) throw err;
-		var dbo = db.db("mydb");
+		var dbo = db.db(dbname);
 		dbo.collection("doctor").findOne({id: id}, {header: 0, prikey: 0, pkc: 0},  function(err, mres) {
 			if (err) throw err;
 			res.send(mres);
@@ -163,7 +167,7 @@ app.get('/getPatientInfo/:id', function(req, res){
 	// 		addr:"sysundc"});
 	MongoClient.connect(MongoURL, function(err, db) {
 		if (err) throw err;
-		var dbo = db.db("mydb");
+		var dbo = db.db("patient");
 		dbo.collection("patient").findOne({id: id}, {header: 0, prikey: 0, pkc: 0},  function(err, mres) {
 			if (err) throw err;
 			res.send(mres);
@@ -201,7 +205,7 @@ app.get('/requestDetail/:txid', function(req, httpRes){
 	// res.send({a: "123456", b: "456789"});
 	MongoClient.connect(MongoURL, function(err, db) {
 		if (err) throw err;
-		var dbo = db.db("mydb");
+		var dbo = db.db(dbname);
 		dbo.collection("index").findOne({txid: txid}, function(err, res) {
 			if (err) throw err;
 			var rid = res.rid;
@@ -226,7 +230,7 @@ app.get('/getPatientNameFromId/:pid', function(req, res){
 	// res.send(patientIdToName[pid]);
 	MongoClient.connect(MongoURL, function(err, db) {
 		if (err) throw err;
-		var dbo = db.db("mydb");
+		var dbo = db.db("patient");
 		dbo.collection("patient").findOne({id: pid}, {name: 1},  function(err, mres) {
 			if (err) throw err;
 			res.send(mres.name);
@@ -268,7 +272,7 @@ app.post('/upload', function(req, res){
 			var files = req.files.file;
 			for(var i = 0; i < files.length; i++) {
 				var filename = [recordId, i.toString(), files[i].name].join('$$');
-				data.files[i] = filename;
+				data.files[i] = "http://172.18.232.124:" + port + "/file/" + filename;
 				files[i].mv('./file/'+filename,  function(err){
 					if(err)
 						return res.status(500).send(err);
@@ -279,7 +283,7 @@ app.post('/upload', function(req, res){
 			// console.log("single file");
 			var file = req.files.file;
 			var filename = [recordId, "0", file.name].join('_');
-			data.files[0] = filename;
+			data.files[0] = "http://172.18.232.124:" + port + "/file/" + filename;
 			file.mv('./file/'+filename,  function(err){
 				if(err)
 					return res.status(500).send(err);
@@ -289,7 +293,7 @@ app.post('/upload', function(req, res){
 
 	MongoClient.connect(MongoURL, function(err, db) {
 		if (err) throw err;
-		var dbo = db.db("mydb");
+		var dbo = db.db(dbname);
 		dbo.collection("data").insertOne(data, function(err, res) {
 			if (err) throw err;
 			console.log("insert into mongodb [data] success");
@@ -333,11 +337,25 @@ io.on('connection', function(socket){
 		var email = req.email;
 		var addr = req.addr;
 		console.log('signup', [role, id, name, pwd, phone, email, addr]);
-		// TODO: do some database works
-		// TODO: generate prikey and pkc
-		var prikey = "prikey";
-		var pkc = "pkc";
-		socket.emit('signUpSuccess', {role: role, id: id, name: name, prikey: prikey, pkc: pkc});
+
+		if(role === "patient") {
+			MongoClient.connect(MongoURL, function(err, db) {
+				if (err) throw err;
+				var dbo = db.db("patient");
+				dbo.collection("patient").insertOne({id: id, name: name, pwd: pwd, phone: phone, email: email, addr: addr},
+					function(err, res) {
+					if (err) throw err;
+					console.log("insert into mongodb [patient] success");
+					db.close();
+					var cmd = '../pki/generateKeyAndCsr.sh ' + id;
+					asyncExec(cmd, function(result){
+						console.log("signUpSuccess ", result);
+						socket.emit('signUpSuccess', {role: role, id: id, name: name});
+					});
+				});
+			});
+		}
+
 	});
 	socket.on('signupState', function(req) {
 		var role = req.role;
@@ -401,7 +419,7 @@ io.on('connection', function(socket){
 		console.log(cmd);
 		asyncExec(cmd, function(result){
 			console.log('./bishe/getDoctorInfo.sh result: ', result.stdout);
-			socket.emit('doctorInfo', {id: id, hospital: hospital, doctorInfo: result.stdout});
+			socket.emit('doctorInfo', {id: id, hospitalName: hospitalName, doctorInfo: result.stdout});
 		})
 		cmd = './bishe/getDoctorsPatients.sh ' + id;
 		console.log(cmd);
@@ -517,7 +535,7 @@ var eventCallback = function(event) {
 
 			MongoClient.connect(MongoURL, function(err, db) {
 				if (err) throw err;
-				var dbo = db.db("mydb");
+				var dbo = db.db(dbname);
 				dbo.collection("chaincodeIdToRid").findOne({chaincodeId: ccid}, function(err, res) {
 					if (err) throw err;
 					var rid = res.rid;

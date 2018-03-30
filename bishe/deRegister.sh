@@ -1,10 +1,13 @@
 #!/bin/bash
 
+BASEDIR=$(dirname "$0")
+SIGNDIR=$BASEDIR/../../pki
+
 Patient=$1
 Doctor=$2
 Hospital=$3
 PatientTime=$(date +'%s')
-PatientSig="patientSig"
+PatientSig=$($SIGNDIR/sign "$SIGNDIR/$1.key" "$Patient!!$Doctor!!$Hospital!!$PatientTime")
 PatientPKC="patientPKC"
 
 args='{

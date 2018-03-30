@@ -1,212 +1,230 @@
-<!doctype html>
-<html>
-   <head>
-	  <style type="text/css">
-		 table {
-		 font-family: arial, sans-serif;
-		 border-collapse: collapse;
-		 width: 100%;
-		 }
-		 td, th {
-		 border: 1px solid #dddddd;
-		 text-align: left;
-		 padding: 8px;
-		 }
-		 tr:nth-child(even) {
-		 background-color: #dddddd;
-		 }
-		 html,body{height: 100%}
-		 #outer-wrap{
-		 height: 100%;
-		 position: relative;
-		 }
-		 #center{
-		 width: 400px;
-		 height: 300px;
-		 position: absolute;
-		 top: 50%;
-		 left: 50%;
-		 margin-top: -150px;
-		 margin-left: -200px;
-		 }
-	  </style>
-   </head>
-   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-   <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-   <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script> -->
-   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link href="dashboard.css" rel="stylesheet">
+    <link href="signin.css" rel="stylesheet">
+
+
+  </head>
+
+  <body>
+
+      <div class="container-fluid">
+
+      <div id="onRegister" style="display: none;">
+<!--          <p>
+         <h2 id="onRegisterMsg">Wait for Register</h2>
+         </p>
+         <p><button id="deRegister-button">deRegister</button></p> -->
+         <div class="row">
+          <div class="col-md-6 col-md-offset-3">
+            <h2 id="onRegisterMsg">Wait for Register</h2>
+          </div>
+         </div>
+         <div class="row">
+         <div class="col-md-6 col-md-offset-3">
+           <button class="form-control" id="deRegister-button">deRegister</button>
+         </div>
+         </div>
+      </div>
+
+            <div class="row" id="before-register">
+              <div style="height: 10vh;"></div>
+                <div class="col-md-4 col-md-offset-4">
+                  <div class="panel panel-login">
+                    <div class="panel-heading">
+                      <div class="row">
+                        <div class="col-xs-6">
+                          <a href="#" class="active" id="login-form-link">挂号</a>
+                        </div>
+                        <div class="col-xs-6">
+                          <a href="#" id="register-form-link">注册</a>
+                        </div>
+                      </div>
+                      <hr>
+                    </div>
+                    <div class="panel-body">
+                      <div class="row">
+                        <div class="col-lg-12">
+
+
+                          <div id="login-form" style="display: block;">
+                            <div class="form-group">
+                              <input type="text" name="username" id="login-id" tabindex="1" class="form-control" placeholder="Id" value="">
+                            </div>
+                            <div class="form-group">
+                              <input type="password" name="password" id="login-pwd" tabindex="2" class="form-control" placeholder="Password">
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <a>内科</a>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input type="radio" name="doctor" value="14301036">  张三
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input type="radio" name="doctor" value="14301037">  李四
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <a>外科</a>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input type="radio" name="doctor" value="14301038">  王五
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input type="radio" name="doctor" value="14301039">  李六
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input type="radio" name="doctor" value="14301040">  叶七
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                              <div class="row">
+                                <div class="col-sm-6 col-sm-offset-3">
+                                <button id="login-button" class="btn btn-lg btn-primary btn-block" type="submit">挂号</button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+
+
+                          <div id="register-form" style="display: none;">
+                            <div class="form-group">
+                              <input type="text" id="signupId" class="form-control" placeholder="身份证" value="">
+                            </div>
+                            <div class="form-group">
+                              <input type="text" id="signupName" class="form-control" placeholder="姓名" value="">
+                            </div>
+                            <div class="form-group">
+                              <input type="password" id="signupPwd" class="form-control" placeholder="密码">
+                            </div>
+                            <div class="form-group">
+                              <input type="password" id="confirm-password" class="form-control" placeholder="确认密码">
+                            </div>
+                            <div class="form-group">
+                              <input type="email" id="signupEmail" class="form-control" placeholder="邮箱" value="">
+                            </div>
+                            <div class="form-group">
+                              <input type="text" id="signupPhone" class="form-control" placeholder="联系电话" value="">
+                            </div>
+                            <div class="form-group">
+                              <input type="text" id="signupAddr" class="form-control" placeholder="住址" value="">
+                            </div>
+                            <div class="form-group">
+                              <div class="row">
+                                <div class="col-sm-6 col-sm-offset-3">
+                                  <button id="signup-button" class="btn btn-lg btn-primary btn-block" type="submit">病人注册</button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+            </div>
+    </div>
+
+
+    <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+
+  </body>
    <script src="/socket.io/socket.io.js"></script>
-   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-   <script>
-	$(function () {
-		var socket = io();
-		var id;
-		var did;
-		var prikey;
 
-		$("#register-button").click(function(){
-			document.getElementById("login").style.display = "none";
-			document.getElementById("onRegister").style.display = "block";
-			var keshi = $("input[name='keshi']:checked").val();
-			// console.log(keshi);
-			var doctor = $('input[name="'+keshi+'Doctor"]:checked').val();
-			// console.log(doctor);
-			id = $('#id').val();
-			socket.emit('register', {id: id, keshi: keshi, doctor: doctor});
-		})
-		$("#deRegister-button").click(function(){
-			document.getElementById("onRegister").style.display = "none";
-			document.getElementById("login").style.display = "block";
-			$("#onRegisterMsg").text("Wait for Register");
-			socket.emit('deRegister', {id: id, did: did,
-				time: (Math.floor(new Date() / 1000)).toString(),
-				sig: "deRegisterSig", pkc: "patientPKC"});
-		})
-
-		$("#signup-button").click(function(){
-			document.getElementById("login").style.display = "none";
-			document.getElementById("signup").style.display = "block";
-		})
-
-		$('#signup-submit-button').click(function(){
-			socket.emit('signup', {role: "patient", id: $('#signupId').val(), name: $('#signupName').val(), pwd: $('#signupPwd').val(), phone: $('#signupPhone').val(), email: $('#signupEmail').val(), addr: $('#signupAddr').val()});
-			$('#signupId').val(); $('#signupPwd').val(); $('#signupPhone').val(); $('#signupEmail').val(); $('#signupAddr').val();
-			document.getElementById("signup").style.display = "none";
-			document.getElementById("signupState").style.display = "block";
-		})
-		$('#signup-goback').click(function(){
-			document.getElementById("login").style.display = "block";
-			document.getElementById("signup").style.display = "none";
-		})
-		$('#state-button').click(function() {
-			socket.emit('signupState', {role: "patient", id: $('#stateId').val()});
-			$('#stateId').val('');
-			document.getElementById("signup").style.display = "none";
-			document.getElementById("signupState").style.display = "block";
-		})
-		$('#signupState-goback').click(function(){
-			document.getElementById("signupState").style.display = "none";
-			document.getElementById("login").style.display = "block";
-			document.getElementById('signupStateDiv').innerHTML = "Please Wait for Review";
-		})
-
-		function doctorDiv(keshi) {
-			document.getElementById("neikeDoctor").style.display = "none";
-			document.getElementById("waikeDoctor").style.display = "none";
-			document.getElementById("erbihoukeDoctor").style.display = "none";
-			document.getElementById(keshi+"Doctor").style.display = "block";
-		}
-
-		$("#neike").click(function(){
-			// console.log("neike");
-			doctorDiv("neike");
-		})
-		$("#waike").click(function(){
-			// console.log("waike");
-			doctorDiv("waike");
-		})
-		$("#erbihouke").click(function(){
-			// console.log("erbihouke");
-			doctorDiv("erbihouke");
-		})
+   <script type="text/javascript">
 
 
-		socket.on('onRegister', function(data){
-			console.log(data.msg);
-			did = data.did;
-			$("#onRegisterMsg").text(data.msg);
-		});
-		socket.on('signUpSuccess', function(data){
-			var signUpSuccessHTML = '<p>Hello, ' + data.name + '</p>'
-					+ '<p>Your Private Key: ' + data.prikey + '</p>'
-					+ '<p>Your PKC: ' + data.pkc + '</p>';
-			console.log(signUpSuccessHTML);
-			document.getElementById('signupStateDiv').innerHTML = signUpSuccessHTML;
-		})
-	});
+  $(function () {
+
+      $('#login-form-link').click(function(e) {
+      $("#login-form").delay(100).fadeIn(100);
+      $("#register-form").fadeOut(100);
+      $('#register-form-link').removeClass('active');
+      $(this).addClass('active');
+      e.preventDefault();
+    });
+    $('#register-form-link').click(function(e) {
+      $("#register-form").delay(100).fadeIn(100);
+      $("#login-form").fadeOut(100);
+      $('#login-form-link').removeClass('active');
+      $(this).addClass('active');
+      e.preventDefault();
+    });
+
+    var socket = io();
+
+    var globalDid;
+    var globalPid;
+
+    $("#login-button").click(function(){
+      var pid = $("#login-id").val(); $("#login-id").val("");
+      var pwd = $("#login-pwd").val(); $("#login-pwd").val("");
+      var did = $('input[name="doctor"]:checked').val();
+      globalPid = pid; globalDid = did;
+      console.log([pid, pwd, did]);
+      socket.emit('register', {pid: pid, did: did, pwd: pwd});
+      document.getElementById("before-register").style.display = "none";
+      document.getElementById("onRegister").style.display = "block";
+    });
+
+    socket.on('onRegister', function(data){
+      console.log(data.msg);
+      did = data.did;
+      $("#onRegisterMsg").text(data.msg);
+    });
+
+    $("#deRegister-button").click(function(){
+      document.getElementById("onRegister").style.display = "none";
+      document.getElementById("before-register").style.display = "block";
+      $("#onRegisterMsg").text("Wait for Register");
+      socket.emit('deRegister', {id: globalPid, did: globalDid,
+        time: (Math.floor(new Date() / 1000)).toString(),
+        sig: "deRegisterSig", pkc: "patientPKC"});
+    })
+
+    $("#signup-button").click(function(){
+      var id = $("#signupId").val();
+      var name = $("#signupName").val();
+      var pwd = $("#signupPwd").val();
+      var email = $("#signupEmail").val();
+      var phone = $("#signupPhone").val();
+      var addr = $("#signupAddr").val();
+      $("#signupId").val("");$("#signupName").val("");$("#signupPwd").val("");$("#confirm-password").val("");
+      $("#signupEmail").val("");$("#signupPhone").val("");$("#signupAddr").val("");
+      console.log("sign up ", [id, name, pwd, email, phone, addr]);
+      socket.emit("signup", {role: "patient", id: id, name: name, pwd: pwd, email: email, phone: phone, addr: addr});
+    });
+
+    socket.on("signUpSuccess", function(data){
+      alert("注册成功!");
+      $("#login-form").delay(100).fadeIn(100);
+      $("#register-form").fadeOut(100);
+      $('#register-form-link').removeClass('active');
+      $('#login-form-link').addClass('active');
+    });
+
+  })
+
    </script>
-   <body>
-	  <div id="outer-wrap">
-		 <div id="center">
-			<div id="login">
-			   <div id="pki">
-				  <!-- <p><fieldset><legend>private key</legend><input type="text" name="privateKey" id="prikey"></fieldset></p> -->
-				  <!-- <p><fieldset><legend>pkc</legend><input type="text" name="pkc" id="pkc"></fieldset></p> -->
-				  <p><fieldset><legend>Id</legend><input type="text" name="id" id="id"></fieldset></p>
-			   </div>
-			   <div id="keshi">
-				  <label class="radio-inline">
-				  <input type="radio" name="keshi" value="neike" id="neike"> nei ke
-				  </label>
-				  <label class="radio-inline">
-				  <input type="radio" name="keshi" value="waike" id="waike"> wai ke
-				  </label>
-				  <label class="radio-inline">
-				  <input type="radio" name="keshi" value="erbihouke" id="erbihouke"> er bi hou ke
-				  </label>
-			   </div>
-			   <div id="neikeDoctor" style="display: none;">
-				  <label class="radio-inline">
-				  <input type="radio" name="neikeDoctor" value="anyone" id="neike-anyone" checked> Anyone
-				  </label>
-				  <label class="radio-inline">
-				  <input type="radio" name="neikeDoctor" value="zhangsan" id="neike-zhangsan"> Zhang shan
-				  </label>
-				  <label class="radio-inline">
-				  <input type="radio" name="neikeDoctor" value="lisi" id="neike-lisi"> Li si
-				  </label>
-			   </div>
-			   <div id="waikeDoctor" style="display: none;">
-				  <label class="radio-inline">
-				  <input type="radio" name="waikeDoctor" value="anyone" id="waike-anyone" checked> Anyone
-				  </label>
-				  <label class="radio-inline">
-				  <input type="radio" name="waikeDoctor" value="zhangsan" id="waike-zhangsan"> Zhang shan
-				  </label>
-				  <label class="radio-inline">
-				  <input type="radio" name="waikeDoctor" value="lisi" id="waike-lisi"> Li si
-				  </label>
-			   </div>
-			   <div id="erbihoukeDoctor" style="display: none;">
-				  <label class="radio-inline">
-				  <input type="radio" name="erbihoukeDoctor" value="anyone" id="erbihouke-anyone" checked> Anyone
-				  </label>
-				  <label class="radio-inline">
-				  <input type="radio" name="erbihoukeDoctor" value="zhangsan" id="erbihouke-zhangsan"> Zhang shan
-				  </label>
-				  <label class="radio-inline">
-				  <input type="radio" name="erbihoukeDoctor" value="lisi" id="erbihouke-lisi"> Li si
-				  </label>
-			   </div>
-			   <div id="register">
-				  <p><button id="register-button">Register</button></p>
-				  <p><button id="signup-button">Sign Up</button></p>
-			   </div>
-			</div>
-			<div id="onRegister" style="display: none;">
-			   <p>
-			   <h2 id="onRegisterMsg">Wait for Register</h2>
-			   </p>
-			   <p><button id="deRegister-button">deRegister</button></p>
-			</div>
-			<div id="signup" style="display: none;">
-			   <p><fieldset><legend>Id</legend><input type="text" name="id" id="signupId"></fieldset></p>
-			   <p><fieldset><legend>Name</legend><input type="text" name="name" id="signupName"></fieldset></p>
-			   <p><fieldset><legend>Password</legend><input type="text" name="pwd" id="signupPwd"></fieldset></p>
-			   <p><fieldset><legend>Phone</legend><input type="text" name="phone" id="signupPhone"></fieldset></p>
-			   <p><fieldset><legend>Email</legend><input type="text" name="email" id="signupEmail"></fieldset></p>
-			   <p><fieldset><legend>Addr</legend><input type="text" name="addr" id="signupAddr"></fieldset></p>
-			   <p><button id="signup-submit-button">Submit</button></p>
-			   <p><fieldset><legend>Id</legend><input type="text" name="stateId" id="stateId"></fieldset></p>
-			   <p><button id="state-button">State</button></p>
-			   <p><button id="signup-goback">Go Back</button></p>
-			</div>
-			<div id="signupState" style="display: none;">
-			   <div id="signupStateDiv">Please Wait for Review</div>
-			   <!-- <p><button id="signupState-download">Download Materials</button></p> -->
-			   <p><button id="signupState-goback">Go Back</button></p>
-			</div>
-		 </div>
-	  </div>
-   </body>
+
+
 </html>

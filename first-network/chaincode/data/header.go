@@ -1,5 +1,6 @@
 package main
 
+import "strings"
 
 type RegisterArgs struct {
 	Patient			string
@@ -14,11 +15,11 @@ type RegisterArgs struct {
 }
 
 func (t *RegisterArgs) GetPatientSigContent() string {
-	return ""
+	return strings.Join([]string{t.Patient, t.Doctor, t.Hospital, t.PatientTime}, "!!")
 }
 
 func (t *RegisterArgs) GetHospitalSigContent() string {
-	return ""
+	return strings.Join([]string{t.Patient, t.Doctor, t.Hospital, t.PatientTime, t.HospitalTime}, "!!")
 }
 
 type DeRegisterArgs struct {
@@ -31,7 +32,7 @@ type DeRegisterArgs struct {
 }
 
 func (t *DeRegisterArgs) GetPatientSigContent() string {
-	return ""
+	return strings.Join([]string{t.Patient, t.Doctor, t.Hospital, t.PatientTime}, "!!")
 }
 
 type RequestDetailArgs struct {
@@ -52,7 +53,7 @@ func (t *RequestDetailArgs) GetDoctorProfContent() string {
 }
 
 func (t *RequestDetailArgs) GetDoctorSigContent() string {
-	return ""
+	return strings.Join([]string{t.Doctor, t.Hospital, t.Patient, t.TargetHospital, t.RecordId, t.RequestTime}, "!!")
 }
 
 type NewRecordArgs struct {
@@ -67,7 +68,7 @@ type NewRecordArgs struct {
 }
 
 func (t *NewRecordArgs) GetHospitalSigContent() string {
-	return ""
+	return strings.Join([]string{t.Hospital, t.Doctor, t.Patient, t.Inspection, t.HospitalTime}, "!!")
 }
 
 type GetPatientRecordsArgs struct {
