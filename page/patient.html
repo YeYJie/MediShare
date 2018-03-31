@@ -15,24 +15,46 @@
 
   <body>
 
-      <div class="container-fluid">
-
-      <div id="onRegister" style="display: none;">
-<!--          <p>
-         <h2 id="onRegisterMsg">Wait for Register</h2>
-         </p>
-         <p><button id="deRegister-button">deRegister</button></p> -->
-         <div class="row">
-          <div class="col-md-6 col-md-offset-3">
-            <h2 id="onRegisterMsg">Wait for Register</h2>
+  <div id="onRegister" class="container-fluid" style="display: none;">
+    <div class="row">
+      <div class="col-md-6 col-md-offset-3">
+        <div class="row" id="header-row">
+        <div class="col-md-2 col-md-offset-5">
+          <img src="/header/14301036">
+        </div>
+        </div>
+        <div class="row" id="room-row">
+          <div style="height: 5vh;"></div>
+          <div id="room-div" class="col-md-12 center-block text-center">
+            <center>
+              <h3 id="room-text">请前往<span id="room"></span></h3>
+            </center>
           </div>
+        </div>
+        <div class="row" id="doctor-row">
+          <div style="height: 5vh;"></div>
+          <div id="doctor-div" class="col-md-8 col-md-offset-2">
+          <div class="center-block text-center">
+            <center>
+            <h4 id="name"></h4>
+            <p><span><strong>职称：</strong><span id="title"></span></span></p>
+            <p><span><strong>科室：</strong><span id="keshi"></span></span></p>
+              <p><span id="doctor-text"><strong>详细介绍： </strong><span id="detail"></span></span></p>
+            </center>
+          </div>
+          </div>
+        </div>
+        <div class="row" id="revoke-row">
+          <div style="height: 5vh;"></div>
+          <div class="col-md-6 col-md-offset-3">
+           <button class="btn btn-lg btn-primary btn-block" id="deRegister-button">撤销挂号</button>
          </div>
-         <div class="row">
-         <div class="col-md-6 col-md-offset-3">
-           <button class="form-control" id="deRegister-button">deRegister</button>
-         </div>
-         </div>
+        </div>
       </div>
+    </div>
+  </div>
+
+      <div class="container-fluid">
 
             <div class="row" id="before-register">
               <div style="height: 10vh;"></div>
@@ -66,12 +88,7 @@
                                     <div class="col-md-3">
                                         <a>内科</a>
                                     </div>
-                                    <div class="col-md-3">
-                                        <input type="radio" name="doctor" value="14301036">  张三
-                                    </div>
-                                    <div class="col-md-3">
-                                        <input type="radio" name="doctor" value="14301037">  李四
-                                    </div>
+                                    <div id="neike"></div>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -79,15 +96,7 @@
                                     <div class="col-md-3">
                                         <a>外科</a>
                                     </div>
-                                    <div class="col-md-3">
-                                        <input type="radio" name="doctor" value="14301038">  王五
-                                    </div>
-                                    <div class="col-md-3">
-                                        <input type="radio" name="doctor" value="14301039">  李六
-                                    </div>
-                                    <div class="col-md-3">
-                                        <input type="radio" name="doctor" value="14301040">  叶七
-                                    </div>
+                                    <div id="waike"></div>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -172,6 +181,8 @@
 
     var socket = io();
 
+    socket.emit("newPatient", {});
+
     var globalDid;
     var globalPid;
 
@@ -184,12 +195,6 @@
       socket.emit('register', {pid: pid, did: did, pwd: pwd});
       document.getElementById("before-register").style.display = "none";
       document.getElementById("onRegister").style.display = "block";
-    });
-
-    socket.on('onRegister', function(data){
-      console.log(data.msg);
-      did = data.did;
-      $("#onRegisterMsg").text(data.msg);
     });
 
     $("#deRegister-button").click(function(){
@@ -221,6 +226,58 @@
       $('#register-form-link').removeClass('active');
       $('#login-form-link').addClass('active');
     });
+
+    var doctorOnPage = [];
+
+    var processDoctor = function(doctor) {
+          var did = doctor.did;
+          var keshi;
+          if(doctor.keshi === "内科") keshi = "neike";
+          else if(doctor.keshi === "外科") keshi = "waike";
+          var index = doctorOnPage.indexOf(did);
+          if(index < 0) {
+            doctorOnPage.push(did);
+            var divHTML = document.getElementById(keshi).innerHTML;
+            divHTML += '<div class="col-md-3" id="'+did+'"><input type="radio" name="doctor" value="'+did+'">'+doctor.name+'</div>';
+            document.getElementById(keshi).innerHTML = divHTML;
+          }
+    }
+
+    socket.on("doctors", function(data){
+      console.log("doctors: ", data.doctors);
+      if(data.doctors) {
+        for(var i = 0; i < data.doctors.length; i++) {
+          console.log(data.doctors[i]);
+          processDoctor(data.doctors[i]);
+        }
+      }
+    });
+    socket.on("newWorkingDoctor", function(data){
+      console.log("newWorkingDoctor", data.doctor);
+      processDoctor(data.doctor);
+    });
+    socket.on("doctorLogout", function(data){
+      console.log("doctorLogout", data, doctorOnPage);
+      var did = data.did;
+      var index = doctorOnPage.indexOf(did);
+      if(index > -1) {
+        doctorOnPage.splice(index, 1);
+        console.log("remove doctor from page ", doctorOnPage);
+        document.getElementById(did).outerHTML = "";
+      }
+    });
+
+  socket.on('doctorInfo', function(data){
+    console.log("doctorInfo", data.doctorInfo);
+    var doctorInfo = JSON.parse(data.doctorInfo);
+    console.log([doctorInfo.name, doctorInfo.room]);
+    document.getElementById("room").innerHTML = doctorInfo.room;
+    document.getElementById("name").innerHTML = doctorInfo.name;
+    document.getElementById("title").innerHTML = doctorInfo.title;
+    document.getElementById("keshi").innerHTML = doctorInfo.keshi;
+    document.getElementById("detail").innerHTML = doctorInfo.detail;
+  });
+
 
   })
 

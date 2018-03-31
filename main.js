@@ -78,6 +78,9 @@ var doctorSocket = new Map;
 var patientSocket = new Map;
 var doctorPatients = new Map;
 
+var workingDoctors = [];
+var patientsNotRegister = [];
+
 var eventWatcher = [];
 
 var register = function(pid, did) {
@@ -371,6 +374,10 @@ io.on('connection', function(socket){
 	/*
 	*	For Patient
 	*/
+	socket.on('newPatient', function(req){
+		patientsNotRegister.push(socket);
+		socket.emit('doctors', {doctors: workingDoctors});
+	});
 	socket.on('register', function(req){
 		var pid = req.pid;
 		var did = req.did;
@@ -378,12 +385,23 @@ io.on('connection', function(socket){
 		var sig = req.sig;
 		var pkc = req.pkc;
 		patientSocket[pid] = socket;
-		var did = register(pid, did);
+		did = register(pid, did);
 		console.log('patient register', [pid, did, time, sig, pkc]);
 		var cmd = ['./bishe/register.sh', pid, did, hospital].join(' ');
 		asyncExec(cmd, function(result){
-			socket.emit('onRegister', {did:did , msg: "Please go to room 431"});
+			var index = patientsNotRegister.indexOf(socket);
+			if (index > -1) {
+				patientsNotRegister.splice(index, 1);
+			}
+			// socket.emit('onRegister', {did:did , msg: "Please go to room 431"});
 		});
+
+		cmd = './bishe/getDoctorInfo.sh ' + did;
+		console.log(cmd);
+		asyncExec(cmd, function(result){
+			console.log('./bishe/getDoctorInfo.sh result: ', result.stdout);
+			socket.emit('doctorInfo', {did: did, hospitalName: hospitalName, doctorInfo: result.stdout});
+		})
 	});
 	socket.on('deRegister', function(req){
 		var pid = req.id;
@@ -419,7 +437,14 @@ io.on('connection', function(socket){
 		console.log(cmd);
 		asyncExec(cmd, function(result){
 			console.log('./bishe/getDoctorInfo.sh result: ', result.stdout);
+			var doctorInfo = JSON.parse(result.stdout);
+			workingDoctors.push({did: id, name: doctorInfo.name, keshi: doctorInfo.keshi});
+			console.log('doctor login', workingDoctors);
 			socket.emit('doctorInfo', {id: id, hospitalName: hospitalName, doctorInfo: result.stdout});
+			// socket.emit("newWorkingDoctor", {doctor: {did: id, name: doctorInfo.name, keshi: doctorInfo.keshi}})
+			for(var i = 0; i < patientsNotRegister.length; i++) {
+				patientsNotRegister[i].emit("newWorkingDoctor", {doctor: {did: id, name: doctorInfo.name, keshi: doctorInfo.keshi}});
+			}
 		})
 		cmd = './bishe/getDoctorsPatients.sh ' + id;
 		console.log(cmd);
@@ -427,6 +452,20 @@ io.on('connection', function(socket){
 			console.log('./bishe/getDoctorsPatients.sh result: ', result.stdout);
 			socket.emit('doctorPatients', {id: id, patients: JSON.parse(result.stdout).patients});
 		});
+	});
+
+	socket.on("doctorLogout", function(req) {
+		var did = req.did;
+		for(var i = 0; i < workingDoctors.length; i++) {
+			if(workingDoctors[i].did === did) {
+				workingDoctors.splice(i, 1);
+				break;
+			}
+		}
+		for(var i = 0; i < patientsNotRegister.length; i++) {
+			patientsNotRegister[i].emit("doctorLogout", {did: did});
+		}
+		console.log("doctorLogout", did, workingDoctors);
 	});
 
 	socket.on('getPatientRecords', function(req){
