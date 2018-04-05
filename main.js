@@ -505,7 +505,9 @@ io.on('connection', function(socket){
 			} else {
 				var txid = result.stdout;
 
-				var targetHospitalIpPort = "http://172.18.232.124:8080"
+				var targetHospitalIpPort = "http://172.18.232.124:8080";
+				if(targetHospital.toString() === "2")
+					targetHospitalIpPort = "http://172.18.232.124:8181";
 
 				cmd = 'curl -sS ' + targetHospitalIpPort + '/requestDetail/' + txid;
 				console.log(cmd);
