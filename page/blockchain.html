@@ -74,20 +74,62 @@ var timeToString = function(t) {
 							+ '<p>RecordId: ' +  payload.RecordId + '</p>'
 							+ '<p>RequestTime: ' +  timeToString(payload.RequestTime) + '</p>';
 			}
-			return '<tr><td>' + tid + '</td>'
-					+ '<td>' + timestamp + '</td>'
-					+ '<td>' + etype + '</td>'
-					+ '<td>' + payloadHTML + '</td></tr>'
+			// return '<tr><td>' + tid + '</td>'
+			// 		+ '<td>' + timestamp + '</td>'
+			// 		+ '<td>' + etype + '</td>'
+			// 		+ '<td>' + payloadHTML + '</td></tr>'
+      return '<p>TxId: ' + tid + '</p>'
+            + '<p>Timestamp: ' + timestamp + '</p>'
+            + '<p>TxType: ' + etype + '</p>'
+            + '<p>Payload: ' + payloadHTML + '</p>';
 		};
 
-		socket.on('event', function(data){
-			var rowHTML = buildRow(data.TxId, data.Timestamp, data.EventType, JSON.parse(data.Payload));
-			var table = document.getElementById('table');
-			var rowCount = table.rows.length;
-			var row = table.insertRow(rowCount);
-			row.innerHTML = rowHTML;
-		});
+    var blocks = [];
+    var txs = {};
 
+		socket.on('event', function(data){
+			// var rowHTML = buildRow(data.TxId, data.Timestamp, data.EventType, JSON.parse(data.Payload));
+			// var table = document.getElementById('table');
+			// var rowCount = table.rows.length;
+			// var row = table.insertRow(rowCount);
+			// row.innerHTML = rowHTML;
+		  txs[data.TxId] = data;
+      console.log('txs: ', txs);
+    });
+
+    socket.on('newBlocks', function(data){
+      console.log('newBlocks', data);
+
+      var bs = data.blocks.rows;
+      for(var i = 0; i < bs.length; i++) {
+        var bid = data.blocks.rows[i].blocknum;
+        if(blocks.indexOf(bid) > -1) return;
+        blocks.push(bid);
+        console.log('blocks arr: ', blocks);
+        var createdt = data.blocks.rows[i].createdt;
+        var datahash = data.blocks.rows[i].datahash;
+        var prevhash = data.blocks.rows[i].prehash;
+        var txhash = data.blocks.rows[i].txhash;
+        document.getElementById("blocks").innerHTML += buildBlock(bid, createdt, datahash, prevhash, txhash);
+      }
+
+    });
+
+    var buildBlock = function(bid, createdt, datahash, prevhash, txhash) {
+      var res = '<div class="row"><div class="col-md-8 col-md-offset-2">'
+          + '<p> block ID: ' + bid + '</p>'
+          + '<p> create date: ' + createdt + '</p>'
+          + '<p> datahash: ' + datahash + '</p>'
+          + '<p> prevhash: ' + prevhash + '</p>'
+          + '<p> txcount: ' + txhash.length + '</p>';
+      for(var i = 0; i < txhash.length; i++) {
+        var data = txs[txhash[i]];
+        if(!data) return "";
+        res += buildRow(data.TxId, data.Timestamp, data.EventType, JSON.parse(data.Payload));
+      }
+      res += '</div></div>';
+      return res;
+    }
 
         $("#search-button").click(function(){
             document.getElementById("tx").style.display = "none";
@@ -273,6 +315,11 @@ if(items){  for(var i = 0; i < items.length;  i++) {
 	});
    </script>
    <body>
+
+   <div id="block-container">
+     <div id="blocks" class="container">
+     </div>
+   </div>
 
    		<div id="tx" style="display: block;">
    			<table id="table">

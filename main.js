@@ -317,6 +317,8 @@ app.post('/upload', function(req, res){
 	res.send("upload file success");
 });
 
+var currentBlock;
+var latestBlock = [];
 
 var io = require('socket.io')(http);
 io.on('connection', function(socket){
@@ -326,6 +328,8 @@ io.on('connection', function(socket){
 	*/
 	socket.on('watch', function(req) {
 		eventWatcher.push(socket);
+		latestBlock[eventWatcher.length - 1] = currentBlock;
+		socket.emit('newBlock', {block: latestBlock});
 	});
 
 	/*
@@ -561,9 +565,6 @@ var eventCallback = function(event) {
 	var e = JSON.parse(event.payload);
 	if(!e) return;
 	console.log("eventCallback: ", [e.TxId, e.EventType, e.Payload]);
-	// var socket = doctorSocket["123"];
-	// if(socket)
-	// 	socket.emit("event", e);
 
 	for(var i = 0; i < eventWatcher.length; i++) {
 		eventWatcher[i].emit('event', e);
@@ -592,6 +593,40 @@ var eventCallback = function(event) {
 		}
 	}
 };
+
+
+function updateBlock() {
+	var cmd = 'curl -sS sysundc:8888/api/status/mychannel';
+	asyncExec(cmd, function(result1){
+		console.log(result1.stdout);
+		var lb = JSON.parse(result1.stdout).latestBlock;
+		var lbid = parseInt(lb);
+
+		eventWatcher.forEach(function(soc, i){
+			if(soc && typeof soc == 'undefined') {
+				console.log("fucking eventWatcher ", i);
+				return;
+			}
+			console.log("lucky eventWatcher ", i);
+			var watherLatestBlock = latestBlock[i];
+			var startBlock = lbid;
+			if(watherLatestBlock && lbid > parseInt(watherLatestBlock.blocknum))
+				startBlock = parseInt(watherLatestBlock.blocknum)
+			if(watherLatestBlock && startBlock == lbid)
+				return;
+			var limits = lbid - startBlock + 1;
+			cmd = 'curl -sS sysundc:8888/api/blockAndTxList/mychannel/' + startBlock.toString()
+					+ '/' + limits.toString() + '/0';
+			asyncExec(cmd, function(result2){
+				blocks = JSON.parse(result2.stdout);
+				latestBlock[i] = blocks.rows[0];
+				soc.emit('newBlocks', {blocks: blocks});
+			});
+		});
+	});
+	// console.log(updateBlock, latestBlock);
+};
+setInterval(updateBlock, 1000);
 
 // ============= start server =======================
 
