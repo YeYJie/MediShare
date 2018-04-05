@@ -78,10 +78,11 @@ var timeToString = function(t) {
 			// 		+ '<td>' + timestamp + '</td>'
 			// 		+ '<td>' + etype + '</td>'
 			// 		+ '<td>' + payloadHTML + '</td></tr>'
-      return '<p>TxId: ' + tid + '</p>'
+      return '<div class="row"><div class="col-md-12 col-md-offset-1"><p>TxId: ' + tid + '</p>'
             + '<p>Timestamp: ' + timestamp + '</p>'
             + '<p>TxType: ' + etype + '</p>'
-            + '<p>Payload: ' + payloadHTML + '</p>';
+            + '<p>Payload: <div class="row"><div class="col-md-10 col-md-offset-1">' + payloadHTML
+            + '</div></div></p></div></div>';
 		};
 
     var blocks = [];
@@ -116,29 +117,32 @@ var timeToString = function(t) {
     });
 
     var buildBlock = function(bid, createdt, datahash, prevhash, txhash) {
-      var res = '<div class="row"><div class="col-md-8 col-md-offset-2">'
-          + '<p> block ID: ' + bid + '</p>'
-          + '<p> create date: ' + createdt + '</p>'
-          + '<p> datahash: ' + datahash + '</p>'
-          + '<p> prevhash: ' + prevhash + '</p>'
-          + '<p> txcount: ' + txhash.length + '</p>';
+      var res = '<div class="row"><div style="height: 3vh;"></div></div>'
+          + '<div class="row"><div class="col-md-8 col-md-offset-2">'
+          + '<div style="border-radius: 25px; border: 2px solid #428bca;">'
+          + '<div class="row"><div class="col-md-10 col-md-offset-1">'
+          + '<p> Block ID: ' + bid + '</p>'
+          + '<p> Create Date: ' + createdt + '</p>'
+          + '<p> Datahash: ' + datahash + '</p>'
+          + '<p> Prevhash: ' + prevhash + '</p>'
+          + '<p> TxCount: ' + txhash.length + '</p>';
       for(var i = 0; i < txhash.length; i++) {
         var data = txs[txhash[i]];
         if(!data) return "";
         res += buildRow(data.TxId, data.Timestamp, data.EventType, JSON.parse(data.Payload));
       }
-      res += '</div></div>';
+      res += '</div></div></div></div></div>';
       return res;
     }
 
         $("#search-button").click(function(){
-            document.getElementById("tx").style.display = "none";
+            document.getElementById("block-container").style.display = "none";
             document.getElementById("search-button-div").style.display = "none";
             document.getElementById("search-goback-div").style.display = "block";
             document.getElementById("search-div").style.display = "block";
         });
         $("#search-goback").click(function(){
-            document.getElementById("tx").style.display = "block";
+            document.getElementById("block-container").style.display = "block";
             document.getElementById("search-button-div").style.display = "block";
             document.getElementById("search-goback-div").style.display = "none";
             document.getElementById("search-div").style.display = "none";
@@ -321,7 +325,7 @@ if(items){  for(var i = 0; i < items.length;  i++) {
      </div>
    </div>
 
-   		<div id="tx" style="display: block;">
+<!--    		<div id="tx" style="display: block;">
    			<table id="table">
    				<tr>
    					<th>TxID</th>
@@ -330,7 +334,7 @@ if(items){  for(var i = 0; i < items.length;  i++) {
    					<th>Payload</th>
    				</tr>
    			</table>
-   		</div>
+   		</div> -->
 
         <div id="search-button-div" style="position: fixed; right: 50px; bottom: 0px; height: 100px; width: 100px;">
             <button id="search-button" class="btn btn-primary btn-lg btn-block">查询</button>
