@@ -113,23 +113,6 @@
               </div>
           </div>
 
- <!--      <div class="form-signin" id="before-login">
-        <h2 class="form-signin-heading">Doctor Page</h2>
-
-        <p>
-        <label for="login-id" class="sr-only">Id</label>
-        <input type="text" id="login-id" class="form-control" placeholder="Id">
-        </p>
-        <p>
-
-        <label for="login-pwd" class="sr-only">Password</label>
-        <input type="password" id="login-pwd" class="form-control" placeholder="Password">
-        </p>
-
-        <p><button id="login-button" class="btn btn-lg btn-primary btn-block" type="submit">Login</button></p>
-        <p><button id="signup-button" class="btn btn-lg btn-primary btn-block" type="submit">Signin</button></p>
-      </div> -->
-
 
 
       <div class="row" id="after-login" style="display: none;">
@@ -185,7 +168,7 @@
 
 
 
-    <div id="patientRecords" style="display: none;">
+<!--     <div id="patientRecords" style="display: none;">
      <div id="patientRecords-record">
       <h1 class="page-header">病历记录</h1>
       <table id="patientRecords-table" class="table table-striped">
@@ -200,36 +183,35 @@
       </table>
      </div>
      <div id="patientRecords-diagnose">
-<!--       <p><button id="patientRecords-diagnose-button" class="btn btn-lg btn-default btn-block">诊疗</button></p>
-      <p><button id="patientRecords-goback" class="btn btn-lg btn-default btn-block">返回</button></p>
- -->      <p><button id="patientRecords-diagnose-button" class="btn btn-lg btn-default btn-block">诊疗</button></p>
-      <p><button id="patientRecords-goback" class="btn btn-lg btn-default btn-block">返回</button></p>
+ 		<p><button id="patientRecords-diagnose-button" class="btn btn-lg btn-default btn-block">诊疗</button></p>
+      	<p><button id="patientRecords-goback" class="btn btn-lg btn-default btn-block">返回</button></p>
      </div>
-    </div>
+    </div> -->
 
 
 
     <div id="diagnose" style="display: none;">
-      <div id="diagnose-inspection"></div>
       <h1 class="page-header">Diagnose</h1>
-     <p><fieldset><legend>检查项目</legend><textarea class="form-control" row="5" name="inspection" id="diagnoseInspection"></textarea></fieldset></p>
-     <p><fieldset><legend>检查结果</legend><textarea class="form-control" row="5" name="result" id="diagnoseResult"></textarea></fieldset></p>
-     <p><fieldset><legend>诊疗意见</legend><textarea class="form-control" row="5" name="analysis" id="diagnoseAnalysis"></textarea></fieldset></p>
-     <p><fieldset><legend>处方</legend><textarea class="form-control" row="5" name="prescription" id="diagnosePrescription"></textarea></fieldset></p>
+     <p><fieldset><legend>检验项目</legend><textarea class="form-control" row="5" name="inspection" id="inspection"></textarea></fieldset></p>
+     <!-- <p><fieldset><legend>检查结果</legend><textarea class="form-control" row="5" name="result" id="diagnoseResult"></textarea></fieldset></p> -->
+     <!-- <p><fieldset><legend>诊疗意见</legend><textarea class="form-control" row="5" name="analysis" id="diagnoseAnalysis"></textarea></fieldset></p> -->
+     <!-- <p><fieldset><legend>处方</legend><textarea class="form-control" row="5" name="prescription" id="diagnosePrescription"></textarea></fieldset></p> -->
 
-     <p><fieldset><legend>附件</legend></fieldset></p>
-     <p><fieldset><input type="file" name="sampleFile" id="uploadFile" multiple/></fieldset></p>
-     <p><fieldset><legend> </legend></fieldset></p>
+     <!-- <p><fieldset><legend>附件</legend></fieldset></p> -->
+     <p><fieldset><legend>检验结果</legend><input type="file" class="form-control" row="5" name="sampleFile" id="result" multiple/></fieldset></p>
+     <!-- <p><fieldset><input type="file" name="sampleFile" id="uploadFile" multiple/></fieldset></p> -->
+     <!-- <p><fieldset><legend> </legend></fieldset></p> -->
+     <p><fieldset><legend>检验报告</legend><textarea class="form-control" row="5" name="result" id="report"></textarea></fieldset></p>
      <p><button id="diagnose-submit" class="btn btn-lg btn-default btn-block">提交</button></p>
      <p><button id="diagnose-goback" class="btn btn-lg btn-default btn-block">返回</button></p>
     </div>
 
 
-    <div id="recordDetail" style="display: none;">
+<!--     <div id="recordDetail" style="display: none;">
       <h1 class="page-header">记录详情</h1>
       <div id="recordDetail-div"></div>
       <p><button id="recordDetail-goback" class="btn btn-lg btn-default btn-block">返回</button></p>
-    </div>
+    </div> -->
 
 
         </div>
@@ -249,7 +231,6 @@
 
 
   $(function () {
-
     $('#login-form-link').click(function(e) {
     $("#login-form").delay(100).fadeIn(100);
     $("#register-form").fadeOut(100);
@@ -269,36 +250,39 @@
     var globalDid = "123456";
     var globalPid;
 
-    var patientInspection = new Map;
-    socket.on('newInspection', function(data){
-      console.log("newInspection", data);
-      var inspection = data.data;
-      // patientInspection[inspection.pid].push(inspection);
-      if(patientInspection[inspection.pid])
-        patientInspection[inspection.pid].push(inspection);
-      else
-        patientInspection[inspection.pid] = [inspection];
+
+
+    socket.emit('jianyanke', {});
+    socket.on('patients', function(data){
+    	console.log("[patients]", data);
+		var patients = data.patients;
+
+		for(var i = 0; i < patients.length; i++) {
+			var patientHTML = buildPatientHTML(patients[i]);
+			if(!patientHTML) continue;
+			var row = document.getElementById("patientList-table").insertRow(1);
+			row.innerHTML = patientHTML;
+			$('#patientList-' + patients[i].id.toString()).click(function(){
+				var patientId = $(this).data('pid').toString();
+				globalPid = patientId;
+				// console.log(globalPid);
+				// socket.emit('getPatientRecords', {patientId: patientId, doctorId: globalDid});
+				document.getElementById("patientList").style.display = "none";
+				document.getElementById("diagnose").style.display = "block";
+				console.log('[patients button click]', globalPid);
+			});
+		}
     });
 
-    var buildInspection = function(pid) {
-      console.log("buildInspection", pid, patientInspection[pid]);
-      var inspections = patientInspection[pid];
-      var res = "";
-      if(!inspections) return res;
-      inspections.forEach(function(ins){
-        res += '<p>inspection: ' + ins.inspection + '</p>';
-        ins.files.forEach(function(f){
-          res += '<p><img src="' + f + '" /></p>';
-        });
-        res += '<p>report: ' + ins.report + '</p>';
-      });
-      return res;
-    };
 
-    $("#recordDetail-goback").click(function(){
-      document.getElementById("recordDetail").style.display = "none";
-      document.getElementById("patientRecords").style.display = "block";
-    });
+
+
+
+
+    // $("#recordDetail-goback").click(function(){
+    //   document.getElementById("recordDetail").style.display = "none";
+    //   document.getElementById("patientRecords").style.display = "block";
+    // });
 
     $(".diagnose").click(function(){
       document.getElementById("doctorInfo").style.display = "none";
@@ -306,49 +290,44 @@
       document.getElementById("patientList").style.display = "none";
       document.getElementById("patientRecords").style.display = "block";
     });
-    $("#patientRecords-diagnose-button").click(function(){
-      document.getElementById("patientRecords").style.display = "none";
-      document.getElementById("diagnose").style.display = "block";
-
-      document.getElementById("diagnose-inspection").innerHTML = buildInspection(globalPid);
-
-    });
-    $("#patientRecords-referral-button").click(function(){
-      document.getElementById("patientRecords").style.display = "none";
-      document.getElementById("referral").style.display = "block";
-    });
-    $("#patientRecords-goback").click(function(){
-      document.getElementById("patientRecords").style.display = "none";
-      document.getElementById("patientInfo").style.display = "none";
-      document.getElementById("patientList").style.display = "block";
-      document.getElementById("doctorInfo").style.display = "block";
-      $("#patientRecords-table").find("tr:gt(0)").remove();
-    });
+    // $("#patientRecords-diagnose-button").click(function(){
+    //   document.getElementById("patientRecords").style.display = "none";
+    //   document.getElementById("diagnose").style.display = "block";
+    // });
+    // $("#patientRecords-referral-button").click(function(){
+    //   document.getElementById("patientRecords").style.display = "none";
+    //   document.getElementById("referral").style.display = "block";
+    // });
+    // $("#patientRecords-goback").click(function(){
+    //   document.getElementById("patientRecords").style.display = "none";
+    //   document.getElementById("patientInfo").style.display = "none";
+    //   document.getElementById("patientList").style.display = "block";
+    //   document.getElementById("doctorInfo").style.display = "block";
+    //   $("#patientRecords-table").find("tr:gt(0)").remove();
+    // });
 
     $("#diagnose-submit").click(function(){
       document.getElementById("diagnose").style.display = "none";
-      document.getElementById("patientRecords").style.display = "block";
+      document.getElementById("patientList").style.display = "block";
 
-      console.log('diagnose-submit-button click', [globalDid, globalPid]);
+      console.log('diagnose-submit-button click', [globalPid]);
       var formData = new FormData();
-      formData.append('did', globalDid);
+      // formData.append('did', globalDid);
       formData.append('pid', globalPid);
-
-      formData.append('inspections', JSON.stringify(patientInspection[globalPid]));
-      formData.append('inspection', $("#diagnoseInspection").val());
-      formData.append('result', $("#diagnoseResult").val());
-      formData.append('analysis', $("#diagnoseAnalysis").val());
-      formData.append('prescription', $("#diagnosePrescription").val());
-      $("#diagnoseInspection").val(); $("#diagnoseResult").val(); $("#diagnoseAnalysis").val(); $("#diagnosePrescription").val();
-
-      $.each($("#uploadFile")[0].files, function(i, file) {
+      formData.append('inspection', $("#inspection").val());
+      // formData.append('result', $("#diagnoseResult").val());
+      formData.append('report', $("#report").val());
+      // formData.append('prescription', $("#diagnosePrescription").val());
+      // $("#diagnoseInspection").val(); $("#diagnoseResult").val(); $("#diagnoseAnalysis").val(); $("#diagnosePrescription").val();
+      $("#inspection").val(); $("#report").val();
+      $.each($("#result")[0].files, function(i, file) {
           formData.append('file', file);
       });
       console.log(formData);
 
       $.ajax({
         type: "POST",
-        url: "/upload",
+        url: "/jianyankeUpload",
         data: formData,
         contentType: false,
         processData: false,
@@ -366,22 +345,22 @@
       document.getElementById("patientRecords").style.display = "block";
     });
 
-    $(".referral-submit").click(function(){
-      document.getElementById("referral").style.display = "none";
-      document.getElementById("patientInfo").style.display = "none";
-      document.getElementById("doctorInfo").style.display = "block";
-      document.getElementById("patientList").style.display = "block";
-    });
-    $("#referral-goback").click(function(){
-      document.getElementById("referral").style.display = "none";
-      document.getElementById("patientRecords").style.display = "block";
-    });
+    // $(".referral-submit").click(function(){
+    //   document.getElementById("referral").style.display = "none";
+    //   document.getElementById("patientInfo").style.display = "none";
+    //   document.getElementById("doctorInfo").style.display = "block";
+    //   document.getElementById("patientList").style.display = "block";
+    // });
+    // $("#referral-goback").click(function(){
+    //   document.getElementById("referral").style.display = "none";
+    //   document.getElementById("patientRecords").style.display = "block";
+    // });
 
-    $("#doctorInfoEdit-button").click(function(){
-      document.getElementById("patientList").style.display = "none";
-      document.getElementById("doctorInfo").style.display = "none";
-      document.getElementById("doctorEdit").style.display = "block";
-    });
+    // $("#doctorInfoEdit-button").click(function(){
+    //   document.getElementById("patientList").style.display = "none";
+    //   document.getElementById("doctorInfo").style.display = "none";
+    //   document.getElementById("doctorEdit").style.display = "block";
+    // });
     $("#doctorInfoEdit-logout-button").click(function(){
       // document.getElementById("doctorInfo").style.display = "none";
       // document.getElementById("patientList").style.display = "none";
@@ -392,13 +371,13 @@
       $("#patientList-table").find("tr:gt(0)").remove();
       socket.emit("doctorLogout", {did: globalDid});
     });
-    $("#doctorEdit-submit").click(function(){
-      // socket.emit('doctorEdit', {id: $('#editId'), pwd: $('#editPwd'), phone: $('#editPhone'), email: $('#editEmail'), addr: $('#editAddr')});
-      $('#editPwd').val(); $('#editPhone').val(); $('#editEmail').val(); $('#editAddr').val();
-      document.getElementById("doctorInfo").style.display = "block";
-      document.getElementById("patientList").style.display = "block";
-      document.getElementById("doctorEdit").style.display = "none";
-    });
+    // $("#doctorEdit-submit").click(function(){
+    //   // socket.emit('doctorEdit', {id: $('#editId'), pwd: $('#editPwd'), phone: $('#editPhone'), email: $('#editEmail'), addr: $('#editAddr')});
+    //   $('#editPwd').val(); $('#editPhone').val(); $('#editEmail').val(); $('#editAddr').val();
+    //   document.getElementById("doctorInfo").style.display = "block";
+    //   document.getElementById("patientList").style.display = "block";
+    //   document.getElementById("doctorEdit").style.display = "none";
+    // });
 
     $('#login-button').click(function(){
       globalDid = $('#login-id').val().toString();
@@ -415,35 +394,35 @@
     //   document.getElementById("login").style.display = "none";
     //   document.getElementById("signup").style.display = "block";
     // });
-    $('#signup-goback').click(function(){
-      document.getElementById("login").style.display = "block";
-      document.getElementById("signup").style.display = "none";
-    });
-    $('#signup-button').click(function(){
-      socket.emit('signup', {role: "doctor", id: $('#signupId').val(), name: $('#signupName').val(), pwd: $('#signupPwd').val(), phone: $('#signupPhone').val(), email: $('#signupEmail').val(), addr: $('#signupAddr').val()});
-      $('#signupId').val(); $('#signupName').val(); $('#signupPwd').val(); $('#signupPhone').val(); $('#signupEmail').val(); $('#signupAddr').val();
-      document.getElementById("signup").style.display = "none";
-      document.getElementById("signupState").style.display = "block";
-    });
-    $('#state-button').click(function() {
-      socket.emit('signupState', {role: "doctor", id: $('#stateId').val()});
-      $('#stateId').val('');
-      document.getElementById("signup").style.display = "none";
-      document.getElementById("signupState").style.display = "block";
-    });
-    $('#signupState-goback').click(function(){
-      document.getElementById("signupState").style.display = "none";
-      document.getElementById("login").style.display = "block";
-      document.getElementById('signupStateDiv').innerHTML = "Please Wait for Review";
-    });
+    // $('#signup-goback').click(function(){
+    //   document.getElementById("login").style.display = "block";
+    //   document.getElementById("signup").style.display = "none";
+    // });
+    // $('#signup-button').click(function(){
+    //   socket.emit('signup', {role: "doctor", id: $('#signupId').val(), name: $('#signupName').val(), pwd: $('#signupPwd').val(), phone: $('#signupPhone').val(), email: $('#signupEmail').val(), addr: $('#signupAddr').val()});
+    //   $('#signupId').val(); $('#signupName').val(); $('#signupPwd').val(); $('#signupPhone').val(); $('#signupEmail').val(); $('#signupAddr').val();
+    //   document.getElementById("signup").style.display = "none";
+    //   document.getElementById("signupState").style.display = "block";
+    // });
+    // $('#state-button').click(function() {
+    //   socket.emit('signupState', {role: "doctor", id: $('#stateId').val()});
+    //   $('#stateId').val('');
+    //   document.getElementById("signup").style.display = "none";
+    //   document.getElementById("signupState").style.display = "block";
+    // });
+    // $('#signupState-goback').click(function(){
+    //   document.getElementById("signupState").style.display = "none";
+    //   document.getElementById("login").style.display = "block";
+    //   document.getElementById('signupStateDiv').innerHTML = "Please Wait for Review";
+    // });
 
-    socket.on('signUpSuccess', function(data){
-      var signUpSuccessHTML = '<p>Hello, ' + data.name + '</p>'
-          + '<p>Your Private Key: ' + data.prikey + '</p>'
-          + '<p>Your PKC: ' + data.pkc + '</p>';
-      console.log(signUpSuccessHTML);
-      document.getElementById('signupStateDiv').innerHTML = signUpSuccessHTML;
-    });
+    // socket.on('signUpSuccess', function(data){
+    //   var signUpSuccessHTML = '<p>Hello, ' + data.name + '</p>'
+    //       + '<p>Your Private Key: ' + data.prikey + '</p>'
+    //       + '<p>Your PKC: ' + data.pkc + '</p>';
+    //   console.log(signUpSuccessHTML);
+    //   document.getElementById('signupStateDiv').innerHTML = signUpSuccessHTML;
+    // });
     socket.on('doctorInfo', function(data){
       console.log('doctorInfo', data);
       var doctorInfo = JSON.parse(data.doctorInfo);
@@ -464,28 +443,28 @@
       if(index > -1) return null;
       myPatients.push(patient.id);
       return '<tr><td>' + patient.name + '</td><td><button id="patientList-'+patient.id
-       +'" data-pid="'+patient.id+'" class="btn btn-default btn-lg btn-block">诊疗</button></td></tr>';
+       +'" data-pid="'+patient.id+'" class="btn btn-default btn-lg btn-block">检验</button></td></tr>';
     };
-    socket.on('doctorPatients', function(data){
-      console.log('doctorPatients', data);
-      var patients = data.patients;
-      console.log(patients);
+    // socket.on('doctorPatients', function(data){
+    //   console.log('doctorPatients', data);
+    //   var patients = data.patients;
+    //   console.log(patients);
 
-      for(var i = 0; i < patients.length; i++) {
-        var patientHTML = buildPatientHTML(patients[i]);
-        if(!patientHTML) continue;
-        var row = document.getElementById("patientList-table").insertRow(1);
-        row.innerHTML = patientHTML;
-        $('#patientList-' + patients[i].id.toString()).click(function(){
-          var patientId = $(this).data('pid').toString();
-          globalPid = patientId;
-          console.log(globalPid);
-          socket.emit('getPatientRecords', {patientId: patientId, doctorId: globalDid});
-          document.getElementById("patientList").style.display = "none";
-          document.getElementById("patientRecords").style.display = "block";
-        });
-      }
-    });
+    //   for(var i = 0; i < patients.length; i++) {
+    //     var patientHTML = buildPatientHTML(patients[i]);
+    //     if(!patientHTML) continue;
+    //     var row = document.getElementById("patientList-table").insertRow(1);
+    //     row.innerHTML = patientHTML;
+    //     $('#patientList-' + patients[i].id.toString()).click(function(){
+    //       var patientId = $(this).data('pid').toString();
+    //       globalPid = patientId;
+    //       console.log(globalPid);
+    //       socket.emit('getPatientRecords', {patientId: patientId, doctorId: globalDid});
+    //       document.getElementById("patientList").style.display = "none";
+    //       document.getElementById("patientRecords").style.display = "block";
+    //     });
+    //   }
+    // });
     socket.on('patientInfo', function(data){
       console.log('patientInfo', data);
       var patientInfo = JSON.parse(data.patientInfo);
@@ -498,61 +477,63 @@
       document.getElementById("doctorInfo").style.display = "none";
       document.getElementById("patientInfo").style.display = "block";
     });
-    socket.on('patientRecords', function(data){
-      $("#patientRecords-table").find("tr:gt(0)").remove();
-      console.log('patientRecords', data);
-      var patientRecords = data.records;
-      var buildRecordHTML = function(record) {
-        var date = new Date(parseInt(record.RecordTime) * 1000);
-        var y = date.getFullYear();
-        var m = date.getMonth() + 1;
-        var d = date.getDate();
-        return '<tr><td>' + record.Hospital + '</td><td>' + record.Doctor
-          + '</td><td>' + y + '-' + m + '-' + d + '</td><td>' + record.Inspection
-          + '</td><td><button id="patientRecord-'+record.RecordId+'" data-rid="'
-          + record.RecordId + '" data-pid="' + data.id + '" data-th="'
-          + record.Hospital + '" class="btn btn-default btn-lg btn-block">查看细节</button></td>';
-      };
-      if(!patientRecords) return;
-      for(var i = 0; i < patientRecords.length; i++) {
-        var recordHTML = buildRecordHTML(patientRecords[i]);
-        var row = document.getElementById("patientRecords-table").insertRow(1);
-        row.innerHTML = recordHTML;
-        $("#patientRecord-"+patientRecords[i].RecordId).click(function(){
-          var rid = $(this).data('rid').toString();
-          var pid = $(this).data('pid').toString();
-          var targetHospital = $(this).data('th');
-          console.log([rid, pid, targetHospital]);
-          socket.emit('requestDetail', {rid: rid, did: globalDid, pid: pid,
-                      targetHospital: targetHospital});
-        });
-      }
-    });
-    socket.on('recordDetail', function(data){
-      console.log('recordDetail', data);
 
-      var detail = JSON.parse(data.recordDetail);
-      console.log(detail);
-      recordDetailHTML = '<p><fieldset><legend>检查项目</legend>'+detail.inspection+'</fieldset></p>';
-      recordDetailHTML += '<p></p><p><fieldset><legend>检查结果</legend>'+detail.result+'</fieldset></p>';
-      recordDetailHTML += '<p><fieldset><legend>诊疗意见</legend>'+detail.analysis+'</fieldset></p>';
-      recordDetailHTML += '<p><fieldset><legend>处方</legend>'+detail.prescription+'</fieldset></p>';
-      recordDetailHTML += '<p><fieldset><legend>附件</legend>';
-      var files = detail.files;
-      if(files.length > 0) {
-        for(var i = 0; i < files.length; i++) {
-          recordDetailHTML += '<p><img src="'+files[i]+'" /></p>';
-          // recordDetailHTML += '<p><img src="http://172.18.232.124:8080/file/'+files[i]+'" /></p>';
-        }
-      } else {
-        recordDetailHTML += '<p>无附件</p>';
-      }
-      recordDetailHTML += '</fieldset></p>';
-      document.getElementById("recordDetail-div").innerHTML = recordDetailHTML;
-      document.getElementById("recordDetail").style.display = "block";
-      document.getElementById("patientRecords").style.display = "none";
+    // socket.on('patientRecords', function(data){
+    //   $("#patientRecords-table").find("tr:gt(0)").remove();
+    //   console.log('patientRecords', data);
+    //   var patientRecords = data.records;
+    //   var buildRecordHTML = function(record) {
+    //     var date = new Date(parseInt(record.RecordTime) * 1000);
+    //     var y = date.getFullYear();
+    //     var m = date.getMonth() + 1;
+    //     var d = date.getDate();
+    //     return '<tr><td>' + record.Hospital + '</td><td>' + record.Doctor
+    //       + '</td><td>' + y + '-' + m + '-' + d + '</td><td>' + record.Inspection
+    //       + '</td><td><button id="patientRecord-'+record.RecordId+'" data-rid="'
+    //       + record.RecordId + '" data-pid="' + data.id + '" data-th="'
+    //       + record.Hospital + '" class="btn btn-default btn-lg btn-block">查看细节</button></td>';
+    //   };
+    //   if(!patientRecords) return;
+    //   for(var i = 0; i < patientRecords.length; i++) {
+    //     var recordHTML = buildRecordHTML(patientRecords[i]);
+    //     var row = document.getElementById("patientRecords-table").insertRow(1);
+    //     row.innerHTML = recordHTML;
+    //     $("#patientRecord-"+patientRecords[i].RecordId).click(function(){
+    //       var rid = $(this).data('rid').toString();
+    //       var pid = $(this).data('pid').toString();
+    //       var targetHospital = $(this).data('th');
+    //       console.log([rid, pid, targetHospital]);
+    //       socket.emit('requestDetail', {rid: rid, did: globalDid, pid: pid,
+    //                   targetHospital: targetHospital});
+    //     });
+    //   }
+    // });
 
-    });
+    // socket.on('recordDetail', function(data){
+    //   console.log('recordDetail', data);
+
+    //   var detail = JSON.parse(data.recordDetail);
+    //   console.log(detail);
+    //   recordDetailHTML = '<p><fieldset><legend>检查项目</legend>'+detail.inspection+'</fieldset></p>';
+    //   recordDetailHTML += '<p></p><p><fieldset><legend>检查结果</legend>'+detail.result+'</fieldset></p>';
+    //   recordDetailHTML += '<p><fieldset><legend>诊疗意见</legend>'+detail.analysis+'</fieldset></p>';
+    //   recordDetailHTML += '<p><fieldset><legend>处方</legend>'+detail.prescription+'</fieldset></p>';
+    //   recordDetailHTML += '<p><fieldset><legend>附件</legend>';
+    //   var files = detail.files;
+    //   if(files.length > 0) {
+    //     for(var i = 0; i < files.length; i++) {
+    //       recordDetailHTML += '<p><img src="'+files[i]+'" /></p>';
+    //       // recordDetailHTML += '<p><img src="http://172.18.232.124:8080/file/'+files[i]+'" /></p>';
+    //     }
+    //   } else {
+    //     recordDetailHTML += '<p>无附件</p>';
+    //   }
+    //   recordDetailHTML += '</fieldset></p>';
+    //   document.getElementById("recordDetail-div").innerHTML = recordDetailHTML;
+    //   document.getElementById("recordDetail").style.display = "block";
+    //   document.getElementById("patientRecords").style.display = "none";
+
+    // });
     socket.on('event', function(data){
       console.log(data);
       if(data.EventType === "deRegister") {
@@ -570,38 +551,38 @@
       }
       else if(data.EventType === "register") {
         var payload = JSON.parse(data.Payload);
-        if(payload.Doctor === globalDid) {
-          console.log("patient register to me", payload.Patient);
-          var pid = payload.Patient;
-          $.ajax({
-            type: "GET",
-            url: "/getPatientNameFromId/" + pid,
-            success: function(text) {
-              var patientHTML = buildPatientHTML({id: pid, name: text});
-              console.log(patientHTML);
-              var row = document.getElementById("patientList-table").insertRow(1);
-              row.innerHTML = patientHTML;
-              $('#patientList-' + pid).click(function(){
-                var patientId = $(this).data('pid').toString();
-                globalPid = patientId;
-                console.log(globalPid);
-                socket.emit('getPatientRecords', {patientId: patientId, doctorId: globalDid});
-                document.getElementById("patientList").style.display = "none";
-                document.getElementById("patientRecords").style.display = "block";
-              });
-            },
-            error: function(xhr) {
-            }
-          });
-        }
+        // if(payload.Doctor === globalDid) {
+        //   console.log("patient register to me", payload.Patient);
+        //   var pid = payload.Patient;
+        //   $.ajax({
+        //     type: "GET",
+        //     url: "/getPatientNameFromId/" + pid,
+        //     success: function(text) {
+        //       var patientHTML = buildPatientHTML({id: pid, name: text});
+        //       console.log(patientHTML);
+        //       var row = document.getElementById("patientList-table").insertRow(1);
+        //       row.innerHTML = patientHTML;
+        //       $('#patientList-' + pid).click(function(){
+        //         var patientId = $(this).data('pid').toString();
+        //         globalPid = patientId;
+        //         console.log(globalPid);
+        //         socket.emit('getPatientRecords', {patientId: patientId, doctorId: globalDid});
+        //         document.getElementById("patientList").style.display = "none";
+        //         document.getElementById("patientRecords").style.display = "block";
+        //       });
+        //     },
+        //     error: function(xhr) {
+        //     }
+        //   });
+        // }
       }
-      else if(data.EventType === "newRecord") {
-        var payload = JSON.parse(data.Payload);
-        if(payload.Doctor === globalDid && payload.Patient === globalPid) {
-          console.log("patient has new record");
-          socket.emit('getPatientRecords', {doctorId: globalDid, patientId: globalPid});
-        }
-      }
+      // else if(data.EventType === "newRecord") {
+      //   var payload = JSON.parse(data.Payload);
+      //   if(payload.Doctor === globalDid && payload.Patient === globalPid) {
+      //     console.log("patient has new record");
+      //     socket.emit('getPatientRecords', {doctorId: globalDid, patientId: globalPid});
+      //   }
+      // }
     });
   })
 

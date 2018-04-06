@@ -48,7 +48,7 @@ var MongoURL = "mongodb://localhost:27017/";
 
 var exec = require('child-process-promise').exec;
 var asyncExec = function(cmd, callback) {
-	console.log(asyncExec, cmd);
+	// console.log(asyncExec, cmd);
 	exec(cmd)
 		.then((result) => {
 			callback(result);
@@ -76,12 +76,19 @@ patientIdToName["24301036"] = "张伟";
 
 var doctorSocket = new Map;
 var patientSocket = new Map;
+
 var doctorPatients = new Map;
+var patientDoctor = new Map;
+var registerdPatients = [];
+var jianyanke = [];
 
 var workingDoctors = [];
 var patientsNotRegister = [];
 
 var eventWatcher = [];
+
+var currentBlock;
+var latestBlock = [];
 
 var register = function(pid, did) {
 	if(did === "0") {
@@ -112,15 +119,6 @@ app.get('/doctorPage', function(req, res){
 	res.sendFile(__dirname + '/page/doctor.html-old');
 });
 
-// app.get('/doc', function(req, res){
-// 	console.log('/doc');
-// 	res.sendFile(__dirname + '/page/doctor.html');
-// });
-// app.get('/gov', function(req, res){
-// 	console.log('/doc');
-// 	res.sendFile(__dirname + '/page/gov.html');
-// });
-
 app.get('/doc', function(req, res){
 	console.log('/doc');
 	res.sendFile(__dirname + '/page/doc.html');
@@ -131,10 +129,10 @@ app.get('/patient', function(req, res){
 	res.sendFile(__dirname + '/page/patient.html');
 });
 
-// app.get('/newPatient', function(req, res){
-// 	console.log('/newPatient')
-// 	res.sendFile(__dirname + '/page/newPatient.html');
-// });
+app.get('/jianyanke', function(req, res){
+	res.sendFile(__dirname + '/page/jianyanke.html');
+});
+
 
 app.get('/blockchain', function(req, res){
 	console.log('/blockchain')
@@ -144,11 +142,6 @@ app.get('/blockchain', function(req, res){
 app.get('/getDoctorInfo/:id', function(req, res){
 	id = req.params.id;
 	console.log('/getDoctorInfo/:id ', id);
-	// res.send({ header: "http://172.18.232.124:8080/header/" + id.toString(),
-	// 		name: "张医生",
-	// 		phone:"15521132718",
-	// 		email:"394566396@qq.com",
-	// 		addr:"sysundc"});
 	MongoClient.connect(MongoURL, function(err, db) {
 		if (err) throw err;
 		var dbo = db.db(dbname);
@@ -163,11 +156,6 @@ app.get('/getDoctorInfo/:id', function(req, res){
 app.get('/getPatientInfo/:id', function(req, res){
 	id = req.params.id;
 	console.log('/getPatientInfo/:id ', id);
-	// res.send({ header: "http://172.18.232.124:8080/header/" + id.toString(),
-	// 		name: "叶永杰",
-	// 		phone:"15521132718",
-	// 		email:"sysuyyj@qq.com",
-	// 		addr:"sysundc"});
 	MongoClient.connect(MongoURL, function(err, db) {
 		if (err) throw err;
 		var dbo = db.db("patient");
@@ -182,15 +170,12 @@ app.get('/getPatientInfo/:id', function(req, res){
 app.get('/getDoctorsPatients/:id', function(req, res){
 	var id = req.params.id;
 	console.log('/getDoctorsPatients/:id ', id);
-	// res.send({patients: [{name: "patient1", id:1},
-	// 		{name: "patient2", id:2}, {name: "patient3", id:3}]});
 	var patients = doctorPatients[id];
 	if(!patients || !util.isArray(patients))
 		res.send({patients:[]});
 	var temp = [];
 	for(var i = 0; i < patients.length; i++) {
 		temp[i] = {name: patientIdToName[patients[i]], id: patients[i]};
-		// temp[i] = {name: "", id: patients[i]};
 	}
 	res.send({patients: temp});
 });
@@ -198,14 +183,12 @@ app.get('/getDoctorsPatients/:id', function(req, res){
 app.get('/header/:id', function(req, res){
 	id = req.params.id;
 	console.log('/header/:id ', id);
-	// res.send("header");
 	res.sendFile(__dirname + '/header/' + id + '.png');
 });
 
 app.get('/requestDetail/:txid', function(req, httpRes){
 	txid = req.params.txid;
 	console.log('/requestDetail/:txid ', txid);
-	// res.send({a: "123456", b: "456789"});
 	MongoClient.connect(MongoURL, function(err, db) {
 		if (err) throw err;
 		var dbo = db.db(dbname);
@@ -213,11 +196,6 @@ app.get('/requestDetail/:txid', function(req, httpRes){
 			if (err) throw err;
 			var rid = res.rid;
 			console.log("find mongodb [index] rid: ", rid);
-			// dbo.collection("index").insertOne({txid: e.TxId, rid: rid}, function(err, res) {
-			// 	if(err) throw err;
-			// 	console.log("insert into mongodb [index] success", [e.TxId, rid]);
-			// 	db.close();
-			// });
 			dbo.collection("data").findOne({rid: rid}, function(err, res) {
 				if(err) throw err;
 				console.log("find mongodb [data] ", res);
@@ -261,6 +239,7 @@ app.post('/upload', function(req, res){
 	var data = {did: did,
 				pid: pid,
 				rid: recordId,
+				inspections: req.body.inspections,
 				inspection: req.body.inspection,
 				result: req.body.result,
 				analysis: req.body.analysis,
@@ -317,8 +296,57 @@ app.post('/upload', function(req, res){
 	res.send("upload file success");
 });
 
-var currentBlock;
-var latestBlock = [];
+
+app.post('/jianyankeUpload', function(req, res){
+
+	var currentTime = Math.floor(new Date() / 1000).toString();
+	// var did = req.body.did;
+	var pid = req.body.pid;
+	var did = patientDoctor[pid];
+	// var recordId = [currentTime, did, pid].join("-");
+	var data = {did: did,
+				pid: pid,
+				// rid: recordId,
+				inspection: req.body.inspection,
+				// result: req.body.result,
+				report: req.body.report,
+				// prescription: req.body.prescription,
+				files: []
+			};
+
+	if(req.files) {
+		// console.log(req.files);
+		if(util.isArray(req.files.file)) {
+			// console.log("more than one file");
+			var files = req.files.file;
+			for(var i = 0; i < files.length; i++) {
+				var filename = [currentTime, i.toString(), files[i].name].join('$$');
+				data.files[i] = "http://172.18.232.124:" + port + "/file/" + filename;
+				files[i].mv('./file/'+filename,  function(err){
+					if(err)
+						return res.status(500).send(err);
+				});
+			}
+		}
+		else {
+			// console.log("single file");
+			var file = req.files.file;
+			var filename = [currentTime, "0", file.name].join('_');
+			data.files[0] = "http://172.18.232.124:" + port + "/file/" + filename;
+			file.mv('./file/'+filename,  function(err){
+				if(err)
+					return res.status(500).send(err);
+			});
+		}
+	}
+
+	console.log('jianyankeUpload', [pid, did], data, doctorSocket[did]);
+
+	doctorSocket[did].emit("newInspection", {data: data});
+
+	res.send("upload file success");
+});
+
 
 var io = require('socket.io')(http);
 io.on('connection', function(socket){
@@ -397,7 +425,6 @@ io.on('connection', function(socket){
 			if (index > -1) {
 				patientsNotRegister.splice(index, 1);
 			}
-			// socket.emit('onRegister', {did:did , msg: "Please go to room 431"});
 		});
 
 		cmd = './bishe/getDoctorInfo.sh ' + did;
@@ -405,7 +432,14 @@ io.on('connection', function(socket){
 		asyncExec(cmd, function(result){
 			console.log('./bishe/getDoctorInfo.sh result: ', result.stdout);
 			socket.emit('doctorInfo', {did: did, hospitalName: hospitalName, doctorInfo: result.stdout});
-		})
+		});
+
+		registerdPatients.push(pid);
+		patientDoctor[pid] = did;
+		jianyanke.forEach(function(socket){
+			if(!socket || typeof socket == undefined) return;
+			socket.emit('patients', {patients:[{id: pid, name: patientIdToName[pid]}]});
+		});
 	});
 	socket.on('deRegister', function(req){
 		var pid = req.id;
@@ -419,10 +453,23 @@ io.on('connection', function(socket){
 		asyncExec(cmd, function(result){
 			console.log("patient deRegister success");
 		});
+
+		var index = registerdPatients.indexOf(pid);
+		if(index > -1)
+			registerdPatients.splice(index, 1);
+		delete patientDoctor[pid];
 	});
 
-	socket.on('keshiAndDoctor', function(req){
-		socket.emit('keshiAndDoctor', {"内科": ["张三", "李四"], "外科": ["王五", "李六", "叶七"], "康复科": ["林八"]});
+	/*
+	*	For jianyanke
+	*/
+	socket.on('jianyanke', function(req){
+		jianyanke.push(socket);
+		var patients = [];
+		registerdPatients.forEach(function(pid) {
+			patients.push({id: pid, name: patientIdToName[pid]});
+		});
+		socket.emit('patients', {patients: patients});
 	});
 
 
@@ -434,7 +481,7 @@ io.on('connection', function(socket){
 		var id = req.id;
 		var pwd = req.pwd;
 		console.log('login', [id, pwd]);
-		// doctorSocket[id] = socket;
+		doctorSocket[id] = socket;
 		eventWatcher.push(socket);
 		// myEventListener.myRegisterEventListener('org1', "d1", doctor.doctorHandler, socket);
 		var cmd = './bishe/getDoctorInfo.sh ' + id;
@@ -460,6 +507,7 @@ io.on('connection', function(socket){
 
 	socket.on("doctorLogout", function(req) {
 		var did = req.did;
+		delete doctorSocket[did];
 		for(var i = 0; i < workingDoctors.length; i++) {
 			if(workingDoctors[i].did === did) {
 				workingDoctors.splice(i, 1);
@@ -598,7 +646,7 @@ var eventCallback = function(event) {
 function updateBlock() {
 	var cmd = 'curl -sS sysundc:8888/api/status/mychannel';
 	asyncExec(cmd, function(result1){
-		console.log(result1.stdout);
+		// console.log(result1.stdout);
 		var lb = JSON.parse(result1.stdout).latestBlock;
 		var lbid = parseInt(lb);
 
@@ -607,7 +655,7 @@ function updateBlock() {
 				console.log("fucking eventWatcher ", i);
 				return;
 			}
-			console.log("lucky eventWatcher ", i);
+			// console.log("lucky eventWatcher ", i);
 			var watherLatestBlock = latestBlock[i];
 			var startBlock = lbid;
 			if(watherLatestBlock && lbid > parseInt(watherLatestBlock.blocknum))
@@ -627,6 +675,7 @@ function updateBlock() {
 	// console.log(updateBlock, latestBlock);
 };
 setInterval(updateBlock, 1000);
+
 
 // ============= start server =======================
 
