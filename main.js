@@ -241,7 +241,8 @@ app.post('/upload', function(req, res){
 				rid: recordId,
 				inspections: req.body.inspections,
 				inspection: req.body.inspection,
-				result: req.body.result,
+				// result: req.body.result,
+				symptom: req.body.symptom,
 				analysis: req.body.analysis,
 				prescription: req.body.prescription,
 				files: []
@@ -340,7 +341,7 @@ app.post('/jianyankeUpload', function(req, res){
 		}
 	}
 
-	console.log('jianyankeUpload', [pid, did], data, doctorSocket[did]);
+	console.log('jianyankeUpload', [pid, did], data);
 
 	doctorSocket[did].emit("newInspection", {data: data});
 
@@ -458,6 +459,11 @@ io.on('connection', function(socket){
 		if(index > -1)
 			registerdPatients.splice(index, 1);
 		delete patientDoctor[pid];
+		delete patientSocket[pid];
+		jianyanke.forEach(function(socket){
+			if(!socket || typeof socket == undefined) return;
+			socket.emit('deRegister', {pid: pid});
+		});
 	});
 
 	/*

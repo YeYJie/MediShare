@@ -190,28 +190,47 @@
 
 
 
-    <div id="diagnose" style="display: none;">
-      <h1 class="page-header">Diagnose</h1>
-     <p><fieldset><legend>检验项目</legend><textarea class="form-control" row="5" name="inspection" id="inspection"></textarea></fieldset></p>
-     <!-- <p><fieldset><legend>检查结果</legend><textarea class="form-control" row="5" name="result" id="diagnoseResult"></textarea></fieldset></p> -->
-     <!-- <p><fieldset><legend>诊疗意见</legend><textarea class="form-control" row="5" name="analysis" id="diagnoseAnalysis"></textarea></fieldset></p> -->
-     <!-- <p><fieldset><legend>处方</legend><textarea class="form-control" row="5" name="prescription" id="diagnosePrescription"></textarea></fieldset></p> -->
+<div id="diagnose" style="display: none;">
 
-     <!-- <p><fieldset><legend>附件</legend></fieldset></p> -->
-     <p><fieldset><legend>检验结果</legend><input type="file" class="form-control" row="5" name="sampleFile" id="result" multiple/></fieldset></p>
-     <!-- <p><fieldset><input type="file" name="sampleFile" id="uploadFile" multiple/></fieldset></p> -->
-     <!-- <p><fieldset><legend> </legend></fieldset></p> -->
-     <p><fieldset><legend>检验报告</legend><textarea class="form-control" row="5" name="result" id="report"></textarea></fieldset></p>
-     <p><button id="diagnose-submit" class="btn btn-lg btn-default btn-block">提交</button></p>
-     <p><button id="diagnose-goback" class="btn btn-lg btn-default btn-block">返回</button></p>
-    </div>
+<div class="row">
+	<div class="col-md-12">
+		<div class="form-group">
+			<label for="inspection"><h3>检验项目</h3></label>
+				<textarea class="form-control" id="inspection" rows="5"></textarea>
+		</div>
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-12">
+		<div class="form-group">
+			<label for="result"><h3>检验结果</h3></label>
+			<input type="file" class="form-control-file" id="result">
+		</div>
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-12">
+		<div class="form-group">
+			<label for="report"><h3>检验报告</h3></label>
+			<textarea class="form-control" id="report" rows="5"></textarea>
+		</div>
+	</div>
+</div>
 
 
-<!--     <div id="recordDetail" style="display: none;">
-      <h1 class="page-header">记录详情</h1>
-      <div id="recordDetail-div"></div>
-      <p><button id="recordDetail-goback" class="btn btn-lg btn-default btn-block">返回</button></p>
-    </div> -->
+<div class="row">
+	<div style="height: 5vh;"></div>
+	<div style="position: fixed; right: 50px; bottom: 50px; height: 100px; width: 300px;">
+		<p><button id="diagnose-submit" class="btn btn-lg btn-primary btn-block">提交</button></p>
+		<p><button id="diagnose-goback" class="btn btn-lg btn-primary btn-block">返回</button></p>
+	</div>
+</div>
+
+
+
+</div>
+
+
 
 
         </div>
@@ -250,7 +269,14 @@
     var globalDid = "123456";
     var globalPid;
 
-
+    var myPatients = [];
+    var buildPatientHTML = function(patient) {
+      var index = myPatients.indexOf(patient.id);
+      if(index > -1) return null;
+      myPatients.push(patient.id);
+      return '<tr><td>' + patient.name + '</td><td><button id="patientList-'+patient.id
+       +'" data-pid="'+patient.id+'" class="btn btn-default btn-lg btn-block">检验</button></td></tr>';
+    };
 
     socket.emit('jianyanke', {});
     socket.on('patients', function(data){
@@ -273,7 +299,15 @@
 			});
 		}
     });
-
+    socket.on('deRegister', function(data){
+    	var pid = data.pid;
+    	var index = myPatients.indexOf(pid);
+    	if(index < 0) return;
+    	myPatients.splice(index, 1);
+		var row = document.getElementById("patientList-" + pid).parentElement.parentElement;
+		// console.log(row);
+		document.getElementById("patientList-table").deleteRow(row.rowIndex);
+    });
 
 
 
@@ -342,7 +376,7 @@
     });
     $("#diagnose-goback").click(function(){
       document.getElementById("diagnose").style.display = "none";
-      document.getElementById("patientRecords").style.display = "block";
+      document.getElementById("patientList").style.display = "block";
     });
 
     // $(".referral-submit").click(function(){
@@ -437,14 +471,6 @@
       document.getElementById("hospital-name").innerHTML = data.hospitalName;
     });
 
-    var myPatients = [];
-    var buildPatientHTML = function(patient) {
-      var index = myPatients.indexOf(patient.id);
-      if(index > -1) return null;
-      myPatients.push(patient.id);
-      return '<tr><td>' + patient.name + '</td><td><button id="patientList-'+patient.id
-       +'" data-pid="'+patient.id+'" class="btn btn-default btn-lg btn-block">检验</button></td></tr>';
-    };
     // socket.on('doctorPatients', function(data){
     //   console.log('doctorPatients', data);
     //   var patients = data.patients;
