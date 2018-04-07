@@ -59,11 +59,11 @@ var asyncExec = function(cmd, callback) {
 };
 
 var doctorIdToName = new Map;
-doctorIdToName["14301036"] = "张三";
-doctorIdToName["14301037"] = "李四";
-doctorIdToName["14301038"] = "王五";
-doctorIdToName["14301039"] = "李六";
-doctorIdToName["14301040"] = "叶七";
+doctorIdToName["14301036"] = "董文广";
+doctorIdToName["14301037"] = "詹文华";
+doctorIdToName["14301038"] = "万加生";
+doctorIdToName["14301039"] = "胡作军";
+doctorIdToName["14301040"] = "王劲松";
 var patientIdToName = new Map;
 patientIdToName["24301030"] = "王勇";
 patientIdToName["24301031"] = "张静";
@@ -309,31 +309,50 @@ app.post('/jianyankeUpload', function(req, res){
 				pid: pid,
 				// rid: recordId,
 				inspection: req.body.inspection,
-				// result: req.body.result,
-				report: req.body.report,
+				resultText: req.body.resultText,
+				reportText: req.body.reportText,
 				// prescription: req.body.prescription,
-				files: []
+				// files: []
+				resultFiles: [],
+				reportFiles: []
 			};
 
 	if(req.files) {
 		// console.log(req.files);
-		if(util.isArray(req.files.file)) {
-			// console.log("more than one file");
-			var files = req.files.file;
-			for(var i = 0; i < files.length; i++) {
-				var filename = [currentTime, i.toString(), files[i].name].join('$$');
-				data.files[i] = "http://172.18.232.124:" + port + "/file/" + filename;
-				files[i].mv('./file/'+filename,  function(err){
+		if(util.isArray(req.files.resultFile)) {
+			req.files.resultFile.forEach(function(file, i){
+				var filename = [currentTime, i.toString(), file.name].join('$$');
+				data.resultFiles[i] = "http://172.18.232.124:" + port + "/file/" + filename;
+				file.mv('./file/'+filename,  function(err){
 					if(err)
 						return res.status(500).send(err);
 				});
-			}
+			});
 		}
 		else {
-			// console.log("single file");
-			var file = req.files.file;
+			var file = req.files.resultFile;
 			var filename = [currentTime, "0", file.name].join('_');
-			data.files[0] = "http://172.18.232.124:" + port + "/file/" + filename;
+			data.resultFiles[0] = "http://172.18.232.124:" + port + "/file/" + filename;
+			file.mv('./file/'+filename,  function(err){
+				if(err)
+					return res.status(500).send(err);
+			});
+		}
+
+		if(util.isArray(req.files.reportFile)) {
+			req.files.reportFile.forEach(function(file, i){
+				var filename = [currentTime, i.toString(), file.name].join('$$');
+				data.reportFiles[i] = "http://172.18.232.124:" + port + "/file/" + filename;
+				file.mv('./file/'+filename,  function(err){
+					if(err)
+						return res.status(500).send(err);
+				});
+			});
+		}
+		else {
+			var file = req.files.reportFile;
+			var filename = [currentTime, "0", file.name].join('_');
+			data.reportFiles[0] = "http://172.18.232.124:" + port + "/file/" + filename;
 			file.mv('./file/'+filename,  function(err){
 				if(err)
 					return res.status(500).send(err);

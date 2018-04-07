@@ -196,23 +196,29 @@
 	<div class="col-md-12">
 		<div class="form-group">
 			<label for="inspection"><h3>检验项目</h3></label>
-				<textarea class="form-control" id="inspection" rows="5"></textarea>
+			<textarea class="form-control" id="inspection" rows="3"></textarea>
 		</div>
 	</div>
 </div>
 <div class="row">
 	<div class="col-md-12">
 		<div class="form-group">
-			<label for="result"><h3>检验结果</h3></label>
-			<input type="file" class="form-control-file" id="result">
+			<label for="resultText"><h3>检验结果</h3></label>
+			<textarea class="form-control" id="resultText" rows="3"></textarea>
+		</div>
+		<div class="form-group">
+			<input type="file" class="form-control-file" id="resultFile">
 		</div>
 	</div>
 </div>
 <div class="row">
 	<div class="col-md-12">
 		<div class="form-group">
-			<label for="report"><h3>检验报告</h3></label>
-			<textarea class="form-control" id="report" rows="5"></textarea>
+			<label for="reportText"><h3>检验报告</h3></label>
+			<textarea class="form-control" id="reportText" rows="3"></textarea>
+		</div>
+		<div class="form-group">
+			<input type="file" class="form-control-file" id="reportFile">
 		</div>
 	</div>
 </div>
@@ -350,12 +356,16 @@
       formData.append('pid', globalPid);
       formData.append('inspection', $("#inspection").val());
       // formData.append('result', $("#diagnoseResult").val());
-      formData.append('report', $("#report").val());
+      formData.append('resultText', $("#resultText").val());
+      formData.append('reportText', $("#reportText").val());
       // formData.append('prescription', $("#diagnosePrescription").val());
       // $("#diagnoseInspection").val(); $("#diagnoseResult").val(); $("#diagnoseAnalysis").val(); $("#diagnosePrescription").val();
       $("#inspection").val(); $("#report").val();
-      $.each($("#result")[0].files, function(i, file) {
-          formData.append('file', file);
+      $.each($("#resultFile")[0].files, function(i, file) {
+          formData.append('resultFile', file);
+      });
+      $.each($("#reportFile")[0].files, function(i, file) {
+          formData.append('reportFile', file);
       });
       console.log(formData);
 

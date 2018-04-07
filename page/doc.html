@@ -389,25 +389,39 @@
 							+ '	<div class="col-md-12">'
 							+ '		<div class="form-group">'
 							+ '			<label for="inspection"><h3>检验项目</h3></label>'
-							+ '			<textarea class="form-control" id="inspection" rows="5" readonly>' + ins.inspection + '</textarea>'
+							+ '			<textarea class="form-control" id="inspection" rows="3" readonly>' + ins.inspection + '</textarea>'
 							+ '  	</div>'
-							+ '</div>'
-							+ '</div>'
-							+ '<div class="row">'
-							+ '	<div class="col-md-12">'
-							+ '		<div class="form-group">'
-							+ '			<label for="result"><h3>检验结果</h3></label>';
-				ins.files.forEach(function(f){
-					res += '<div id="result"><img src="' + f + '" /></div>';
-				});
-				res +=  '		</div>'
 							+ '	</div>'
 							+ '</div>'
+							+ ''
 							+ '<div class="row">'
 							+ '	<div class="col-md-12">'
 							+ '		<div class="form-group">'
-							+ '			<label for="report"><h3>检验报告</h3></label>'
-							+ '			<textarea class="form-control" id="report" rows="5" readonly>' + ins.report + '</textarea>'
+							+ '			<label for="resultText"><h3>检验结果</h3></label>'
+							+ '			<textarea class="form-control" id="resultText" rows="3" readonly>' + ins.resultText + '</textarea>'
+							+ '		</div>'
+							+ '		<div class="form-group">'
+							+ '			<div id="resultFile">';
+													ins.resultFiles.forEach(function(f){
+														res += '<img src="' + f + '" />';
+													});
+				 res += '			</div>'
+							+ '		</div>'
+							+ '	</div>'
+							+ '</div>'
+							+ ''
+							+ '<div class="row">'
+							+ '	<div class="col-md-12">'
+							+ '		<div class="form-group">'
+							+ '			<label for="reportText"><h3>检验报告</h3></label>'
+							+ '			<textarea class="form-control" id="reportText" rows="3" readonly>' + ins.reportText + '</textarea>'
+							+ '		</div>'
+							+ '		<div class="form-group">'
+							+ '			<div id="reportFile">';
+													ins.reportFiles.forEach(function(f){
+														res += '<img src="' + f + '" />';
+													});
+				 res += '			</div>'
 							+ '		</div>'
 							+ '	</div>'
 							+ '</div>'
@@ -631,6 +645,13 @@
 			document.getElementById("doctorInfo").style.display = "none";
 			document.getElementById("patientInfo").style.display = "block";
 		});
+
+		var hospitalIdToName = function(hid) {
+			if(hid === "1") return "省中医";
+			else if(hid === "2") return "市六医院";
+			else return "未知医院";
+		}
+
 		socket.on('patientRecords', function(data){
 			$("#patientRecords-table").find("tr:gt(0)").remove();
 			console.log('patientRecords', data);
@@ -640,7 +661,7 @@
 				var y = date.getFullYear();
 				var m = date.getMonth() + 1;
 				var d = date.getDate();
-				return '<tr><td>' + record.Hospital + '</td><td>' + record.Doctor
+				return '<tr><td>' + hospitalIdToName(record.Hospital) + '</td><td>' + record.Doctor
 					+ '</td><td>' + y + '-' + m + '-' + d + '</td><td>' + record.Inspection
 					+ '</td><td><button id="patientRecord-'+record.RecordId+'" data-rid="'
 					+ record.RecordId + '" data-pid="' + data.id + '" data-th="'
