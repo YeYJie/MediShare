@@ -269,6 +269,7 @@
 
 		$('#login-button').click(function(){
 			document.getElementById("outer-wrap").style.display = "none";
+			document.getElementById("nav").style.display = "block";
 			document.getElementById("staffInfo").style.display = "block";
 			document.getElementById("fileList").style.display = "block";
 			document.getElementById("normalfile").style.display = "block";
@@ -1014,6 +1015,19 @@
 	</div>
 </div>
 
+
+<nav class="navbar navbar-inverse navbar-fixed-top" id="nav" style="display: none;">
+	<div class="container-fluid">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+				<span class="sr-only">Toggle navigation</span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand" id="hospital-name">Project name</a>
+		</div>
+</nav>
 
 
   </body>
