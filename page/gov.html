@@ -1,6 +1,10 @@
 <!doctype html>
 <html>
 	<head>
+<!-- 		<link href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js" rel="stylesheet">
+		<script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
+		<script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
 		<style type="text/css">
 			table {
 			    font-family: arial, sans-serif;
@@ -16,39 +20,53 @@
 			    background-color: #dddddd;
 			}
 			html,body{height: 100%}
-			#outer-wrap{
-				height: 100%;
-				position: relative;
-			}
-			#login-panel{
-				width: 400px;
-				height: 300px;
-				position: absolute;
-				top: 50%;
-				left: 50%;
-				margin-top: -150px;
-				margin-left: -200px;
-			}
-		</style>
+		</style> -->
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+
+		<link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+		<!-- <link href="dashboard.css" rel="stylesheet"> -->
+		<!-- <link href="signin.css" rel="stylesheet"> -->
+	    <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+	    <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
+	    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+	    <style type="text/css">
+.btn-group.special {
+	display: flex;
+}
+
+.special .btn {
+	flex: 1
+}
+	    </style>
+
 	</head>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-	<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script> -->
+	<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="172.1anonymous"></script> -->
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 	<script src="/socket.io/socket.io.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<!-- <script type="/jingtaiziyuan/qiang.js"></script> -->
 	<script>
 
 
 	$(function () {
+		//var admin = "林思宜";
+		//var staff = "李明";
+
 		var socket = io();
 
 		var buildRowHTML = function(fileId, fileName, fileVersion, fileSize, department, uploader,
 							time, needAuthorization, buttonId) {
 			var date = new Date(parseInt(time) * 1000);
+			console.log("data    "+date);
 			var y = date.getFullYear();
 			var m = date.getMonth() + 1;
 			var d = date.getDate();
+			console.log("DDDDDD   "+d);
 			return '<tr><td>' + fileName +'</td>'
 					+'<td>' + fileVersion +'</td>'
 					+'<td>' + fileSize +'</td>'
@@ -56,77 +74,225 @@
 					+'<td>' + uploader +'</td>'
 					+'<td>' + y + '-' + m + '-' + d +'</td>'
 					+'<td>' + needAuthorization +'</td>'
-					+'<td><button id="' + buttonId + '" data-fileId="' + fileId
-					+ '" needAuthorization="' + needAuthorization + '">Requset File</button></td></tr>'
+					+'<td><button id="' + buttonId + '" fileSize="' + fileSize + '" data-fileId="' + fileId
+					+ '" needAuthorization="' + needAuthorization + '" fileName="'+fileName+'">查看文件</button></td></tr>'
 		};
+		var buildRowHTML1 = function(fileId, fileName, fileVersion, department, uploader,
+							time, needAuthorization, buttonId) {
+			var date = new Date(parseInt(time) * 1000);
+			console.log("data    "+date);
+			var y = date.getFullYear();
+			var m = date.getMonth() + 1;
+			var d = date.getDate();
+			var fileSize = "-1";
+			console.log("DDDDDD   "+d);
+			return '<tr><td>' + fileName +'</td>'
+					+'<td>' + fileVersion +'</td>'
+					+'<td>' + department +'</td>'
+					+'<td>' + uploader +'</td>'
+					+'<td>' + y + '-' + m + '-' + d +'</td>'
+					+'<td>' + needAuthorization +'</td>'
+					+'<td><button id="' + buttonId + '" fileSize="' + fileSize + '" data-fileId="' + fileId
+					+ '" needAuthorization="' + needAuthorization + '" fileName="'+fileName+'">数据库入口</button></td></tr>'
+		};
+
+		socket.on('show', function(data) {
+			//location.reload();
+			//location.replace(location.href);
+			//location.reload(true);
+			console.log("1,抱歉！您所属部门没有访问权限！");
+			alert("抱歉！您所属部门没有访问权限！");
+			console.log("2,抱歉！您所属部门没有访问权限！");
+		});
 
 		socket.on('fileList', function(data) {
 			console.log(data);
 			for(var i = 0; i < data.files.length; ++i) {
 				console.log(data.files[i]);
 				var file = data.files[i];
-				var fileHTML = buildRowHTML(file.FileId, file.FileName, file.FileVersion, file.FileSize, file.Department,
-								file.Uploader, file.UploadTime, file.NeedAuthorization,
-								"fileList-request-button-"+file.FileId);
-				var row = document.getElementById("fileList-table").insertRow(1);
-				row.innerHTML = fileHTML;
+				//
+				if(file.Department == "1")
+					var c = "教育局";
+				var d;
+				if(file.NeedAuthorization == true)
+					d = "需要";
+				else
+					d = "不需要";
+				//
+				var e = file.FileSize;
+				if (e =="-1"){
+					var fileHTML = buildRowHTML1(file.FileId, file.FileName, file.FileVersion, c,file.Uploader, file.UploadTime, d,"fileList-request-button-"+file.FileId);
+					var row = document.getElementById("fileList-table1").insertRow(1);
+					row.innerHTML = fileHTML;
+				}
+				else{
+					var fileHTML = buildRowHTML(file.FileId, file.FileName, file.FileVersion, file.FileSize, c,file.Uploader, file.UploadTime, d,"fileList-request-button-"+file.FileId);
+					var row = document.getElementById("fileList-table").insertRow(1);
+					row.innerHTML = fileHTML;
+				}
+
 				$('#fileList-request-button-' + file.FileId).click(function(){
 					var needAuthorization = $(this).attr('needAuthorization');
+					if(needAuthorization == "需要"){
+						needAuthorization = "true";
+					}
+					else{
+						needAuthorization = "false";
+					}
+
 					var fileId = $(this).attr('data-fileId');
-					if(needAuthorization === "true") {
-						console.log("emit requestFileAuthorization " + fileId);
-						socket.emit('requestFileAuthorization', {fileId: fileId});
+					var fileName = $(this).attr('fileName');
+					var fileSize = $(this).attr('fileSize');
+					/*if(fileSize == "-1"){
+						if(needAuthorization === "true") {//need
+							console.log("emit requestFileAuthorization1 " + fileId);
+							socket.emit('requestFileAuthorization1', {fileId: fileId,fileName:fileName});
+						}
+						else {//no need---public
+							console.log("emit requestFile1 " + fileId);
+							socket.emit('requestFile1', {fileId: fileId,fileName:fileName});
+						}
 					}
-					else {
-						console.log("emit requestFile " + fileId);
-						socket.emit('requestFile', {fileId: fileId});
-					}
+					else{*/
+						if(needAuthorization === "true") {//need
+							console.log("emit requestFileAuthorization " + fileId);
+							socket.emit('requestFileAuthorization', {fileId: fileId,fileName:fileName,fileSize:fileSize});
+						}
+						else {//no need---public
+							console.log("emit requestFile " + fileId);
+							socket.emit('requestFile', {fileId: fileId,fileName:fileName,fileSize:fileSize});
+						}
+					/*}*/
+
 				});
 			}
 		});
 		socket.on('searchResult', function(data) {
 			console.log(data);
+			//delete filelist
+			$("#searchResult-table tr:not(:first)").empty("");
+			$("#searchResult-table1 tr:not(:first)").empty("");
 			for(var i = 0; i < data.files.length; ++i) {
 				console.log(data.files[i]);
 				var file = data.files[i];
-				var fileHTML = buildRowHTML(file.FileId, file.FileName, file.FileVersion, file.FileSize, file.Department,
-								file.Uploader, file.UploadTime, file.NeedAuthorization,
-								"searchResult-request-button-"+file.FileId);
-				var row = document.getElementById("searchResult-table").insertRow(1);
-				row.innerHTML = fileHTML;
+				//
+				if(file.Department == "1")
+					var c = "教育局";
+				var d;
+				if(file.NeedAuthorization == true)
+					d = "需要";
+				else
+					d = "不需要";
+				//
+				var e = file.FileSize;
+				if (e =="-1"){
+					var fileHTML = buildRowHTML1(file.FileId, file.FileName, file.FileVersion, c,file.Uploader, file.UploadTime, d,"searchResult-request-button-"+file.FileId);
+					var row = document.getElementById("searchResult-table1").insertRow(1);
+					row.innerHTML = fileHTML;
+				}
+				else{
+					var fileHTML = buildRowHTML(file.FileId, file.FileName, file.FileVersion, file.FileSize, c,file.Uploader, file.UploadTime, d,"searchResult-request-button-"+file.FileId);
+					var row = document.getElementById("searchResult-table").insertRow(1);
+					row.innerHTML = fileHTML;
+				}
 				$('#searchResult-request-button-' + file.FileId).click(function(){
 					var needAuthorization = $(this).attr('needAuthorization');
+					if(needAuthorization == "需要"){
+						needAuthorization = "true";
+					}
+					else{
+						needAuthorization = "false";
+					}
 					var fileId = $(this).attr('data-fileId');
-					if(needAuthorization === "true") {
-						console.log("emit requestFileAuthorization " + fileId);
-						socket.emit('requestFileAuthorization', {fileId: fileId});
+					var fileName = $(this).attr('fileName');
+					var fileSize = $(this).attr('fileSize');
+					/*if(fileSize == "-1"){
+						if(needAuthorization === "true") {//need
+							console.log("emit requestFileAuthorization1 " + fileId);
+							socket.emit('requestFileAuthorization1', {fileId: fileId,fileName:fileName});
+						}
+						else {//no need---public
+							console.log("emit requestFile1 " + fileId);
+							socket.emit('requestFile1', {fileId: fileId,fileName:fileName});
+						}
 					}
-					else {
-						console.log("emit requestFile " + fileId);
-						socket.emit('requestFile', {fileId: fileId});
-					}
+					else{*/
+						if(needAuthorization === "true") {//need
+							console.log("emit requestFileAuthorization " + fileId);
+							socket.emit('requestFileAuthorization', {fileId: fileId,fileName:fileName,fileSize:fileSize});
+						}
+						else {//no need---public
+							console.log("emit requestFile " + fileId);
+							socket.emit('requestFile', {fileId: fileId,fileName:fileName,fileSize:fileSize});
+						}
+					/*}*/
 				});
 			}
 		});
 		socket.on('fileEntry', function(data) {
 			var entry = data.entry;
-			console.log(entry);
-			document.getElementById("fileContent").style.display = "block";
-			var fileContentHTML = '<img src="' + entry + '"/>'
-			document.getElementById("fileContent-p").innerHTML = fileContentHTML;
-		});
+			var fileId = data.fileId;
+			var fileName = data.fileName;
+			var fileSize = data.fileSize;
+			console.log(fileId);
+			console.log(data);
+			console.log("EEEEEEEE  "+entry);
+			console.log("EEEEEEEE  "+fileSize);
+			//entry = "http://127.0.0.1" + entry.substring(16);
 
-		$('#fileContent-goback').click(function(){
-			document.getElementById("fileContent").style.display = "none";
-		})
+			//var fileContentHTML = '<img src="' + entry + '"/>'
+			//<a href="/images/myw3schoolimage.jpg" download="w3logo">
+			//var fileContentHTML = '<a href="' + entry + '"  download="' + fileName + '">Click to download</a>'
+			if(fileSize == "-1"){
+				document.getElementById("fileContent1").style.display = "block";
+				entry = entry + "/table.txt";
+				console.log("fileSize  -1");
+				console.log(entry);
+				var fileContentHTML = '<a href="' + entry + '" target="_blank">直接查看数据库文件</a>'
+				document.getElementById("fileContent-p1").innerHTML = fileContentHTML;
+				var fileContentHTML1 = '<a href="' + entry + '" download="table.txt" target="_blank">下载数据库文件</a>'
+				document.getElementById("fileContent-p2").innerHTML = fileContentHTML1;
+			}
+			else{
+				document.getElementById("fileContent").style.display = "block";
+				entry = entry + "/" + fileName;
+				console.log(entry);
+				var fileContentHTML = '<a href="' + entry + '" target="_blank">直接浏览文件</a>'
+				//fileList-request-button-3ced6d85bf4a945b335aa036585e293d3a831eb4
+				document.getElementById("fileContent-p").innerHTML = fileContentHTML;
+				//document.getElementById('fileList-request-button-' + fileId).innerHTML = fileContentHTML;
+				var fileContentHTML1 = '<a href="' + entry + '" download="' + fileName + '" target="_blank">下载文件</a>'
+				//fileList-request-button-3ced6d85bf4a945b335aa036585e293d3a831eb4
+				document.getElementById("fileContent-pp").innerHTML = fileContentHTML1;
+			}
+		});
 
 		$('#login-button').click(function(){
 			document.getElementById("outer-wrap").style.display = "none";
 			document.getElementById("staffInfo").style.display = "block";
 			document.getElementById("fileList").style.display = "block";
+			document.getElementById("normalfile").style.display = "block";
+			document.getElementById("databasefile").style.display = "none";
+
+			var c =  document.getElementsByName('identity');
+			if(c[1].checked == true){
+				console.log("PPPPPPP  ");
+				document.getElementById("fileList-upload").style.display = "none";
+				document.getElementById("fileList-upload1").style.display = "none";
+			}
+			else{
+				document.getElementById("fileList-upload").style.display = "block";
+				document.getElementById("fileList-upload1").style.display = "block";
+			}
+
+
 			// TODO
+			$("#fileList-table tr:not(:first)").empty("");
+			$("#fileList-table1 tr:not(:first)").empty("");
+			var rObj = document.getElementsByName("filelist_filetype");
+			rObj[0].checked = "checked";
 			socket.emit('login', {id: $('#login-id').val(), pwd: $('#login-pwd').val()});
-			$('#login-id').val("");
+			//$('#login-id').val("");
 			$('#login-pwd').val("");
 		})
 		$('#fileList-logout').click(function(){
@@ -134,30 +300,116 @@
 			document.getElementById("staffInfo").style.display = "none";
 			document.getElementById("fileList").style.display = "none";
 			$("#fileList-table").find("tr:gt(0)").remove();
+			var rObj = document.getElementsByName("identity");
+			rObj[0].checked = "checked";
+		})
+		$('#fileList-logout1').click(function(){
+			document.getElementById("outer-wrap").style.display = "block";
+			document.getElementById("staffInfo").style.display = "none";
+			document.getElementById("fileList").style.display = "none";
+			$("#fileList-table1").find("tr:gt(0)").remove();
+			var rObj = document.getElementsByName("identity");
+			rObj[0].checked = "checked";
 		})
 		$('#fileList-search').click(function(){
 			document.getElementById("search").style.display = "block";
-			document.getElementById("fileList").style.display = "none";
+			document.getElementById("normalfile").style.display = "none";
+		})
+		$('#fileList-search1').click(function(){
+			document.getElementById("search1").style.display = "block";
+			document.getElementById("databasefile").style.display = "none";
 		})
 		$('#fileList-upload').click(function(){
 			// TODO
 			document.getElementById("fileList").style.display = "none";
 			document.getElementById("upload").style.display = "block";
+			document.getElementById("filetype11").style.display = "block";
+			document.getElementById("filetype22").style.display = "none";
+			document.getElementById("Partialpublic").style.display = "none";
+
+			var rem = document.getElementById('login-id').value;
+			//alert(rem);
+			document.getElementById('uploader1').value = rem;
+			//alert(document.getElementById('uploader1').value);
+		})
+		$('#fileList-upload1').click(function(){
+			// TODO
+			document.getElementById("fileList").style.display = "none";
+			document.getElementById("upload").style.display = "block";
+			document.getElementById("filetype11").style.display = "none";
+			document.getElementById("filetype22").style.display = "block";
+			document.getElementById("Partialpublic").style.display = "none";
+
+			var rem = document.getElementById('login-id').value;
+			//alert(rem);
+			document.getElementById('uploader2').value = rem;
+			//alert(document.getElementById('uploader1').value);
 		})
 
 
-
-
-
-		$('#upload-button').click(function(){
+		$('#upload-button').click(function(){//提交
 
 			console.log('upload-button click');
 
 			var formData = new FormData();
 			formData.append("uploadText", $('#uploadText').val());
 			formData.append('uploadFile', $('#uploadFile')[0].files[0]);
-
 			console.log(formData);
+
+			// get data
+			//var a = $('#uploadFile').val();
+			//var fileName = a.substring(12);
+			/*var date = new Date(parseInt(time) * 1000);
+			console.log("upload  "+date);*/
+			var fileName = $('#uploadFile')[0].files[0].name;
+			//$('#uploadFile').outerHTML=$('#uploadFile').outerHTML.replace(/(value=\").+\"/i,"$1\"");
+			//var fileSize = "1k";
+			var fileSize = document.getElementById("uploadFile").files[0].size;
+			if(fileSize < 1025)
+				fileSize = fileSize + "B";
+			else if(fileSize > 1024*1024)
+				fileSize = (fileSize/(1024*1024.0)).toFixed(2) + "M";
+			else
+				fileSize = (fileSize/1024.0).toFixed(2) + "K";
+
+
+			var fileChecksum = "aaa";
+			var uploader = document.getElementById('login-id').value;
+			var myDate = new Date();
+			var b = myDate.getTime();
+			var uploadTime = Math.floor(new Date().valueOf() / 1000).toString();
+
+			//database insert
+			console.log("RRRRRRRRR");
+			var authorization;
+			var authorization_department = new Array();
+			var c =  document.getElementsByName('radio');
+			var d =  document.getElementsByName('au_department');
+			var num=0;
+			for(var i=0;i<c.length;i++){
+				if(c[i].checked == true){
+					authorization = c[i].value;
+					if(c[i].value == "2"){//choose partial public
+						for(var j=0;j<d.length;j++){
+							if(d[j].checked == true){
+								authorization_department[num] = d[j].value;
+								num++;
+							}
+						}
+					}
+					else if(c[i].value == "3"){//secret
+						authorization_department[0] = "1";
+					}
+				}
+			}
+			console.log(authorization);//true
+			console.log("RRRRRRRRR");
+			console.log(authorization_department);//true
+
+			console.log("emit upload " );
+			socket.emit('upload',{fileName:fileName,fileSize:fileSize,fileChecksum:fileChecksum,uploader:uploader,uploadTime:uploadTime,authorization:authorization,authorization_department:authorization_department});
+
+
 
 			$.ajax({
 				type: "POST",
@@ -174,8 +426,58 @@
 				},
 				error: function(xhr) {
 					// MvcUtil.showErrorResponse(xhr.responseText, button);
+					return false;
 				}
 			});
+
+
+			return false;
+		})
+
+
+		$('#upload-button1').click(function(){//提交1
+
+			console.log('upload-button1 click');
+			var datacontent = document.getElementById('datacontent').value;
+			var databaseip = document.getElementById('databaseip').value;
+			var databaseport = document.getElementById('databaseport').value;
+			var databasename = document.getElementById('databasename').value;
+			var tablename = document.getElementById('tablename').value;
+
+			var uploader = document.getElementById('login-id').value;
+			var myDate = new Date();
+			var b = myDate.getTime();
+			var uploadTime = Math.floor(new Date().valueOf() / 1000).toString();
+
+			//database insert
+			console.log("RRRRRRRRR");
+			var authorization1;
+			var authorization_department1 = new Array();
+			var c =  document.getElementsByName('radio1');
+			var d =  document.getElementsByName('au_department1');
+			var num=0;
+			for(var i=0;i<c.length;i++){
+				if(c[i].checked == true){
+					authorization1 = c[i].value;
+					if(c[i].value == "2"){//choose partial public
+						for(var j=0;j<d.length;j++){
+							if(d[j].checked == true){
+								authorization_department1[num] = d[j].value;
+								num++;
+							}
+						}
+					}
+					else if(c[i].value == "3"){//secret
+						authorization_department1[0] = "1";
+					}
+				}
+			}
+			console.log(authorization1);//true
+			console.log("RRRRRRRRR");
+			console.log(authorization_department1);//true
+
+			console.log("emit upload " );
+			socket.emit('upload1',{datacontent:datacontent,databaseip:databaseip,databaseport:databaseport,databasename:databasename,tablename:tablename,uploader:uploader,uploadTime:uploadTime,authorization1:authorization1,authorization_department1:authorization_department1});
 
 			return false;
 		})
@@ -183,11 +485,6 @@
 
 
 
-
-		$('#upload-goback').click(function(){
-			document.getElementById("fileList").style.display = "block";
-			document.getElementById("upload").style.display = "none";
-		})
 		$('#search-name-button').click(function(){
 			document.getElementById("search").style.display = "none";
 			document.getElementById("searchResult").style.display = "block";
@@ -213,11 +510,16 @@
 			document.getElementById("search").style.display = "none";
 			document.getElementById("searchResult").style.display = "block";
 			var department = $('#search-department').val();
+
+			if (department == "教育局"){
+				department = "1";
+			}
 			var begin = $('#search-department-begin').val();
 			var end = $('#search-department-end').val();
 			$('#search-department').val("");
 			$('#search-department-begin').val("");
 			$('#search-department-end').val("");
+			console.log("DDDD "+department);
 			console.log('search-department: ' + department);
 			if(begin !== "")
 				console.log('search-department-begin: ' + begin);
@@ -241,52 +543,308 @@
 				console.log('search-uploader-end: ' + end);
 			socket.emit('searchByUploader', {uploader: uploader, begin: begin, end:end});
 		})
+
+		$('#search-name-button1').click(function(){
+			document.getElementById("search1").style.display = "none";
+			document.getElementById("searchResult1").style.display = "block";
+			var name = $('#search-name1').val();
+			$('#search-name1').val("");
+			console.log('search-name: ' + name);
+			socket.emit('searchByName', {name: name});
+		})
+		$('#search-time-button1').click(function(){
+			document.getElementById("search1").style.display = "none";
+			document.getElementById("searchResult1").style.display = "block";
+			var begin = $('#search-time-begin1').val();
+			var end = $('#search-time-end1').val();
+			$('#search-time-begin1').val("");
+			$('#search-time-end1').val("");
+			if(begin !== "")
+				console.log('search-time-begin: ' + begin);
+			if(end !== "")
+				console.log('search-time-end: ' + end);
+			socket.emit('searchByTime', {begin: begin, end:end});
+		})
+		$('#search-department-button1').click(function(){
+			document.getElementById("search1").style.display = "none";
+			document.getElementById("searchResult1").style.display = "block";
+			var department = $('#search-department1').val();
+
+			if (department == "教育局"){
+				department = "1";
+			}
+			var begin = $('#search-department-begin1').val();
+			var end = $('#search-department-end1').val();
+			$('#search-department1').val("");
+			$('#search-department-begin1').val("");
+			$('#search-department-end1').val("");
+			console.log("DDDD "+department);
+			console.log('search-department: ' + department);
+			if(begin !== "")
+				console.log('search-department-begin: ' + begin);
+			if(end !== "")
+				console.log('search-department-end: ' + end);
+			socket.emit('searchByDepartment', {department: department, begin: begin, end:end});
+		})
+		$('#search-uploader-button1').click(function(){
+			document.getElementById("search1").style.display = "none";
+			document.getElementById("searchResult1").style.display = "block";
+			var uploader = $('#search-uploader1').val();
+			var begin = $('#search-uploader-begin1').val();
+			var end = $('#search-uploader-end1').val();
+			$('#search-uploader1').val("");
+			$('#search-uploader-begin1').val("");
+			$('#search-uploader-end1').val("");
+			console.log('search-uploader: ' + uploader);
+			if(begin !== "")
+				console.log('search-uploader-begin: ' + begin);
+			if(end !== "")
+				console.log('search-uploader-end: ' + end);
+			socket.emit('searchByUploader', {uploader: uploader, begin: begin, end:end});
+		})
+
+
 		$('#search-goback').click(function(){
 			document.getElementById("search").style.display = "none";
-			document.getElementById("fileList").style.display = "block";
-			$("#searchResult-table").find("tr:gt(0)").remove();
+			document.getElementById("normalfile").style.display = "block";
+			//$("#searchResult-table").find("tr:gt(0)").remove();
+		})
+		$('#search-goback1').click(function(){
+			document.getElementById("search1").style.display = "none";
+			document.getElementById("databasefile").style.display = "block";
+			//$("#searchResult-table").find("tr:gt(0)").remove();
 		})
 		$('#searchResult-goback').click(function(){
 			document.getElementById("searchResult").style.display = "none";
 			document.getElementById("search").style.display = "block";
-			$("#searchResult-table").find("tr:gt(0)").remove();
+			//$("#searchResult-table").find("tr:gt(0)").remove();
+		})
+		$('#searchResult-goback1').click(function(){
+			document.getElementById("searchResult1").style.display = "none";
+			document.getElementById("search1").style.display = "block";
+			//$("#searchResult-table").find("tr:gt(0)").remove();
+		})
+		$('#fileContent-goback').click(function(){
+			document.getElementById("fileContent").style.display = "none";
+		})
+		$('#fileContent-goback1').click(function(){
+			document.getElementById("fileContent1").style.display = "none";
+		})
+		$('#upload-goback').click(function(){
+			document.getElementById("fileList").style.display = "block";
+			//document.getElementById("fileContent").style.display = "none";
+			//document.getElementById("searchResult").style.display = "none";
+			//document.getElementById("search").style.display = "none";
+			document.getElementById("upload").style.display = "none";
+			//$("#searchResult-table").find("tr:gt(0)").remove();
+			//update filelist
+			$("#fileList-table tr:not(:first)").empty("");
+			$("#fileList-table1 tr:not(:first)").empty("");
+			socket.emit('login', {id: $('#login-id').val(), pwd: $('#login-pwd').val()});
 		})
 	});
-</script>
-  <body>
+	function Partial_Public(){
+		document.getElementById("Partialpublic").style.display = "block";
+	};
+	function Public(){
+		document.getElementById("Partialpublic").style.display = "none";
+	};
+	function Secret(){
+		document.getElementById("Partialpublic").style.display = "none";
+	};
+	function Partial_Public1(){
+		document.getElementById("Partialpublic1").style.display = "block";
+	};
+	function Public1(){
+		document.getElementById("Partialpublic1").style.display = "none";
+	};
+	function Secret1(){
+		document.getElementById("Partialpublic1").style.display = "none";
+	};
+	function filetype1(){
+		document.getElementById("filetype11").style.display = "block";
+		document.getElementById("filetype22").style.display = "none";
+	};
+	function filetype2(){
+		document.getElementById("filetype11").style.display = "none";
+		document.getElementById("filetype22").style.display = "block";
+	};
+	function filelist_filetype1(){
+		document.getElementById("normalfile").style.display = "block";
+		document.getElementById("databasefile").style.display = "none";
+		document.getElementById("search").style.display = "none";
+		document.getElementById("search1").style.display = "none";
+	};
+	function filelist_filetype2(){
+		document.getElementById("normalfile").style.display = "none";
+		document.getElementById("databasefile").style.display = "block";
+		document.getElementById("search").style.display = "none";
+		document.getElementById("search1").style.display = "none";
+	};
+	</script>
+  	<body>
 	  	<div id="staffInfo" style="display: none;float:left;"></div>
-
 	  	<div id="fileList" style="display: none;float:right; width: 80%">
-	  		<ul id="fileList-ul"></ul>
-	  		<p><table id="fileList-table">
-				<tr>
-					<th>FileName</th>
-					<th>FileVersion</th>
-					<th>FileSize</th>
-					<th>Department</th>
-					<th>Uploader</th>
-					<th>Upload time</th>
-					<th>NeedAuthorization</th>
-					<th></th>
-				</tr>
-	  		</table></p>
-	  		<p><button id="fileList-search">Search</button></p>
-	  		<p><button id="fileList-upload">Upload</button></p>
-	  		<p><button id="fileList-logout">Logout</button></p>
+
+	  	<input type="radio" name="filelist_filetype" value="1" onclick="filelist_filetype1()" checked>文件
+		<input type="radio" name="filelist_filetype" value="2" onclick="filelist_filetype2()">数据库入口
+
+	  		<div id="normalfile">
+		  		<ul id="fileList-ul"></ul>
+		  		<p><table id="fileList-table">
+					<tr>
+						<th>文件名</th>
+						<th>版本号</th>
+						<th>文件大小</th>
+						<th>上传单位</th>
+						<th>上传者</th>
+						<th>上传时间</th>
+						<th>是否需要访问权限</th>
+						<th></th>
+					</tr>
+		  		</table></p>
+		  		<p><button id="fileList-search">查找文件</button></p>
+		  		<p><button id="fileList-upload">上传文件</button></p>
+		  		<p><button id="fileList-logout">退出登录</button></p>
+
+		  	</div>
+
+		  	<div id="databasefile">
+		  		<ul id="fileList-ul"></ul>
+		  		<p><table id="fileList-table1">
+					<tr>
+						<th>数据内容</th>
+						<th>版本号</th>
+						<th>上传单位</th>
+						<th>上传者</th>
+						<th>上传时间</th>
+						<th>是否需要访问权限</th>
+						<th></th>
+					</tr>
+		  		</table></p>
+		  		<p><button id="fileList-search1">查找数据库入口</button></p>
+		  		<p><button id="fileList-upload1">上传数据库入口</button></p>
+		  		<p><button id="fileList-logout1">退出登录</button></p>
+
+		  	</div>
+
 	  	</div>
 
 
+	  	<div id="upload" style="display: none">
 
+	  		<!-- <input type="radio" name="filetype" value="1" onclick="filetype1()" checked>上传文件
+			<input type="radio" name="filetype" value="2" onclick="filetype2()">提供数据库入口 -->
 
+			  	<div id="filetype11">
+			  		<h1>上传文件</h1>
 
+			  		<h4>
+			  			<p>单位：教育局&nbsp;&nbsp;&nbsp;</p>
+			  			<lable>上传者：</lable>
+			  			<input type='text' id='uploader1' style="border:0" border='none' outline='medium'></input>
+			  		</h4>
+			  		<form ref='uploadForm' id='uploadForm' action='/upload' method='post' encType="multipart/form-data">
+			  			<!-- <input type="text" id="uploadText"> -->
+			  			<input type="file"  id="uploadFile" />
+			  			<button id="upload-button" >提交</button>
+			  			<br><br>
+			  		</form>
+			  		<div>
+			  			<p>文件访问控制：</p>
+			  			<input type="radio" name="radio" value="1" onclick="Public()" checked>公开
+						<input type="radio" name="radio" value="2" onclick="Partial_Public()">部分公开
+						<input type="radio" name="radio" value="3" onclick="Secret()">仅自己单位可见
+						<br><br>
+			  		</div>
 
+			  		<div id="Partialpublic" style="display: none">
+			  			<p>选择文件可访问的单位：</p>
+			  			<p>
+			  				<input type="checkbox" name="au_department" value="1" checked="checked">  教育局
+		        			<input type="checkbox" name="au_department" value="2" >  公安局
+		        			<input type="checkbox" name="au_department" value="3" >  财政局
+		        			<input type="checkbox" name="au_department" value="4" >  卫生局
+		        			<input type="checkbox" name="au_department" value="5" >  文化局
+		        			<input type="checkbox" name="au_department" value="6" >  体育局
+		        			<input type="checkbox" name="au_department" value="7" >  民政局
+		        			<input type="checkbox" name="au_department" value="8" >  司法局
+		        			<input type="checkbox" name="au_department" value="9" >  监察局
+		        			<input type="checkbox" name="au_department" value="10" >  旅游局<br>
+		        			<input type="checkbox" name="au_department" value="11" > 交通委员会
+		        			<input type="checkbox" name="au_department" value="12" > 环境保护局
+		        			<input type="checkbox" name="au_department" value="13" > 建设委员会
+		        			<input type="checkbox" name="au_department" value="14" > 农业委员会
+		        			<input type="checkbox" name="au_department" value="15" > 外事办公室
+		        			<input type="checkbox" name="au_department" value="16" > 广播电视局
+		        			<input type="checkbox" name="au_department" value="17" > 科学技术局
+		        			<input type="checkbox" name="au_department" value="18" > 新闻出版局
+			  			</p>
+			  		</div>
+			  	</div>
 
-	  	<div id="upload">
-	  		<form ref='uploadForm' id='uploadForm' action='/upload' method='post' encType="multipart/form-data">
-	  			<input type="text" id="uploadText">
-	  			<input type="file" name="sampleFile" id="uploadFile" />
-	  			<button id="upload-button">Submit</button>
-	  		</form>
+			  	<div id="filetype22">
+			  		<h1>上传数据库入口</h1>
+
+			  		<h4>
+			  			<p>单位：教育局&nbsp;&nbsp;&nbsp;</p>
+			  			<lable>上传者：</lable>
+			  			<input type='text' id='uploader2' style="border:0" border='none' outline='medium'></input>
+			  		</h4>
+			  		<p>
+				  		<lable>数据内容：</lable>
+		  				<input type='text' id='datacontent'></input>
+		  			</p>
+				  	<p>
+				  		<lable>数据库地址：</lable>
+		  				<input type='text' id='databaseip'></input>
+		  			</p>
+		  			<p>
+		  				<lable>连接端口：</lable>
+		  				<input type='text' id='databaseport'></input>
+		  			</p>
+		  			<p>
+		  				<lable>数据库名称：</lable>
+		  				<input type='text' id='databasename'></input>
+		  			</p>
+		  			<p>
+		  				<lable>表单名称：</lable>
+		  				<input type='text' id='tablename'></input>
+		  			</p>
+		  			<div>
+			  			<p>文件访问控制：</p>
+			  			<input type="radio" name="radio1" value="1" onclick="Public1()" checked>公开
+						<input type="radio" name="radio1" value="2" onclick="Partial_Public1()">部分公开
+						<input type="radio" name="radio1" value="3" onclick="Secret1()">仅自己单位可见
+						<br><br>
+			  		</div>
+
+			  		<div id="Partialpublic1" style="display: none">
+			  			<p>选择数据库入口可访问的单位：</p>
+			  			<p>
+			  				<input type="checkbox" name="au_department1" value="1" checked="checked">  教育局
+		        			<input type="checkbox" name="au_department1" value="2" >  公安局
+		        			<input type="checkbox" name="au_department1" value="3" >  财政局
+		        			<input type="checkbox" name="au_department1" value="4" >  卫生局
+		        			<input type="checkbox" name="au_department1" value="5" >  文化局
+		        			<input type="checkbox" name="au_department1" value="6" >  体育局
+		        			<input type="checkbox" name="au_department1" value="7" >  民政局
+		        			<input type="checkbox" name="au_department1" value="8" >  司法局
+		        			<input type="checkbox" name="au_department1" value="9" >  监察局
+		        			<input type="checkbox" name="au_department1" value="10" >  旅游局<br>
+		        			<input type="checkbox" name="au_department1" value="11" > 交通委员会
+		        			<input type="checkbox" name="au_department1" value="12" > 环境保护局
+		        			<input type="checkbox" name="au_department1" value="13" > 建设委员会
+		        			<input type="checkbox" name="au_department1" value="14" > 农业委员会
+		        			<input type="checkbox" name="au_department1" value="15" > 外事办公室
+		        			<input type="checkbox" name="au_department1" value="16" > 广播电视局
+		        			<input type="checkbox" name="au_department1" value="17" > 科学技术局
+		        			<input type="checkbox" name="au_department1" value="18" > 新闻出版局
+			  			</p>
+			  		</div>
+			  		<button id="upload-button1" >提交</button>
+			  	</div>
+			  	<button id="upload-goback" >返回</button>
 	  	</div>
 
 
@@ -294,61 +852,169 @@
 
 
 	  	<div id="search" style="display: none;float:right; width: 80%">
+	  		<h1>查找文件</h1>
   			<p><fieldset>
-  				<legend>By Name</legend>
+  				<legend>按文件名查找:</legend>
   				<input type="text" id="search-name">
-  				<button id="search-name-button">Search</button>
+  				<button id="search-name-button">查找</button>
   			</fieldset></p>
     		<p><fieldset>
-  				<legend>By Time</legend>
+  				<legend>按时间查找:</legend>
   				<input type="date" id="search-time-begin">
   				<input type="date" id="search-time-end">
-  				<button id="search-time-button">Search</button>
+  				<button id="search-time-button">查找</button>
   			</fieldset></p>
   			<p><fieldset>
-  				<legend>By Department</legend>
+  				<legend>按单位查找:</legend>
   				<input type="text" id="search-department">
   				<input type="date" id="search-department-begin">
   				<input type="date" id="search-department-end">
-  				<button id="search-department-button">Search</button>
+  				<button id="search-department-button">查找</button>
   			</fieldset></p>
   			<p><fieldset>
-  				<legend>By Uploader</legend>
+  				<legend>按上传者查找:</legend>
   				<input type="text" id="search-uploader">
   				<input type="date" id="search-uploader-begin">
   				<input type="date" id="search-uploader-end">
-  				<button id="search-uploader-button">Search</button>
+  				<button id="search-uploader-button">查找</button>
   			</fieldset></p>
-	  		<button id="search-goback">Go Back</button>
+	  		<button id="search-goback">返回</button>
+	  	</div>
+
+	  	<div id="search1" style="display: none;float:right; width: 80%">
+	  		<h1>查找数据库入口</h1>
+  			<p><fieldset>
+  				<legend>按数据内容查找:</legend>
+  				<input type="text" id="search-name1">
+  				<button id="search-name-button1">查找</button>
+  			</fieldset></p>
+    		<p><fieldset>
+  				<legend>按时间查找:</legend>
+  				<input type="date" id="search-time-begin1">
+  				<input type="date" id="search-time-end1">
+  				<button id="search-time-button1">查找</button>
+  			</fieldset></p>
+  			<p><fieldset>
+  				<legend>按单位查找:</legend>
+  				<input type="text" id="search-department1">
+  				<input type="date" id="search-department-begin1">
+  				<input type="date" id="search-department-end1">
+  				<button id="search-department-button1">查找</button>
+  			</fieldset></p>
+  			<p><fieldset>
+  				<legend>按上传者查找:</legend>
+  				<input type="text" id="search-uploader1">
+  				<input type="date" id="search-uploader-begin1">
+  				<input type="date" id="search-uploader-end1">
+  				<button id="search-uploader-button1">查找</button>
+  			</fieldset></p>
+	  		<button id="search-goback1">返回</button>
 	  	</div>
 
 	  	<div id="searchResult" style="display: none;float:right; width: 80%">
 	  		<p><table id="searchResult-table">
 				<tr>
-					<th>FileName</th>
-					<th>FileVersion</th>
-					<th>FileSize</th>
-					<th>Department</th>
-					<th>Uploader</th>
-					<th>Upload time</th>
-					<th>NeedAuthorization</th>
+					<th>文件名</th>
+					<th>版本号</th>
+					<th>文件大小</th>
+					<th>上传单位</th>
+					<th>上传者</th>
+					<th>上传时间</th>
+					<th>是否需要访问权限</th>
 					<th></th>
 				</tr>
 	  		</table></p>
-	  		<button id="searchResult-goback">Go Back</button>
+	  		<button id="searchResult-goback">返回</button>
 	  	</div>
+
+	  	<div id="searchResult1" style="display: none;float:right; width: 80%">
+		  		<p><table id="searchResult-table1">
+					<tr>
+						<th>数据内容</th>
+						<th>版本号</th>
+						<th>上传单位</th>
+						<th>上传者</th>
+						<th>上传时间</th>
+						<th>是否需要访问权限</th>
+						<th></th>
+					</tr>
+		  		</table></p>
+		  		<button id="searchResult-goback1">返回</button>
+		  	</div>
 
 	  	<div id="fileContent" style="display: none; position:fixed; width:100%; height:100%; background-color:#FFF;">
 	  		<p id="fileContent-p"></p>
-	  		<p><button id="fileContent-goback">Go Back</button></p>
+	  		<p id="fileContent-pp"></p>
+	  		<p><button id="fileContent-goback">返回</button></p>
 	  	</div>
 
-		<div id="outer-wrap">
+	  	<div id="fileContent1" style="display: none; position:fixed; width:100%; height:100%; background-color:#FFF;">
+	  		<p id="fileContent-p1"></p>
+	  		<p id="fileContent-p2"></p>
+	  		<p><button id="fileContent-goback1">返回</button></p>
+	  	</div>
+
+<!-- 		<div id="outer-wrap">
 			<div id="login-panel">
-			  	<p><input id="login-id" autocomplete="off" /></p>
-			  	<p><input id="login-pwd" autocomplete="off" /></p>
-			  	<p><button id="login-button">Login</button></p>
+				<h1>政府文件共享平台</h1>
+				<input type="radio" name="identity" value="1" checked>管理员
+				<input type="radio" name="identity" value="2">普通员工
+			  	<p>
+			  		<lable>用户名&nbsp;</lable>
+			  		<input id="login-id" autocomplete="off" />
+			  	</p>
+			  	<p>
+			  		<lable>密码&nbsp;&nbsp;&nbsp;&nbsp;</lable>
+			  		<input type="password" id="login-pwd" autocomplete="off" />
+			  	</p>
+			  	<p><button id="login-button">登录</button></p>
+			</div>
+		</div> -->
+
+
+
+<div class="container" id="outer-wrap">
+    <div class="row" style="padding-top:100px;">
+    	<div class="col-md-4 col-md-offset-4">
+    		<div class="panel panel-default">
+			  	<div class="panel-heading">
+					<div class="panel-title pull-left">BCG-Share</div>
+					<div class="panel-title pull-right" id="login-department">教育局</div>
+					<div class="clearfix"></div>
+
+			 	</div>
+			  	<div class="panel-body">
+                    <fieldset>
+			    	  	<div class="form-group">
+			    		    <input class="form-control" placeholder="用户名" type="text" id="login-id" autocomplete="off">
+			    		</div>
+			    		<div class="form-group">
+			    			<input class="form-control" placeholder="密码" type="password" id="login-pwd" autocomplete="off">
+			    		</div>
+						<div class="form-group">
+							<div class="btn-group special" data-toggle="buttons">
+							<label class="btn btn-default active form-check-label col-md-6">
+								<input class="form-check-input" type="radio" name="identity" value="1" checked autocomplete="off">管理员
+							</label>
+							<label class="btn btn-default form-check-label col-md-6 col-md-offset-6">
+								<input class="form-check-input" type="radio" name="identity" value="2" autocomplete="off">普通员工
+							</label>
+							</div>
+						</div>
+			    		<div class="checkbox">
+			    	    	<label>
+			    	    		<input name="remember" type="checkbox" value="Remember Me"> Remember Me
+			    	    	</label>
+			    	    </div>
+			    		<button id="login-button" class="btn btn-lg btn-success btn-block">登录</button>
+			    	</fieldset>
+			    </div>
 			</div>
 		</div>
+	</div>
+</div>
+
+
+
   </body>
 </html>
