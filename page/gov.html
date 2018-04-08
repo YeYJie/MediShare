@@ -33,13 +33,14 @@
 	    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
 	    <style type="text/css">
-.btn-group.special {
-	display: flex;
-}
+			.btn-group.special {
+				display: flex;
+			}
 
-.special .btn {
-	flex: 1
-}
+			.special .btn {
+				flex: 1
+			}
+
 	    </style>
 
 	</head>
@@ -684,8 +685,21 @@
 	};
 	</script>
   	<body>
-	  	<div id="staffInfo" style="display: none;float:left;"></div>
-	  	<div id="fileList" style="display: none;float:right; width: 80%">
+
+
+<nav class="navbar navbar-dark bg-dark" id="nav" style="display: none;">
+	<h1 class="pull-left" style="color: white">BCG-Share</h1>
+	<div class="pull-right">
+		<h1 style="color: white">linsiyi</h1>
+	</div>
+</nav>
+
+
+<div class="container">
+
+	  	<div id="staffInfo" style="display: none;"></div>
+	  	<!-- <div id="fileList" style="display: none;float:right; width: 80%"> -->
+	  	<div id="fileList" style="display: none;">
 
 	  	<input type="radio" name="filelist_filetype" value="1" onclick="filelist_filetype1()" checked>文件
 		<input type="radio" name="filelist_filetype" value="2" onclick="filelist_filetype2()">数据库入口
@@ -743,7 +757,7 @@
 			  		<h4>
 			  			<p>单位：教育局&nbsp;&nbsp;&nbsp;</p>
 			  			<lable>上传者：</lable>
-			  			<input type='text' id='uploader1' style="border:0" border='none' outline='medium'></input>
+			  			<input type='text' id='uploader1' border='none' outline='medium'></input>
 			  		</h4>
 			  		<form ref='uploadForm' id='uploadForm' action='/upload' method='post' encType="multipart/form-data">
 			  			<!-- <input type="text" id="uploadText"> -->
@@ -790,7 +804,7 @@
 			  		<h4>
 			  			<p>单位：教育局&nbsp;&nbsp;&nbsp;</p>
 			  			<lable>上传者：</lable>
-			  			<input type='text' id='uploader2' style="border:0" border='none' outline='medium'></input>
+			  			<input type='text' id='uploader2' border='none' outline='medium'></input>
 			  		</h4>
 			  		<p>
 				  		<lable>数据内容：</lable>
@@ -852,7 +866,7 @@
 
 
 
-	  	<div id="search" style="display: none;float:right; width: 80%">
+	  	<div id="search" style="display: none;">
 	  		<h1>查找文件</h1>
   			<p><fieldset>
   				<legend>按文件名查找:</legend>
@@ -882,7 +896,7 @@
 	  		<button id="search-goback">返回</button>
 	  	</div>
 
-	  	<div id="search1" style="display: none;float:right; width: 80%">
+	  	<div id="search1" style="display: none;">
 	  		<h1>查找数据库入口</h1>
   			<p><fieldset>
   				<legend>按数据内容查找:</legend>
@@ -912,7 +926,7 @@
 	  		<button id="search-goback1">返回</button>
 	  	</div>
 
-	  	<div id="searchResult" style="display: none;float:right; width: 80%">
+	  	<div id="searchResult" style="display: none;">
 	  		<p><table id="searchResult-table">
 				<tr>
 					<th>文件名</th>
@@ -928,7 +942,7 @@
 	  		<button id="searchResult-goback">返回</button>
 	  	</div>
 
-	  	<div id="searchResult1" style="display: none;float:right; width: 80%">
+	  	<div id="searchResult1" style="display: none;">
 		  		<p><table id="searchResult-table1">
 					<tr>
 						<th>数据内容</th>
@@ -943,36 +957,20 @@
 		  		<button id="searchResult-goback1">返回</button>
 		  	</div>
 
-	  	<div id="fileContent" style="display: none; position:fixed; width:100%; height:100%; background-color:#FFF;">
+	  	<div id="fileContent" style="display: none; background-color:#FFF;">
 	  		<p id="fileContent-p"></p>
 	  		<p id="fileContent-pp"></p>
 	  		<p><button id="fileContent-goback">返回</button></p>
 	  	</div>
 
-	  	<div id="fileContent1" style="display: none; position:fixed; width:100%; height:100%; background-color:#FFF;">
+	  	<div id="fileContent1" style="display: none; background-color:#FFF;">
 	  		<p id="fileContent-p1"></p>
 	  		<p id="fileContent-p2"></p>
 	  		<p><button id="fileContent-goback1">返回</button></p>
 	  	</div>
 
-<!-- 		<div id="outer-wrap">
-			<div id="login-panel">
-				<h1>政府文件共享平台</h1>
-				<input type="radio" name="identity" value="1" checked>管理员
-				<input type="radio" name="identity" value="2">普通员工
-			  	<p>
-			  		<lable>用户名&nbsp;</lable>
-			  		<input id="login-id" autocomplete="off" />
-			  	</p>
-			  	<p>
-			  		<lable>密码&nbsp;&nbsp;&nbsp;&nbsp;</lable>
-			  		<input type="password" id="login-pwd" autocomplete="off" />
-			  	</p>
-			  	<p><button id="login-button">登录</button></p>
-			</div>
-		</div> -->
 
-
+</div>
 
 <div class="container" id="outer-wrap">
     <div class="row" style="padding-top:100px;">
@@ -1015,19 +1013,6 @@
 	</div>
 </div>
 
-
-<nav class="navbar navbar-inverse navbar-fixed-top" id="nav" style="display: none;">
-	<div class="container-fluid">
-		<div class="navbar-header">
-			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-				<span class="sr-only">Toggle navigation</span>
-				<span class="icon-bar"></span>
-				<span class="icon-bar"></span>
-				<span class="icon-bar"></span>
-			</button>
-			<a class="navbar-brand" id="hospital-name">Project name</a>
-		</div>
-</nav>
 
 
   </body>
