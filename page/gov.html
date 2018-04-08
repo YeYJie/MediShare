@@ -678,7 +678,7 @@
   	<body>
 
 
-<nav class="navbar navbar-dark bg-dark" id="nav" style="display: block;">
+<nav class="navbar navbar-dark bg-dark" id="nav" style="display: none;">
 	<h1 class="pull-left" style="color: white">BCG-Share</h1>
 	<div class="pull-right">
 		<h1 style="color: white">linsiyi</h1>
@@ -693,8 +693,8 @@
 
 
 
-<div class="container">
-	<div class="row" id="after-login" style="display: block;">
+<div class="container" id="fileList" style="display: block;">
+	<div class="row" id="after-login">
 
 
 		<div class="col-md-2 sidebar">
@@ -704,9 +704,9 @@
 			<p><button id="fileList-logout1" style="display: none;">退出登录 数据库</button></p>
 		</div>
 
-		<div class="col-md-10 main" id="fileList">
+		<div class="col-md-10 main">
 
-		  	<div id="normalfile" style="display: block;">
+		  	<div id="normalfile" style="display: none;">
 		  		<h2 class="page-header" style="margin-top: 20px;">文件列表</h2>
 		  		<table id="fileList-table" class="table table-striped">
 		  			<thead>
@@ -741,23 +741,23 @@
 
 		</div>
 
-<div class="row" id="normalFileList-button">
-	<div style="position: fixed; right: 50px; bottom: 50px; height: 100px; width: 300px;">
-		<p><button id="fileList-search" class="btn btn-lg btn-primary btn-block">查找普通文件</button></p>
-		<p><button id="fileList-upload" class="btn btn-lg btn-primary btn-block">上传文件</button></p>
-	</div>
-</div>
+		<div class="row" id="normalFileList-button" style="display: none;">
+			<div style="position: fixed; right: 50px; bottom: 50px; height: 100px; width: 300px;">
+				<p><button id="fileList-search" class="btn btn-lg btn-primary btn-block">查找普通文件</button></p>
+				<p><button id="fileList-upload" class="btn btn-lg btn-primary btn-block">上传文件</button></p>
+			</div>
+		</div>
 
-<div class="row" id="dbFileList-button" style="display: none;">
-	<div style="position: fixed; right: 50px; bottom: 50px; height: 100px; width: 300px;">
-		<p><button id="fileList-search1" class="btn btn-lg btn-primary btn-block">查找数据库文件</button></p>
-		<p><button id="fileList-upload1" class="btn btn-lg btn-primary btn-block">上传文件</button></p>
-	</div>
-</div>
+		<div class="row" id="dbFileList-button" style="display: none;">
+			<div style="position: fixed; right: 50px; bottom: 50px; height: 100px; width: 300px;">
+				<p><button id="fileList-search1" class="btn btn-lg btn-primary btn-block">查找数据库文件</button></p>
+				<p><button id="fileList-upload1" class="btn btn-lg btn-primary btn-block">上传文件</button></p>
+			</div>
+		</div>
 
 
 
-<!-- 		<div id="diagnose" style="display: none;">
+<!-- 		<div id="diagnose" style="display: block;">
 			<div id="diagnose-inspection"></div>
 			<div class="row"><div style="height: 3vh;"></div></div>
 				<div class="row">
@@ -805,7 +805,7 @@
 
 
 
-<div class="container" id="outer-wrap" style="display: none;">
+<div class="container" id="outer-wrap" style="display: block;">
     <div class="row" style="padding-top:100px;">
     	<div class="col-md-4 col-md-offset-4">
     		<div class="panel panel-default">
