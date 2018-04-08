@@ -1,38 +1,12 @@
 <!doctype html>
 <html>
 	<head>
-<!-- 		<link href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js" rel="stylesheet">
-		<script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
-		<script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-
-		<style type="text/css">
-			table {
-			    font-family: arial, sans-serif;
-			    border-collapse: collapse;
-			    width: 100%;
-			}
-			td, th {
-			    border: 1px solid #dddddd;
-			    text-align: left;
-			    padding: 8px;
-			}
-			tr:nth-child(even) {
-			    background-color: #dddddd;
-			}
-			html,body{height: 100%}
-		</style> -->
 		<meta charset="utf-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-
+		<title>BCG-Share</title>
 		<link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-		<!-- <link href="dashboard.css" rel="stylesheet"> -->
-		<!-- <link href="signin.css" rel="stylesheet"> -->
-	    <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
-	    <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
-	    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-
-	    <style type="text/css">
+		<style type="text/css">
 			.btn-group.special {
 				display: flex;
 			}
@@ -41,8 +15,7 @@
 				flex: 1
 			}
 
-	    </style>
-
+		</style>
 	</head>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
@@ -50,7 +23,6 @@
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 	<script src="/socket.io/socket.io.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-	<!-- <script type="/jingtaiziyuan/qiang.js"></script> -->
 	<script>
 
 
@@ -270,11 +242,18 @@
 
 		$('#login-button').click(function(){
 			document.getElementById("outer-wrap").style.display = "none";
+
 			document.getElementById("nav").style.display = "block";
 			document.getElementById("staffInfo").style.display = "block";
+
 			document.getElementById("fileList").style.display = "block";
+
 			document.getElementById("normalfile").style.display = "block";
+			document.getElementById("normalFileList-button").style.display = "block";
+			document.getElementById("fileList-logout").style.display = "block";
+
 			document.getElementById("databasefile").style.display = "none";
+			document.getElementById("dbFileList-button").style.display = "none";
 
 			var c =  document.getElementsByName('identity');
 			if(c[1].checked == true){
@@ -673,13 +652,25 @@
 	};
 	function filelist_filetype1(){
 		document.getElementById("normalfile").style.display = "block";
+		document.getElementById("normalFileList-button").style.display = "block";
+		document.getElementById("fileList-logout").style.display = "block";
+
 		document.getElementById("databasefile").style.display = "none";
+		document.getElementById("dbFileList-button").style.display = "none";
+		document.getElementById("fileList-logout1").style.display = "none";
+
 		document.getElementById("search").style.display = "none";
 		document.getElementById("search1").style.display = "none";
 	};
 	function filelist_filetype2(){
 		document.getElementById("normalfile").style.display = "none";
+		document.getElementById("normalFileList-button").style.display = "none";
+		document.getElementById("fileList-logout").style.display = "none";
+
 		document.getElementById("databasefile").style.display = "block";
+		document.getElementById("dbFileList-button").style.display = "block";
+		document.getElementById("fileList-logout1").style.display = "block";
+
 		document.getElementById("search").style.display = "none";
 		document.getElementById("search1").style.display = "none";
 	};
@@ -687,7 +678,7 @@
   	<body>
 
 
-<nav class="navbar navbar-dark bg-dark" id="nav" style="display: none;">
+<nav class="navbar navbar-dark bg-dark" id="nav" style="display: block;">
 	<h1 class="pull-left" style="color: white">BCG-Share</h1>
 	<div class="pull-right">
 		<h1 style="color: white">linsiyi</h1>
@@ -695,19 +686,30 @@
 </nav>
 
 
+
+
+
+
+
+
+
 <div class="container">
+	<div class="row" id="after-login" style="display: block;">
 
-	  	<div id="staffInfo" style="display: none;"></div>
-	  	<!-- <div id="fileList" style="display: none;float:right; width: 80%"> -->
-	  	<div id="fileList" style="display: none;">
 
-	  	<input type="radio" name="filelist_filetype" value="1" onclick="filelist_filetype1()" checked>文件
-		<input type="radio" name="filelist_filetype" value="2" onclick="filelist_filetype2()">数据库入口
+		<div class="col-md-2 sidebar">
+			<p><input type="radio" name="filelist_filetype" value="1" onclick="filelist_filetype1()" checked>文件</p>
+			<p><input type="radio" name="filelist_filetype" value="2" onclick="filelist_filetype2()">数据库入口</p>
+			<p><button id="fileList-logout" style="display: none;">退出登录 普通</button></p>
+			<p><button id="fileList-logout1" style="display: none;">退出登录 数据库</button></p>
+		</div>
 
-	  		<div id="normalfile">
-		  		<ul id="fileList-ul"></ul>
-		  		<p><table id="fileList-table">
-					<tr>
+		<div class="col-md-10 main" id="fileList">
+
+		  	<div id="normalfile" style="display: block;">
+		  		<h2 class="page-header" style="margin-top: 20px;">文件列表</h2>
+		  		<table id="fileList-table" class="table table-striped">
+		  			<thead>
 						<th>文件名</th>
 						<th>版本号</th>
 						<th>文件大小</th>
@@ -716,18 +718,14 @@
 						<th>上传时间</th>
 						<th>是否需要访问权限</th>
 						<th></th>
-					</tr>
-		  		</table></p>
-		  		<p><button id="fileList-search">查找文件</button></p>
-		  		<p><button id="fileList-upload">上传文件</button></p>
-		  		<p><button id="fileList-logout">退出登录</button></p>
-
+		  			</thead>
+		  			<tbody></tbody>
+		  		</table>
 		  	</div>
-
-		  	<div id="databasefile">
-		  		<ul id="fileList-ul"></ul>
-		  		<p><table id="fileList-table1">
-					<tr>
+		  	<div id="databasefile" style="display: none;">
+		  		<h2 class="page-header" style="margin-top: 20px;">数据库列表</h2>
+		  		<table id="fileList-table1" class="table table-striped">
+		  			<thead>
 						<th>数据内容</th>
 						<th>版本号</th>
 						<th>上传单位</th>
@@ -735,244 +733,79 @@
 						<th>上传时间</th>
 						<th>是否需要访问权限</th>
 						<th></th>
-					</tr>
-		  		</table></p>
-		  		<p><button id="fileList-search1">查找数据库入口</button></p>
-		  		<p><button id="fileList-upload1">上传数据库入口</button></p>
-		  		<p><button id="fileList-logout1">退出登录</button></p>
-
+		  			</thead>
+		  			<tbody></tbody>
+		  		</table>
 		  	</div>
 
-	  	</div>
 
+		</div>
 
-	  	<div id="upload" style="display: none">
-
-	  		<!-- <input type="radio" name="filetype" value="1" onclick="filetype1()" checked>上传文件
-			<input type="radio" name="filetype" value="2" onclick="filetype2()">提供数据库入口 -->
-
-			  	<div id="filetype11">
-			  		<h1>上传文件</h1>
-
-			  		<h4>
-			  			<p>单位：教育局&nbsp;&nbsp;&nbsp;</p>
-			  			<lable>上传者：</lable>
-			  			<input type='text' id='uploader1' border='none' outline='medium'></input>
-			  		</h4>
-			  		<form ref='uploadForm' id='uploadForm' action='/upload' method='post' encType="multipart/form-data">
-			  			<!-- <input type="text" id="uploadText"> -->
-			  			<input type="file"  id="uploadFile" />
-			  			<button id="upload-button" >提交</button>
-			  			<br><br>
-			  		</form>
-			  		<div>
-			  			<p>文件访问控制：</p>
-			  			<input type="radio" name="radio" value="1" onclick="Public()" checked>公开
-						<input type="radio" name="radio" value="2" onclick="Partial_Public()">部分公开
-						<input type="radio" name="radio" value="3" onclick="Secret()">仅自己单位可见
-						<br><br>
-			  		</div>
-
-			  		<div id="Partialpublic" style="display: none">
-			  			<p>选择文件可访问的单位：</p>
-			  			<p>
-			  				<input type="checkbox" name="au_department" value="1" checked="checked">  教育局
-		        			<input type="checkbox" name="au_department" value="2" >  公安局
-		        			<input type="checkbox" name="au_department" value="3" >  财政局
-		        			<input type="checkbox" name="au_department" value="4" >  卫生局
-		        			<input type="checkbox" name="au_department" value="5" >  文化局
-		        			<input type="checkbox" name="au_department" value="6" >  体育局
-		        			<input type="checkbox" name="au_department" value="7" >  民政局
-		        			<input type="checkbox" name="au_department" value="8" >  司法局
-		        			<input type="checkbox" name="au_department" value="9" >  监察局
-		        			<input type="checkbox" name="au_department" value="10" >  旅游局<br>
-		        			<input type="checkbox" name="au_department" value="11" > 交通委员会
-		        			<input type="checkbox" name="au_department" value="12" > 环境保护局
-		        			<input type="checkbox" name="au_department" value="13" > 建设委员会
-		        			<input type="checkbox" name="au_department" value="14" > 农业委员会
-		        			<input type="checkbox" name="au_department" value="15" > 外事办公室
-		        			<input type="checkbox" name="au_department" value="16" > 广播电视局
-		        			<input type="checkbox" name="au_department" value="17" > 科学技术局
-		        			<input type="checkbox" name="au_department" value="18" > 新闻出版局
-			  			</p>
-			  		</div>
-			  	</div>
-
-			  	<div id="filetype22">
-			  		<h1>上传数据库入口</h1>
-
-			  		<h4>
-			  			<p>单位：教育局&nbsp;&nbsp;&nbsp;</p>
-			  			<lable>上传者：</lable>
-			  			<input type='text' id='uploader2' border='none' outline='medium'></input>
-			  		</h4>
-			  		<p>
-				  		<lable>数据内容：</lable>
-		  				<input type='text' id='datacontent'></input>
-		  			</p>
-				  	<p>
-				  		<lable>数据库地址：</lable>
-		  				<input type='text' id='databaseip'></input>
-		  			</p>
-		  			<p>
-		  				<lable>连接端口：</lable>
-		  				<input type='text' id='databaseport'></input>
-		  			</p>
-		  			<p>
-		  				<lable>数据库名称：</lable>
-		  				<input type='text' id='databasename'></input>
-		  			</p>
-		  			<p>
-		  				<lable>表单名称：</lable>
-		  				<input type='text' id='tablename'></input>
-		  			</p>
-		  			<div>
-			  			<p>文件访问控制：</p>
-			  			<input type="radio" name="radio1" value="1" onclick="Public1()" checked>公开
-						<input type="radio" name="radio1" value="2" onclick="Partial_Public1()">部分公开
-						<input type="radio" name="radio1" value="3" onclick="Secret1()">仅自己单位可见
-						<br><br>
-			  		</div>
-
-			  		<div id="Partialpublic1" style="display: none">
-			  			<p>选择数据库入口可访问的单位：</p>
-			  			<p>
-			  				<input type="checkbox" name="au_department1" value="1" checked="checked">  教育局
-		        			<input type="checkbox" name="au_department1" value="2" >  公安局
-		        			<input type="checkbox" name="au_department1" value="3" >  财政局
-		        			<input type="checkbox" name="au_department1" value="4" >  卫生局
-		        			<input type="checkbox" name="au_department1" value="5" >  文化局
-		        			<input type="checkbox" name="au_department1" value="6" >  体育局
-		        			<input type="checkbox" name="au_department1" value="7" >  民政局
-		        			<input type="checkbox" name="au_department1" value="8" >  司法局
-		        			<input type="checkbox" name="au_department1" value="9" >  监察局
-		        			<input type="checkbox" name="au_department1" value="10" >  旅游局<br>
-		        			<input type="checkbox" name="au_department1" value="11" > 交通委员会
-		        			<input type="checkbox" name="au_department1" value="12" > 环境保护局
-		        			<input type="checkbox" name="au_department1" value="13" > 建设委员会
-		        			<input type="checkbox" name="au_department1" value="14" > 农业委员会
-		        			<input type="checkbox" name="au_department1" value="15" > 外事办公室
-		        			<input type="checkbox" name="au_department1" value="16" > 广播电视局
-		        			<input type="checkbox" name="au_department1" value="17" > 科学技术局
-		        			<input type="checkbox" name="au_department1" value="18" > 新闻出版局
-			  			</p>
-			  		</div>
-			  		<button id="upload-button1" >提交</button>
-			  	</div>
-			  	<button id="upload-goback" >返回</button>
-	  	</div>
-
-
-
-
-
-	  	<div id="search" style="display: none;">
-	  		<h1>查找文件</h1>
-  			<p><fieldset>
-  				<legend>按文件名查找:</legend>
-  				<input type="text" id="search-name">
-  				<button id="search-name-button">查找</button>
-  			</fieldset></p>
-    		<p><fieldset>
-  				<legend>按时间查找:</legend>
-  				<input type="date" id="search-time-begin">
-  				<input type="date" id="search-time-end">
-  				<button id="search-time-button">查找</button>
-  			</fieldset></p>
-  			<p><fieldset>
-  				<legend>按单位查找:</legend>
-  				<input type="text" id="search-department">
-  				<input type="date" id="search-department-begin">
-  				<input type="date" id="search-department-end">
-  				<button id="search-department-button">查找</button>
-  			</fieldset></p>
-  			<p><fieldset>
-  				<legend>按上传者查找:</legend>
-  				<input type="text" id="search-uploader">
-  				<input type="date" id="search-uploader-begin">
-  				<input type="date" id="search-uploader-end">
-  				<button id="search-uploader-button">查找</button>
-  			</fieldset></p>
-	  		<button id="search-goback">返回</button>
-	  	</div>
-
-	  	<div id="search1" style="display: none;">
-	  		<h1>查找数据库入口</h1>
-  			<p><fieldset>
-  				<legend>按数据内容查找:</legend>
-  				<input type="text" id="search-name1">
-  				<button id="search-name-button1">查找</button>
-  			</fieldset></p>
-    		<p><fieldset>
-  				<legend>按时间查找:</legend>
-  				<input type="date" id="search-time-begin1">
-  				<input type="date" id="search-time-end1">
-  				<button id="search-time-button1">查找</button>
-  			</fieldset></p>
-  			<p><fieldset>
-  				<legend>按单位查找:</legend>
-  				<input type="text" id="search-department1">
-  				<input type="date" id="search-department-begin1">
-  				<input type="date" id="search-department-end1">
-  				<button id="search-department-button1">查找</button>
-  			</fieldset></p>
-  			<p><fieldset>
-  				<legend>按上传者查找:</legend>
-  				<input type="text" id="search-uploader1">
-  				<input type="date" id="search-uploader-begin1">
-  				<input type="date" id="search-uploader-end1">
-  				<button id="search-uploader-button1">查找</button>
-  			</fieldset></p>
-	  		<button id="search-goback1">返回</button>
-	  	</div>
-
-	  	<div id="searchResult" style="display: none;">
-	  		<p><table id="searchResult-table">
-				<tr>
-					<th>文件名</th>
-					<th>版本号</th>
-					<th>文件大小</th>
-					<th>上传单位</th>
-					<th>上传者</th>
-					<th>上传时间</th>
-					<th>是否需要访问权限</th>
-					<th></th>
-				</tr>
-	  		</table></p>
-	  		<button id="searchResult-goback">返回</button>
-	  	</div>
-
-	  	<div id="searchResult1" style="display: none;">
-		  		<p><table id="searchResult-table1">
-					<tr>
-						<th>数据内容</th>
-						<th>版本号</th>
-						<th>上传单位</th>
-						<th>上传者</th>
-						<th>上传时间</th>
-						<th>是否需要访问权限</th>
-						<th></th>
-					</tr>
-		  		</table></p>
-		  		<button id="searchResult-goback1">返回</button>
-		  	</div>
-
-	  	<div id="fileContent" style="display: none; background-color:#FFF;">
-	  		<p id="fileContent-p"></p>
-	  		<p id="fileContent-pp"></p>
-	  		<p><button id="fileContent-goback">返回</button></p>
-	  	</div>
-
-	  	<div id="fileContent1" style="display: none; background-color:#FFF;">
-	  		<p id="fileContent-p1"></p>
-	  		<p id="fileContent-p2"></p>
-	  		<p><button id="fileContent-goback1">返回</button></p>
-	  	</div>
-
-
+<div class="row" id="normalFileList-button">
+	<div style="position: fixed; right: 50px; bottom: 50px; height: 100px; width: 300px;">
+		<p><button id="fileList-search" class="btn btn-lg btn-primary btn-block">查找普通文件</button></p>
+		<p><button id="fileList-upload" class="btn btn-lg btn-primary btn-block">上传文件</button></p>
+	</div>
 </div>
 
-<div class="container" id="outer-wrap">
+<div class="row" id="dbFileList-button" style="display: none;">
+	<div style="position: fixed; right: 50px; bottom: 50px; height: 100px; width: 300px;">
+		<p><button id="fileList-search1" class="btn btn-lg btn-primary btn-block">查找数据库文件</button></p>
+		<p><button id="fileList-upload1" class="btn btn-lg btn-primary btn-block">上传文件</button></p>
+	</div>
+</div>
+
+
+
+<!-- 		<div id="diagnose" style="display: none;">
+			<div id="diagnose-inspection"></div>
+			<div class="row"><div style="height: 3vh;"></div></div>
+				<div class="row">
+					<div class="col-md-12">
+						<div class="form-group">
+							<label for="diagnoseInspection"><h3>诊断项目</h3></label>
+							<textarea class="form-control" id="diagnoseInspection" rows="3"></textarea>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div style="position: fixed; right: 50px; bottom: 50px; height: 100px; width: 300px;">
+						<p><button id="diagnose-submit" class="btn btn-lg btn-primary btn-block">提交</button></p>
+						<p><button id="diagnose-goback" class="btn btn-lg btn-primary btn-block">返回</button></p>
+					</div>
+				</div>
+		</div>
+
+
+		<div id="recordDetail" style="display: none;">
+			<h1 class="page-header">记录详情</h1>
+			<div id="recordDetail-div"></div>
+			<div class="row">
+				<div style="position: fixed; right: 50px; bottom: 0px; height: 100px; width: 300px;">
+					<p><button id="recordDetail-goback" class="btn btn-lg btn-primary btn-block">返回</button></p>
+				</div>
+			</div>
+		</div> -->
+
+
+	</div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="container" id="outer-wrap" style="display: none;">
     <div class="row" style="padding-top:100px;">
     	<div class="col-md-4 col-md-offset-4">
     		<div class="panel panel-default">
@@ -1014,6 +847,10 @@
 </div>
 
 
+
+    <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
   </body>
 </html>
