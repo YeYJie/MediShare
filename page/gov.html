@@ -244,7 +244,8 @@
 			document.getElementById("outer-wrap").style.display = "none";
 
 			document.getElementById("nav").style.display = "block";
-			document.getElementById("staffInfo").style.display = "block";
+			// document.getElementById("staffInfo").style.display = "block";
+			document.getElementById("sidebar").style.display = "block";
 
 			document.getElementById("fileList").style.display = "block";
 
@@ -697,7 +698,7 @@
 	<div class="row" id="after-login">
 
 
-		<div class="col-md-2 sidebar">
+		<div class="col-md-2 sidebar" id="sidebar" style="display: none;">
 			<p><input type="radio" name="filelist_filetype" value="1" onclick="filelist_filetype1()" checked>文件</p>
 			<p><input type="radio" name="filelist_filetype" value="2" onclick="filelist_filetype2()">数据库入口</p>
 			<p><button id="fileList-logout" style="display: none;">退出登录 普通</button></p>
