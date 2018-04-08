@@ -428,7 +428,7 @@ io.on('connection', function(socket){
 	*/
 	socket.on('newPatient', function(req){
 		patientsNotRegister.push(socket);
-		socket.emit('doctors', {doctors: workingDoctors});
+		socket.emit('doctors', {doctors: workingDoctors, hname: hospitalName});
 	});
 	socket.on('register', function(req){
 		var pid = req.pid;

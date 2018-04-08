@@ -60,6 +60,15 @@
               <div style="height: 10vh;"></div>
                 <div class="col-md-4 col-md-offset-4">
                   <div class="panel panel-login">
+
+  <div class="form-group">
+    <div class="col-md-5 col-md-offset-4">
+  <h3 id="hname"></h3>
+  <div style="height:3vh;"></div>
+      </div>
+    </div>
+
+
                     <div class="panel-heading">
                       <div class="row">
                         <div class="col-xs-6">
@@ -251,6 +260,7 @@
           processDoctor(data.doctors[i]);
         }
       }
+      document.getElementById("hname").innerHTML = "欢迎来到" + data.hname;
     });
     socket.on("newWorkingDoctor", function(data){
       console.log("newWorkingDoctor", data.doctor);
