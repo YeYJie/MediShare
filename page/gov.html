@@ -74,8 +74,12 @@
 			console.log("2,抱歉！您所属部门没有访问权限！");
 		});
 
-		socket.on('fileList', function(data) {
-			console.log(data);
+		var fillFileList = function(data, normalTableId, dbTableId) {
+			$("#" + normalTableId + " tr:not(:first)").empty("");
+			$("#" + dbTableId + " tr:not(:first)").empty("");
+
+			var timestamp = new Date().valueOf().toString();
+
 			for(var i = 0; i < data.files.length; ++i) {
 				console.log(data.files[i]);
 				var file = data.files[i];
@@ -87,18 +91,24 @@
 					d = "需要";
 				else
 					d = "不需要";
-				//
+
+				var buttonId = "fileList-request-button-"+file.FileId + timestamp;
+
 				var e = file.FileSize;
 				if (e =="-1"){
-					var fileHTML = buildDbRowHTML(file.FileId, file.FileName, file.FileVersion, c,file.Uploader, file.UploadTime, d,"fileList-request-button-"+file.FileId);
-					$('#dbTable > tbody:last').append(fileHTML);
+					var fileHTML = buildDbRowHTML(file.FileId, file.FileName,
+						file.FileVersion, c,file.Uploader, file.UploadTime, d,
+						buttonId);
+					$('#' + dbTableId + ' > tbody:last').append(fileHTML);
 				}
 				else{
-					var fileHTML = buildNormalRowHTML(file.FileId, file.FileName, file.FileVersion, file.FileSize, c,file.Uploader, file.UploadTime, d,"fileList-request-button-"+file.FileId);
-					$('#normalTable > tbody:last').append(fileHTML);
+					var fileHTML = buildNormalRowHTML(file.FileId, file.FileName,
+						file.FileVersion, file.FileSize, c,file.Uploader, file.UploadTime, d,
+						buttonId);
+					$('#' + normalTableId + ' > tbody:last').append(fileHTML);
 				}
 
-				$('#fileList-request-button-' + file.FileId).click(function(){
+				$('#'+buttonId).click(function(){
 					var needAuthorization = $(this).attr('needAuthorization');
 					if(needAuthorization == "需要"){
 						needAuthorization = "true";
@@ -110,91 +120,31 @@
 					var fileId = $(this).attr('data-fileId');
 					var fileName = $(this).attr('fileName');
 					var fileSize = $(this).attr('fileSize');
-					/*if(fileSize == "-1"){
-						if(needAuthorization === "true") {//need
-							console.log("emit requestFileAuthorization1 " + fileId);
-							socket.emit('requestFileAuthorization1', {fileId: fileId,fileName:fileName});
-						}
-						else {//no need---public
-							console.log("emit requestFile1 " + fileId);
-							socket.emit('requestFile1', {fileId: fileId,fileName:fileName});
-						}
+
+					if(needAuthorization === "true") {//need
+						console.log("emit requestFileAuthorization " + fileId);
+						socket.emit('requestFileAuthorization', {fileId: fileId,fileName:fileName,fileSize:fileSize});
 					}
-					else{*/
-						if(needAuthorization === "true") {//need
-							console.log("emit requestFileAuthorization " + fileId);
-							socket.emit('requestFileAuthorization', {fileId: fileId,fileName:fileName,fileSize:fileSize});
-						}
-						else {//no need---public
-							console.log("emit requestFile " + fileId);
-							socket.emit('requestFile', {fileId: fileId,fileName:fileName,fileSize:fileSize});
-						}
-					/*}*/
+					else {//no need---public
+						console.log("emit requestFile " + fileId);
+						socket.emit('requestFile', {fileId: fileId,fileName:fileName,fileSize:fileSize});
+					}
 
 				});
 			}
+		}
+
+		socket.on('fileList', function(data) {
+			console.log(data);
+			fillFileList(data, "normalTable", "dbTable");
+			showFileListPannel();
 		});
 		socket.on('searchResult', function(data) {
 			console.log(data);
-			//delete filelist
-			$("#searchResult-table tr:not(:first)").empty("");
-			$("#searchResult-table1 tr:not(:first)").empty("");
-			for(var i = 0; i < data.files.length; ++i) {
-				console.log(data.files[i]);
-				var file = data.files[i];
-				//
-				if(file.Department == "1")
-					var c = "教育局";
-				var d;
-				if(file.NeedAuthorization == true)
-					d = "需要";
-				else
-					d = "不需要";
-				//
-				var e = file.FileSize;
-				if (e =="-1"){
-					var fileHTML = buildDbRowHTML(file.FileId, file.FileName, file.FileVersion, c,file.Uploader, file.UploadTime, d,"searchResult-request-button-"+file.FileId);
-					// var row = document.getElementById("searchResult-table1").insertRow(1);
-					// row.innerHTML = fileHTML;
-					$('#dbTable > tbody:last').append(fileHTML);
-				}
-				else{
-					var fileHTML = buildNormalRowHTML(file.FileId, file.FileName, file.FileVersion, file.FileSize, c,file.Uploader, file.UploadTime, d,"searchResult-request-button-"+file.FileId);
-					$('#normalTable > tbody:last').append(fileHTML);
-				}
-				$('#searchResult-request-button-' + file.FileId).click(function(){
-					var needAuthorization = $(this).attr('needAuthorization');
-					if(needAuthorization == "需要"){
-						needAuthorization = "true";
-					}
-					else{
-						needAuthorization = "false";
-					}
-					var fileId = $(this).attr('data-fileId');
-					var fileName = $(this).attr('fileName');
-					var fileSize = $(this).attr('fileSize');
-					/*if(fileSize == "-1"){
-						if(needAuthorization === "true") {//need
-							console.log("emit requestFileAuthorization1 " + fileId);
-							socket.emit('requestFileAuthorization1', {fileId: fileId,fileName:fileName});
-						}
-						else {//no need---public
-							console.log("emit requestFile1 " + fileId);
-							socket.emit('requestFile1', {fileId: fileId,fileName:fileName});
-						}
-					}
-					else{*/
-						if(needAuthorization === "true") {//need
-							console.log("emit requestFileAuthorization " + fileId);
-							socket.emit('requestFileAuthorization', {fileId: fileId,fileName:fileName,fileSize:fileSize});
-						}
-						else {//no need---public
-							console.log("emit requestFile " + fileId);
-							socket.emit('requestFile', {fileId: fileId,fileName:fileName,fileSize:fileSize});
-						}
-					/*}*/
-				});
-			}
+			fillFileList(data, "normalTable-searchResult", "dbTable-searchResult");
+
+			hideSearchPannel();
+			showSearchResultPannel();
 		});
 		socket.on('fileEntry', function(data) {
 			var entry = data.entry;
@@ -282,6 +232,26 @@
 		};
 
 
+		var showSearchResultPannel = function() {
+			document.getElementById("normalfile-searchResult").style.display = "none";
+			document.getElementById("databasefile-searchResult").style.display = "none";
+			if(ftype === "normal")
+				document.getElementById("normalfile-searchResult").style.display = "block";
+			else if(ftype === "db")
+				document.getElementById("databasefile-searchResult").style.display = "block";
+			else
+				console.log("showSearchResultPannel", "error ftype: ", ftype);
+			document.getElementById("searchResult-pannel-button").style.display = "block";
+			onFileListPage = false;
+		};
+		var hideSearchResultPannel = function() {
+			document.getElementById("normalfile-searchResult").style.display = "none";
+			document.getElementById("databasefile-searchResult").style.display = "none";
+			document.getElementById("searchResult-pannel-button").style.display = "none";
+			onFileListPage = false;
+		};
+
+
 		var showSearchPannel = function() {
 			document.getElementById("search").style.display = "block";
 			document.getElementById("search-pannel-button").style.display = "block";
@@ -324,9 +294,8 @@
 
 			$("#normalTable tr:not(:first)").empty("");
 			$("#dbTable tr:not(:first)").empty("");
-
-			$("#searchResult-table tr:not(:first)").empty("");
-			$("#searchResult-table1 tr:not(:first)").empty("");
+			$("#normalTable-searchResult tr:not(:first)").empty("");
+			$("#dbTable-searchResult tr:not(:first)").empty("");
 		})
 
 
@@ -491,16 +460,12 @@
 
 
 		$('#search-name-button').click(function(){
-			document.getElementById("search").style.display = "none";
-			document.getElementById("searchResult").style.display = "block";
 			var name = $('#search-name').val();
 			$('#search-name').val("");
 			console.log('search-name: ' + name);
 			socket.emit('searchByName', {name: name});
 		})
 		$('#search-time-button').click(function(){
-			document.getElementById("search").style.display = "none";
-			document.getElementById("searchResult").style.display = "block";
 			var begin = $('#search-time-begin').val();
 			var end = $('#search-time-end').val();
 			$('#search-time-begin').val("");
@@ -512,10 +477,7 @@
 			socket.emit('searchByTime', {begin: begin, end:end});
 		})
 		$('#search-department-button').click(function(){
-			document.getElementById("search").style.display = "none";
-			document.getElementById("searchResult").style.display = "block";
 			var department = $('#search-department').val();
-
 			if (department == "教育局"){
 				department = "1";
 			}
@@ -533,8 +495,6 @@
 			socket.emit('searchByDepartment', {department: department, begin: begin, end:end});
 		})
 		$('#search-uploader-button').click(function(){
-			document.getElementById("search").style.display = "none";
-			document.getElementById("searchResult").style.display = "block";
 			var uploader = $('#search-uploader').val();
 			var begin = $('#search-uploader-begin').val();
 			var end = $('#search-uploader-end').val();
@@ -558,9 +518,8 @@
 
 
 		$('#searchResult-goback').click(function(){
-			document.getElementById("searchResult").style.display = "none";
-			document.getElementById("search").style.display = "block";
-			//$("#searchResult-table").find("tr:gt(0)").remove();
+			hideSearchResultPannel();
+			showSearchPannel();
 		})
 
 		$('#upload-goback').click(function(){
@@ -633,6 +592,40 @@
 			<div id="databasefile" style="display: none;">
 				<h2 class="page-header" style="margin-top: 20px;">数据库列表</h2>
 				<table id="dbTable" class="table table-striped">
+					<thead>
+						<th>数据内容</th>
+						<th>版本号</th>
+						<th>上传单位</th>
+						<th>上传者</th>
+						<th>上传时间</th>
+						<th>是否需要访问权限</th>
+						<th></th>
+					</thead>
+					<tbody></tbody>
+				</table>
+			</div>
+		</div>
+
+		<div>
+			<div id="normalfile-searchResult" style="display: none;">
+				<h2 class="page-header" style="margin-top: 20px;">查找结果</h2>
+				<table id="normalTable-searchResult" class="table table-striped">
+					<thead>
+						<th>文件名</th>
+						<th>版本号</th>
+						<th>文件大小</th>
+						<th>上传单位</th>
+						<th>上传者</th>
+						<th>上传时间</th>
+						<th>是否需要访问权限</th>
+						<th></th>
+					</thead>
+					<tbody></tbody>
+				</table>
+			</div>
+			<div id="databasefile-searchResult" style="display: none;">
+				<h2 class="page-header" style="margin-top: 20px;">查找结果</h2>
+				<table id="dbTable-searchResult" class="table table-striped">
 					<thead>
 						<th>数据内容</th>
 						<th>版本号</th>
@@ -837,7 +830,11 @@
 				<p><button id="search-goback" class="btn btn-lg btn-primary btn-block">返回</button></p>
 			</div>
 		</div>
-
+		<div class="row" id="searchResult-pannel-button" style="display: none;">
+			<div style="position: fixed; right: 50px; bottom: 50px; height: 100px; width: 300px;">
+				<p><button id="searchResult-goback" class="btn btn-lg btn-primary btn-block">返回</button></p>
+			</div>
+		</div>
 
 	</div>
 </div>
