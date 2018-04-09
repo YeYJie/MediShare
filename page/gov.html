@@ -19,7 +19,6 @@
 	</head>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-	<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="172.1anonymous"></script> -->
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 	<script src="/socket.io/socket.io.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -27,8 +26,6 @@
 
 
 	$(function () {
-		//var admin = "林思宜";
-		//var staff = "李明";
 
 		var socket = io();
 
@@ -95,12 +92,12 @@
 				var e = file.FileSize;
 				if (e =="-1"){
 					var fileHTML = buildRowHTML1(file.FileId, file.FileName, file.FileVersion, c,file.Uploader, file.UploadTime, d,"fileList-request-button-"+file.FileId);
-					var row = document.getElementById("fileList-table1").insertRow(1);
+					var row = document.getElementById("dbTable").insertRow(1);
 					row.innerHTML = fileHTML;
 				}
 				else{
 					var fileHTML = buildRowHTML(file.FileId, file.FileName, file.FileVersion, file.FileSize, c,file.Uploader, file.UploadTime, d,"fileList-request-button-"+file.FileId);
-					var row = document.getElementById("fileList-table").insertRow(1);
+					var row = document.getElementById("normalTable").insertRow(1);
 					row.innerHTML = fileHTML;
 				}
 
@@ -240,98 +237,133 @@
 			}
 		});
 
-		$('#login-button').click(function(){
-			document.getElementById("outer-wrap").style.display = "none";
+		var id;
+		var ftype;
+		var role;
+		var onFileListPage = false;
 
+		var showUploadPannel = function() {
+			document.getElementById("upload").style.display = "block";
+			if(ftype === "normal")
+				document.getElementById("uploadNormal").style.display = "block";
+			else if(ftype === "db")
+				document.getElementById("uploadDb").style.display = "block";
+			else
+				console.log("showUploadPannel", "error ftype: ", ftype);
+			document.getElementById("upload-pannel-button").style.display = "block";
+		}
+		var hideUploadPannel = function() {
+			document.getElementById("upload").style.display = "none";
+			document.getElementById("uploadNormal").style.display = "none";
+			document.getElementById("uploadDb").style.display = "none";
+			document.getElementById("upload-pannel-button").style.display = "none";
+		}
+
+		var showFileListPannelButton = function() {
+			if(role === "worker")
+				document.getElementById("fileList-worker-button").style.display = "block";
+			else if(role === "admin")
+				document.getElementById("fileList-admin-button").style.display = "block";
+			else
+				console.log("showFileListPannelButton", "error role: ", role);
+		}
+		var hideFileListPannelButton = function() {
+			document.getElementById("fileList-worker-button").style.display = "none";
+			document.getElementById("fileList-admin-button").style.display = "none";
+		}
+
+		var showFileListPannel = function() {
+			document.getElementById("normalfile").style.display = "none";
+			document.getElementById("databasefile").style.display = "none";
+			if(ftype === "normal")
+				document.getElementById("normalfile").style.display = "block";
+			else if(ftype === "db")
+				document.getElementById("databasefile").style.display = "block";
+			else
+				console.log("showFileListPannel", "error ftype: ", ftype);
+			showFileListPannelButton();
+			onFileListPage = true;
+		};
+		var hideFileListPannel = function() {
+			document.getElementById("normalfile").style.display = "none";
+			document.getElementById("databasefile").style.display = "none";
+			hideFileListPannelButton();
+			onFileListPage = false;
+		};
+
+
+		var showSearchPannel = function() {
+			document.getElementById("search").style.display = "block";
+			document.getElementById("search-pannel-button").style.display = "block";
+		}
+		var hideSearchPannel = function() {
+			document.getElementById("search").style.display = "none";
+			document.getElementById("search-pannel-button").style.display = "none";
+		}
+
+		$('#login-button').click(function(){
+
+			// $("#myModal").modal('show');
+
+			document.getElementById("outer-wrap").style.display = "none";
 			document.getElementById("nav").style.display = "block";
-			// document.getElementById("staffInfo").style.display = "block";
 			document.getElementById("sidebar").style.display = "block";
 
-			document.getElementById("fileList").style.display = "block";
+			id = document.getElementById("login-id").value;
+			role = $('input[name=identity]:checked').val();
+			ftype = "normal";
+			$('input[name="filelist_filetype"]')[0].checked =  true
+			showFileListPannel();
 
-			document.getElementById("normalfile").style.display = "block";
-			document.getElementById("normalFileList-button").style.display = "block";
-			document.getElementById("fileList-logout").style.display = "block";
-
-			document.getElementById("databasefile").style.display = "none";
-			document.getElementById("dbFileList-button").style.display = "none";
-
-			var c =  document.getElementsByName('identity');
-			if(c[1].checked == true){
-				console.log("PPPPPPP  ");
-				document.getElementById("fileList-upload").style.display = "none";
-				document.getElementById("fileList-upload1").style.display = "none";
-			}
-			else{
-				document.getElementById("fileList-upload").style.display = "block";
-				document.getElementById("fileList-upload1").style.display = "block";
-			}
-
-
-			// TODO
-			$("#fileList-table tr:not(:first)").empty("");
-			$("#fileList-table1 tr:not(:first)").empty("");
-			var rObj = document.getElementsByName("filelist_filetype");
-			rObj[0].checked = "checked";
-			socket.emit('login', {id: $('#login-id').val(), pwd: $('#login-pwd').val()});
-			//$('#login-id').val("");
 			$('#login-pwd').val("");
+			$("#normalTable tr:not(:first)").empty("");
+			$("#dbTable tr:not(:first)").empty("");
+
+			socket.emit('login', {id: $('#login-id').val(), pwd: $('#login-pwd').val()});
 		})
-		$('#fileList-logout').click(function(){
+
+
+		$('#logout').click(function(){
+			document.getElementById("sidebar").style.display = "none";
 			document.getElementById("outer-wrap").style.display = "block";
-			document.getElementById("staffInfo").style.display = "none";
-			document.getElementById("fileList").style.display = "none";
-			$("#fileList-table").find("tr:gt(0)").remove();
-			var rObj = document.getElementsByName("identity");
-			rObj[0].checked = "checked";
+			hideFileListPannel();
+			hideSearchPannel();
+			hideUploadPannel();
+			ftype = "";
+			role = "";
+
+			$("#normalTable tr:not(:first)").empty("");
+			$("#dbTable tr:not(:first)").empty("");
+
+			$("#searchResult-table tr:not(:first)").empty("");
+			$("#searchResult-table1 tr:not(:first)").empty("");
 		})
-		$('#fileList-logout1').click(function(){
-			document.getElementById("outer-wrap").style.display = "block";
-			document.getElementById("staffInfo").style.display = "none";
-			document.getElementById("fileList").style.display = "none";
-			$("#fileList-table1").find("tr:gt(0)").remove();
-			var rObj = document.getElementsByName("identity");
-			rObj[0].checked = "checked";
+
+
+
+		$('.fileList-search').click(function(){
+			hideFileListPannel();
+			showSearchPannel();
 		})
-		$('#fileList-search').click(function(){
-			document.getElementById("search").style.display = "block";
-			document.getElementById("normalfile").style.display = "none";
-		})
-		$('#fileList-search1').click(function(){
-			document.getElementById("search1").style.display = "block";
-			document.getElementById("databasefile").style.display = "none";
-		})
+
+
+
 		$('#fileList-upload').click(function(){
-			// TODO
-			document.getElementById("fileList").style.display = "none";
-			document.getElementById("upload").style.display = "block";
-			document.getElementById("filetype11").style.display = "block";
-			document.getElementById("filetype22").style.display = "none";
-			document.getElementById("Partialpublic").style.display = "none";
 
-			var rem = document.getElementById('login-id').value;
-			//alert(rem);
-			document.getElementById('uploader1').value = rem;
-			//alert(document.getElementById('uploader1').value);
-		})
-		$('#fileList-upload1').click(function(){
-			// TODO
-			document.getElementById("fileList").style.display = "none";
-			document.getElementById("upload").style.display = "block";
-			document.getElementById("filetype11").style.display = "none";
-			document.getElementById("filetype22").style.display = "block";
-			document.getElementById("Partialpublic").style.display = "none";
+			if(ftype === "normal")
+				document.getElementById('normalUploader').value = id;
+			else if(ftype === "db")
+				document.getElementById('dbUploader').value = id;
+			else
+				console.log("fileList-upload error ftype: ", ftype);
 
-			var rem = document.getElementById('login-id').value;
-			//alert(rem);
-			document.getElementById('uploader2').value = rem;
-			//alert(document.getElementById('uploader1').value);
+			hideFileListPannel();
+			showUploadPannel();
 		})
 
 
-		$('#upload-button').click(function(){//提交
-
-			console.log('upload-button click');
+		var uploadDb = function() {
+			console.log('uploadDb');
 
 			var formData = new FormData();
 			formData.append("uploadText", $('#uploadText').val());
@@ -411,15 +443,10 @@
 					return false;
 				}
 			});
+		}
 
-
-			return false;
-		})
-
-
-		$('#upload-button1').click(function(){//提交1
-
-			console.log('upload-button1 click');
+		var uploadNormal = function() {
+			console.log('uploadNormal');
 			var datacontent = document.getElementById('datacontent').value;
 			var databaseip = document.getElementById('databaseip').value;
 			var databaseport = document.getElementById('databaseport').value;
@@ -460,10 +487,16 @@
 
 			console.log("emit upload " );
 			socket.emit('upload1',{datacontent:datacontent,databaseip:databaseip,databaseport:databaseport,databasename:databasename,tablename:tablename,uploader:uploader,uploadTime:uploadTime,authorization1:authorization1,authorization_department1:authorization_department1});
+		}
 
-			return false;
-		})
-
+		$("#upload-button").click(function(){
+			if(ftype === "normal")
+				uploadNormal();
+			else if(ftype === "db")
+				uploadDb();
+			else
+				console.log("upload-button error ftype: ", ftype);
+		});
 
 
 
@@ -526,104 +559,47 @@
 			socket.emit('searchByUploader', {uploader: uploader, begin: begin, end:end});
 		})
 
-		$('#search-name-button1').click(function(){
-			document.getElementById("search1").style.display = "none";
-			document.getElementById("searchResult1").style.display = "block";
-			var name = $('#search-name1').val();
-			$('#search-name1').val("");
-			console.log('search-name: ' + name);
-			socket.emit('searchByName', {name: name});
-		})
-		$('#search-time-button1').click(function(){
-			document.getElementById("search1").style.display = "none";
-			document.getElementById("searchResult1").style.display = "block";
-			var begin = $('#search-time-begin1').val();
-			var end = $('#search-time-end1').val();
-			$('#search-time-begin1').val("");
-			$('#search-time-end1').val("");
-			if(begin !== "")
-				console.log('search-time-begin: ' + begin);
-			if(end !== "")
-				console.log('search-time-end: ' + end);
-			socket.emit('searchByTime', {begin: begin, end:end});
-		})
-		$('#search-department-button1').click(function(){
-			document.getElementById("search1").style.display = "none";
-			document.getElementById("searchResult1").style.display = "block";
-			var department = $('#search-department1').val();
-
-			if (department == "教育局"){
-				department = "1";
-			}
-			var begin = $('#search-department-begin1').val();
-			var end = $('#search-department-end1').val();
-			$('#search-department1').val("");
-			$('#search-department-begin1').val("");
-			$('#search-department-end1').val("");
-			console.log("DDDD "+department);
-			console.log('search-department: ' + department);
-			if(begin !== "")
-				console.log('search-department-begin: ' + begin);
-			if(end !== "")
-				console.log('search-department-end: ' + end);
-			socket.emit('searchByDepartment', {department: department, begin: begin, end:end});
-		})
-		$('#search-uploader-button1').click(function(){
-			document.getElementById("search1").style.display = "none";
-			document.getElementById("searchResult1").style.display = "block";
-			var uploader = $('#search-uploader1').val();
-			var begin = $('#search-uploader-begin1').val();
-			var end = $('#search-uploader-end1').val();
-			$('#search-uploader1').val("");
-			$('#search-uploader-begin1').val("");
-			$('#search-uploader-end1').val("");
-			console.log('search-uploader: ' + uploader);
-			if(begin !== "")
-				console.log('search-uploader-begin: ' + begin);
-			if(end !== "")
-				console.log('search-uploader-end: ' + end);
-			socket.emit('searchByUploader', {uploader: uploader, begin: begin, end:end});
-		})
 
 
 		$('#search-goback').click(function(){
-			document.getElementById("search").style.display = "none";
-			document.getElementById("normalfile").style.display = "block";
-			//$("#searchResult-table").find("tr:gt(0)").remove();
+			hideSearchPannel();
+			showFileListPannel();
 		})
-		$('#search-goback1').click(function(){
-			document.getElementById("search1").style.display = "none";
-			document.getElementById("databasefile").style.display = "block";
-			//$("#searchResult-table").find("tr:gt(0)").remove();
-		})
+
+
 		$('#searchResult-goback').click(function(){
 			document.getElementById("searchResult").style.display = "none";
 			document.getElementById("search").style.display = "block";
 			//$("#searchResult-table").find("tr:gt(0)").remove();
 		})
-		$('#searchResult-goback1').click(function(){
-			document.getElementById("searchResult1").style.display = "none";
-			document.getElementById("search1").style.display = "block";
-			//$("#searchResult-table").find("tr:gt(0)").remove();
-		})
+		// $('#searchResult-goback1').click(function(){
+		// 	document.getElementById("searchResult1").style.display = "none";
+		// 	document.getElementById("search1").style.display = "block";
+		// 	//$("#searchResult-table").find("tr:gt(0)").remove();
+		// })
 		$('#fileContent-goback').click(function(){
 			document.getElementById("fileContent").style.display = "none";
 		})
-		$('#fileContent-goback1').click(function(){
-			document.getElementById("fileContent1").style.display = "none";
-		})
+		// $('#fileContent-goback1').click(function(){
+		// 	document.getElementById("fileContent1").style.display = "none";
+		// })
 		$('#upload-goback').click(function(){
-			document.getElementById("fileList").style.display = "block";
-			//document.getElementById("fileContent").style.display = "none";
-			//document.getElementById("searchResult").style.display = "none";
-			//document.getElementById("search").style.display = "none";
-			document.getElementById("upload").style.display = "none";
-			//$("#searchResult-table").find("tr:gt(0)").remove();
+			hideUploadPannel();
+			showFileListPannel();
+
 			//update filelist
-			$("#fileList-table tr:not(:first)").empty("");
-			$("#fileList-table1 tr:not(:first)").empty("");
+			$("#normalTable tr:not(:first)").empty("");
+			$("#dbTable tr:not(:first)").empty("");
 			socket.emit('login', {id: $('#login-id').val(), pwd: $('#login-pwd').val()});
 		})
+
+
+		$('input[name="filelist_filetype"]').click(function(){
+			ftype = $('input[name="filelist_filetype"]:checked').val();
+			console.log(ftype);
+			showFileListPannel();
+		});
+
 	});
 	function Partial_Public(){
 		document.getElementById("Partialpublic").style.display = "block";
@@ -651,32 +627,9 @@
 		document.getElementById("filetype11").style.display = "none";
 		document.getElementById("filetype22").style.display = "block";
 	};
-	function filelist_filetype1(){
-		document.getElementById("normalfile").style.display = "block";
-		document.getElementById("normalFileList-button").style.display = "block";
-		document.getElementById("fileList-logout").style.display = "block";
 
-		document.getElementById("databasefile").style.display = "none";
-		document.getElementById("dbFileList-button").style.display = "none";
-		document.getElementById("fileList-logout1").style.display = "none";
-
-		document.getElementById("search").style.display = "none";
-		document.getElementById("search1").style.display = "none";
-	};
-	function filelist_filetype2(){
-		document.getElementById("normalfile").style.display = "none";
-		document.getElementById("normalFileList-button").style.display = "none";
-		document.getElementById("fileList-logout").style.display = "none";
-
-		document.getElementById("databasefile").style.display = "block";
-		document.getElementById("dbFileList-button").style.display = "block";
-		document.getElementById("fileList-logout1").style.display = "block";
-
-		document.getElementById("search").style.display = "none";
-		document.getElementById("search1").style.display = "none";
-	};
 	</script>
-  	<body>
+	<body>
 
 
 <nav class="navbar navbar-dark bg-dark" id="nav" style="display: none;">
@@ -694,26 +647,23 @@
 
 
 
-<div class="container" id="fileList" style="display: block;">
-	<div class="row" id="after-login">
-<div class="col-md-12">
-<div class="row">
-
+<div class="container-fluid" id="after-login" style="display: block;">
+	<div class="row">
 
 
 		<div class="col-md-2 sidebar" id="sidebar" style="display: none;">
-			<p><input type="radio" name="filelist_filetype" value="1" onclick="filelist_filetype1()" checked>文件</p>
-			<p><input type="radio" name="filelist_filetype" value="2" onclick="filelist_filetype2()">数据库入口</p>
-			<p><button id="fileList-logout" style="display: none;">退出登录 普通</button></p>
-			<p><button id="fileList-logout1" style="display: none;">退出登录 数据库</button></p>
+			<p><input type="radio" name="filelist_filetype" value="normal" checked>文件</p>
+			<p><input type="radio" name="filelist_filetype" value="db">数据库入口</p>
+			<p><button id="logout">退出登录</button></p>
 		</div>
 
 		<div class="col-md-10 main">
 
-		  	<div id="normalfile" style="display: none;">
-		  		<h2 class="page-header" style="margin-top: 20px;">文件列表</h2>
-		  		<table id="fileList-table" class="table table-striped">
-		  			<thead>
+		<div>
+			<div id="normalfile" style="display: none;">
+				<h2 class="page-header" style="margin-top: 20px;">文件列表</h2>
+				<table id="normalTable" class="table table-striped">
+					<thead>
 						<th>文件名</th>
 						<th>版本号</th>
 						<th>文件大小</th>
@@ -722,14 +672,14 @@
 						<th>上传时间</th>
 						<th>是否需要访问权限</th>
 						<th></th>
-		  			</thead>
-		  			<tbody></tbody>
-		  		</table>
-		  	</div>
-		  	<div id="databasefile" style="display: none;">
-		  		<h2 class="page-header" style="margin-top: 20px;">数据库列表</h2>
-		  		<table id="fileList-table1" class="table table-striped">
-		  			<thead>
+					</thead>
+					<tbody></tbody>
+				</table>
+			</div>
+			<div id="databasefile" style="display: none;">
+				<h2 class="page-header" style="margin-top: 20px;">数据库列表</h2>
+				<table id="dbTable" class="table table-striped">
+					<thead>
 						<th>数据内容</th>
 						<th>版本号</th>
 						<th>上传单位</th>
@@ -737,72 +687,154 @@
 						<th>上传时间</th>
 						<th>是否需要访问权限</th>
 						<th></th>
-		  			</thead>
-		  			<tbody></tbody>
-		  		</table>
-		  	</div>
+					</thead>
+					<tbody></tbody>
+				</table>
+			</div>
+		</div>
+
+
+			<div id="search" style="display: none;">
+				<h1>查找文件</h1>
+				<p><fieldset>
+				<legend>按文件名查找:</legend>
+				<input type="text" id="search-name">
+				<button id="search-name-button">查找</button>
+				</fieldset></p>
+
+				<p><fieldset>
+				<legend>按时间查找:</legend>
+				<input type="date" id="search-time-begin">
+				<input type="date" id="search-time-end">
+				<button id="search-time-button">查找</button>
+				</fieldset></p>
+
+				<p><fieldset>
+				<legend>按单位查找:</legend>
+				<input type="text" id="search-department">
+				<input type="date" id="search-department-begin">
+				<input type="date" id="search-department-end">
+				<button id="search-department-button">查找</button>
+				</fieldset></p>
+
+				<p><fieldset>
+				<legend>按上传者查找:</legend>
+				<input type="text" id="search-uploader">
+				<input type="date" id="search-uploader-begin">
+				<input type="date" id="search-uploader-end">
+				<button id="search-uploader-button">查找</button>
+				</fieldset></p>
+			</div>
+
+
+
+			<div id="upload" style="display: none">
+				<div id="uploadNormal" style="display: none">
+					<h1>上传文件</h1>
+
+						<p>单位：教育局&nbsp;&nbsp;&nbsp;</p>
+						<lable>上传者：</lable>
+						<input type='text' id='normalUploader' border='none' outline='medium' />
+						<form ref='uploadForm' id='uploadForm' action='/upload' method='post' encType="multipart/form-data">
+							<input type="file"  id="uploadFile" />
+						</form>
+				</div>
+				<div id="uploadDb" style="display: none">
+					<h1>上传数据库入口</h1>
+
+						<p>单位：教育局&nbsp;&nbsp;&nbsp;</p>
+						<lable>上传者：</lable>
+						<input type='text' id='dbUploader' border='none' outline='medium' />
+					<p>
+						<lable>数据内容：</lable>
+						<input type='text' id='datacontent' />
+					</p>
+					<p>
+						<lable>数据库地址：</lable>
+						<input type='text' id='databaseip' />
+					</p>
+					<p>
+						<lable>连接端口：</lable>
+						<input type='text' id='databaseport' />
+					</p>
+					<p>
+						<lable>数据库名称：</lable>
+						<input type='text' id='databasename' />
+					</p>
+					<p>
+						<lable>表单名称：</lable>
+						<input type='text' id='tablename' />
+					</p>
+				</div>
+
+				<div>
+					<p>文件访问控制：</p>
+					<input type="radio" name="radio" value="1" onclick="Public()" checked>公开
+					<input type="radio" name="radio" value="2" onclick="Partial_Public()">部分公开
+					<input type="radio" name="radio" value="3" onclick="Secret()">仅自己单位可见
+					<br><br>
+				</div>
+				<div id="Partialpublic" style="display: none">
+					<p>选择文件可访问的单位：</p>
+					<p>
+						<input type="checkbox" name="au_department" value="1" checked="checked">  教育局
+						<input type="checkbox" name="au_department" value="2" >  公安局
+						<input type="checkbox" name="au_department" value="3" >  财政局
+						<input type="checkbox" name="au_department" value="4" >  卫生局
+						<input type="checkbox" name="au_department" value="5" >  文化局
+						<input type="checkbox" name="au_department" value="6" >  体育局
+						<input type="checkbox" name="au_department" value="7" >  民政局
+						<input type="checkbox" name="au_department" value="8" >  司法局
+						<input type="checkbox" name="au_department" value="9" >  监察局
+						<input type="checkbox" name="au_department" value="10" >  旅游局<br>
+						<input type="checkbox" name="au_department" value="11" > 交通委员会
+						<input type="checkbox" name="au_department" value="12" > 环境保护局
+						<input type="checkbox" name="au_department" value="13" > 建设委员会
+						<input type="checkbox" name="au_department" value="14" > 农业委员会
+						<input type="checkbox" name="au_department" value="15" > 外事办公室
+						<input type="checkbox" name="au_department" value="16" > 广播电视局
+						<input type="checkbox" name="au_department" value="17" > 科学技术局
+						<input type="checkbox" name="au_department" value="18" > 新闻出版局
+					</p>
+				</div>
+
+
+
+			</div>
+
+
 
 
 		</div>
 
-		<div class="row" id="normalFileList-button" style="display: none;">
+		<div class="row" id="fileList-worker-button" style="display: none;">
 			<div style="position: fixed; right: 50px; bottom: 50px; height: 100px; width: 300px;">
-				<p><button id="fileList-search" class="btn btn-lg btn-primary btn-block">查找普通文件</button></p>
-				<p><button id="fileList-upload" class="btn btn-lg btn-primary btn-block">上传文件</button></p>
+				<p><button class="fileList-search btn btn-lg btn-primary btn-block">查找</button></p>
 			</div>
 		</div>
-
-		<div class="row" id="dbFileList-button" style="display: none;">
+		<div class="row" id="fileList-admin-button" style="display: none;">
 			<div style="position: fixed; right: 50px; bottom: 50px; height: 100px; width: 300px;">
-				<p><button id="fileList-search1" class="btn btn-lg btn-primary btn-block">查找数据库文件</button></p>
-				<p><button id="fileList-upload1" class="btn btn-lg btn-primary btn-block">上传文件</button></p>
+				<p><button class="fileList-search btn btn-lg btn-primary btn-block">查找</button></p>
+				<p><button id="fileList-upload" class="btn btn-lg btn-primary btn-block">上传</button></p>
 			</div>
 		</div>
 
 
-
-<!-- 		<div id="diagnose" style="display: block;">
-			<div id="diagnose-inspection"></div>
-			<div class="row"><div style="height: 3vh;"></div></div>
-				<div class="row">
-					<div class="col-md-12">
-						<div class="form-group">
-							<label for="diagnoseInspection"><h3>诊断项目</h3></label>
-							<textarea class="form-control" id="diagnoseInspection" rows="3"></textarea>
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div style="position: fixed; right: 50px; bottom: 50px; height: 100px; width: 300px;">
-						<p><button id="diagnose-submit" class="btn btn-lg btn-primary btn-block">提交</button></p>
-						<p><button id="diagnose-goback" class="btn btn-lg btn-primary btn-block">返回</button></p>
-					</div>
-				</div>
+		<div class="row" id="upload-pannel-button" style="display: none;">
+			<div style="position: fixed; right: 50px; bottom: 50px; height: 100px; width: 300px;">
+				<p><button id="upload-button" class="btn btn-lg btn-primary btn-block">提交</button></p>
+				<p><button id="upload-goback" class="btn btn-lg btn-primary btn-block">返回</button></p>
+			</div>
+		</div>
+		<div class="row" id="search-pannel-button" style="display: none;">
+			<div style="position: fixed; right: 50px; bottom: 50px; height: 100px; width: 300px;">
+				<p><button id="search-goback" class="btn btn-lg btn-primary btn-block">返回</button></p>
+			</div>
 		</div>
 
 
-		<div id="recordDetail" style="display: none;">
-			<h1 class="page-header">记录详情</h1>
-			<div id="recordDetail-div"></div>
-			<div class="row">
-				<div style="position: fixed; right: 50px; bottom: 0px; height: 100px; width: 300px;">
-					<p><button id="recordDetail-goback" class="btn btn-lg btn-primary btn-block">返回</button></p>
-				</div>
-			</div>
-		</div> -->
-
-</div>
-</div>
 	</div>
 </div>
-
-
-
-
-
-
-
-
 
 
 
@@ -811,51 +843,73 @@
 
 
 <div class="container" id="outer-wrap" style="display: block;">
-    <div class="row" style="padding-top:100px;">
-    	<div class="col-md-4 col-md-offset-4">
-    		<div class="panel panel-default">
-			  	<div class="panel-heading">
+	<div class="row">
+	<!-- <div class="row" style="padding-top:100px;"> -->
+		<div class="col-md-4 col-md-offset-4">
+			<div class="panel panel-default">
+				<div class="panel-heading">
 					<div class="panel-title pull-left">BCG-Share</div>
 					<div class="panel-title pull-right" id="login-department">教育局</div>
 					<div class="clearfix"></div>
 
-			 	</div>
-			  	<div class="panel-body">
-                    <fieldset>
-			    	  	<div class="form-group">
-			    		    <input class="form-control" placeholder="用户名" type="text" id="login-id" autocomplete="off">
-			    		</div>
-			    		<div class="form-group">
-			    			<input class="form-control" placeholder="密码" type="password" id="login-pwd" autocomplete="off">
-			    		</div>
+				</div>
+				<div class="panel-body">
+					<fieldset>
+						<div class="form-group">
+							<input class="form-control" placeholder="用户名" type="text" id="login-id" autocomplete="off">
+						</div>
+						<div class="form-group">
+							<input class="form-control" placeholder="密码" type="password" id="login-pwd" autocomplete="off">
+						</div>
 						<div class="form-group">
 							<div class="btn-group special" data-toggle="buttons">
 							<label class="btn btn-default active form-check-label col-md-6">
-								<input class="form-check-input" type="radio" name="identity" value="1" checked autocomplete="off">管理员
+								<input class="form-check-input" type="radio" name="identity" value="admin" checked autocomplete="off">管理员
 							</label>
 							<label class="btn btn-default form-check-label col-md-6 col-md-offset-6">
-								<input class="form-check-input" type="radio" name="identity" value="2" autocomplete="off">普通员工
+								<input class="form-check-input" type="radio" name="identity" value="worker" autocomplete="off">普通员工
 							</label>
 							</div>
 						</div>
-			    		<div class="checkbox">
-			    	    	<label>
-			    	    		<input name="remember" type="checkbox" value="Remember Me"> Remember Me
-			    	    	</label>
-			    	    </div>
-			    		<button id="login-button" class="btn btn-lg btn-success btn-block">登录</button>
-			    	</fieldset>
-			    </div>
+						<div class="checkbox">
+							<label>
+								<input name="remember" type="checkbox" value="Remember Me"> Remember Me
+							</label>
+						</div>
+						<button id="login-button" class="btn btn-lg btn-success btn-block">登录</button>
+					</fieldset>
+				</div>
 			</div>
 		</div>
 	</div>
 </div>
 
 
+<!-- <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"> -->
+<div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        ...
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
 
-    <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
-    <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
-    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+	<script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+	<script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
+	<script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
   </body>
 </html>
