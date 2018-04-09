@@ -14,7 +14,6 @@
 			.special .btn {
 				flex: 1
 			}
-
 		</style>
 	</head>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
@@ -577,40 +576,23 @@
 		$('input[name="filelist_filetype"]').click(function(){
 			ftype = $('input[name="filelist_filetype"]:checked').val();
 			console.log(ftype);
+			hideUploadPannel();
+			hideSearchPannel();
 			showFileListPannel();
 		});
 
+		$('input[name="radio"]').click(function(){
+			var val = $('input[name="radio"]:checked').val();
+			if(val === "2")
+				document.getElementById("partialpublic").style.display = "block";
+			else
+				document.getElementById("partialpublic").style.display = "none";
+		});
+
 	});
-	function Partial_Public(){
-		document.getElementById("Partialpublic").style.display = "block";
-	};
-	function Public(){
-		document.getElementById("Partialpublic").style.display = "none";
-	};
-	function Secret(){
-		document.getElementById("Partialpublic").style.display = "none";
-	};
-	function Partial_Public1(){
-		document.getElementById("Partialpublic1").style.display = "block";
-	};
-	function Public1(){
-		document.getElementById("Partialpublic1").style.display = "none";
-	};
-	function Secret1(){
-		document.getElementById("Partialpublic1").style.display = "none";
-	};
-	function filetype1(){
-		document.getElementById("filetype11").style.display = "block";
-		document.getElementById("filetype22").style.display = "none";
-	};
-	function filetype2(){
-		document.getElementById("filetype11").style.display = "none";
-		document.getElementById("filetype22").style.display = "block";
-	};
 
 	</script>
 	<body>
-
 
 <nav class="navbar navbar-dark bg-dark" id="nav" style="display: none;">
 	<h1 class="pull-left" style="color: white">BCG-Share</h1>
@@ -618,14 +600,6 @@
 		<h1 style="color: white">linsiyi</h1>
 	</div>
 </nav>
-
-
-
-
-
-
-
-
 
 <div class="container-fluid" id="after-login" style="display: block;">
 	<div class="row">
@@ -674,155 +648,164 @@
 		</div>
 
 
-			<div id="search" style="display: none;">
-				<h1>查找文件</h1>
-				<p><fieldset>
-				<legend>按文件名查找:</legend>
-				<input type="text" id="search-name">
-				<button id="search-name-button">查找</button>
-				</fieldset></p>
+		<div id="search" style="display: none;">
+			<h1>查找文件</h1>
+			<p><fieldset>
+			<legend>按文件名查找:</legend>
+			<input type="text" id="search-name">
+			<button id="search-name-button">查找</button>
+			</fieldset></p>
 
-				<p><fieldset>
-				<legend>按时间查找:</legend>
-				<input type="date" id="search-time-begin">
-				<input type="date" id="search-time-end">
-				<button id="search-time-button">查找</button>
-				</fieldset></p>
+			<p><fieldset>
+			<legend>按时间查找:</legend>
+			<input type="date" id="search-time-begin">
+			<input type="date" id="search-time-end">
+			<button id="search-time-button">查找</button>
+			</fieldset></p>
 
-				<p><fieldset>
-				<legend>按单位查找:</legend>
-				<input type="text" id="search-department">
-				<input type="date" id="search-department-begin">
-				<input type="date" id="search-department-end">
-				<button id="search-department-button">查找</button>
-				</fieldset></p>
+			<p><fieldset>
+			<legend>按单位查找:</legend>
+			<input type="text" id="search-department">
+			<input type="date" id="search-department-begin">
+			<input type="date" id="search-department-end">
+			<button id="search-department-button">查找</button>
+			</fieldset></p>
 
-				<p><fieldset>
-				<legend>按上传者查找:</legend>
-				<input type="text" id="search-uploader">
-				<input type="date" id="search-uploader-begin">
-				<input type="date" id="search-uploader-end">
-				<button id="search-uploader-button">查找</button>
-				</fieldset></p>
-			</div>
+			<p><fieldset>
+			<legend>按上传者查找:</legend>
+			<input type="text" id="search-uploader">
+			<input type="date" id="search-uploader-begin">
+			<input type="date" id="search-uploader-end">
+			<button id="search-uploader-button">查找</button>
+			</fieldset></p>
+		</div>
 
 
 
-			<div id="upload" style="display: none">
-				<div id="uploadNormal" style="display: none">
-					<h1>上传文件</h1>
-
-						<p>单位：教育局&nbsp;&nbsp;&nbsp;</p>
-						<lable>上传者：</lable>
-						<input type='text' id='normalUploader' border='none' outline='medium' />
+		<div id="upload" style="display: none">
+			<div id="uploadNormal" style="display: none">
+				<h2 class="page-header" style="margin-top: 20px;">上传文件</h2>
+				<div class="form-group row">
+					<label for="staticDepartment" class="col-sm-2 col-form-label">单位</label>
+					<div class="col-sm-10">
+						<input type="text" readonly class="form-control-plaintext" id="staticDepartment" value="教育局">
+					</div>
+				</div>
+				<div class="form-group row">
+					<label for="normalUploader" class="col-sm-2 col-form-label">上传者</label>
+					<div class="col-sm-10">
+						<input type="text" readonly class="form-control-plaintext" id="normalUploader" value="">
+					</div>
+				</div>
+				<div class="form-group row">
+					<label for="uploadFile" class="col-sm-2 col-form-label">文件</label>
+					<div class="col-sm-10">
 						<form ref='uploadForm' id='uploadForm' action='/upload' method='post' encType="multipart/form-data">
-							<input type="file"  id="uploadFile" />
+							<input type="file" id="uploadFile" />
 						</form>
-				</div>
-				<div id="uploadDb" style="display: none">
-					<h1>上传数据库入口</h1>
-
-<!-- 						<p>单位：教育局&nbsp;&nbsp;&nbsp;</p>
-						<lable>上传者：</lable>
-						<input type='text' id='dbUploader' border='none' outline='medium' />
-					<p>
-						<lable>数据内容：</lable>
-						<input type='text' id='datacontent' />
-					</p>
-					<p>
-						<lable>数据库地址：</lable>
-						<input type='text' id='databaseip' />
-					</p>
-					<p>
-						<lable>连接端口：</lable>
-						<input type='text' id='databaseport' />
-					</p>
-					<p>
-						<lable>数据库名称：</lable>
-						<input type='text' id='databasename' />
-					</p>
-					<p>
-						<lable>表单名称：</lable>
-						<input type='text' id='tablename' />
-					</p> -->
-					<div class="form-group row">
-						<label for="staticDepartment" class="col-sm-2 col-form-label">单位</label>
-						<div class="col-sm-10">
-							<input type="text" readonly class="form-control-plaintext" id="staticDepartment" value="教育局">
-						</div>
-					</div>
-					<div class="form-group row">
-						<label for="dbUploader" class="col-sm-2 col-form-label">上传者</label>
-						<div class="col-sm-10">
-							<input type="text" readonly class="form-control-plaintext" id="dbUploader" value="">
-						</div>
-					</div>
-					<div class="form-group row">
-						<label for="datacontent" class="col-sm-2 col-form-label">数据内容</label>
-						<div class="col-sm-10">
-							<input type="email" class="form-control" id="datacontent" placeholder="">
-						</div>
-					</div>
-					<div class="form-group row">
-						<label for="databaseip" class="col-sm-2 col-form-label">数据库地址</label>
-						<div class="col-sm-10">
-							<input type="email" class="form-control" id="databaseip" placeholder="">
-						</div>
-					</div>
-					<div class="form-group row">
-						<label for="databaseport" class="col-sm-2 col-form-label">连接端口</label>
-						<div class="col-sm-10">
-							<input type="email" class="form-control" id="databaseport" placeholder="">
-						</div>
-					</div>
-					<div class="form-group row">
-						<label for="databasename" class="col-sm-2 col-form-label">表单名称</label>
-						<div class="col-sm-10">
-							<input type="email" class="form-control" id="databasename" placeholder="">
-						</div>
-					</div>
-					<div class="form-group row">
-						<label for="tablename" class="col-sm-2 col-form-label">数据库名称</label>
-						<div class="col-sm-10">
-							<input type="email" class="form-control" id="tablename" placeholder="">
-						</div>
 					</div>
 				</div>
-
-				<div>
-					<p>文件访问控制：</p>
-					<input type="radio" name="radio" value="1" onclick="Public()" checked>公开
-					<input type="radio" name="radio" value="2" onclick="Partial_Public()">部分公开
-					<input type="radio" name="radio" value="3" onclick="Secret()">仅自己单位可见
-					<br><br>
-				</div>
-				<div id="Partialpublic" style="display: none">
-					<p>选择文件可访问的单位：</p>
-					<p>
-						<input type="checkbox" name="au_department" value="1" checked="checked">  教育局
-						<input type="checkbox" name="au_department" value="2" >  公安局
-						<input type="checkbox" name="au_department" value="3" >  财政局
-						<input type="checkbox" name="au_department" value="4" >  卫生局
-						<input type="checkbox" name="au_department" value="5" >  文化局
-						<input type="checkbox" name="au_department" value="6" >  体育局
-						<input type="checkbox" name="au_department" value="7" >  民政局
-						<input type="checkbox" name="au_department" value="8" >  司法局
-						<input type="checkbox" name="au_department" value="9" >  监察局
-						<input type="checkbox" name="au_department" value="10" >  旅游局<br>
-						<input type="checkbox" name="au_department" value="11" > 交通委员会
-						<input type="checkbox" name="au_department" value="12" > 环境保护局
-						<input type="checkbox" name="au_department" value="13" > 建设委员会
-						<input type="checkbox" name="au_department" value="14" > 农业委员会
-						<input type="checkbox" name="au_department" value="15" > 外事办公室
-						<input type="checkbox" name="au_department" value="16" > 广播电视局
-						<input type="checkbox" name="au_department" value="17" > 科学技术局
-						<input type="checkbox" name="au_department" value="18" > 新闻出版局
-					</p>
-				</div>
-
-
-
 			</div>
+			<div id="uploadDb" style="display: none">
+				<h2 class="page-header" style="margin-top: 20px;">上传数据库入口</h2>
+				<div class="form-group row">
+					<label for="staticDepartment" class="col-sm-2 col-form-label">单位</label>
+					<div class="col-sm-10">
+						<input type="text" readonly class="form-control-plaintext" id="staticDepartment" value="教育局">
+					</div>
+				</div>
+				<div class="form-group row">
+					<label for="dbUploader" class="col-sm-2 col-form-label">上传者</label>
+					<div class="col-sm-10">
+						<input type="text" readonly class="form-control-plaintext" id="dbUploader" value="">
+					</div>
+				</div>
+				<div class="form-group row">
+					<label for="datacontent" class="col-sm-2 col-form-label">数据内容</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" id="datacontent" placeholder="">
+					</div>
+				</div>
+				<div class="form-group row">
+					<label for="databaseip" class="col-sm-2 col-form-label">数据库地址</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" id="databaseip" placeholder="">
+					</div>
+				</div>
+				<div class="form-group row">
+					<label for="databaseport" class="col-sm-2 col-form-label">连接端口</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" id="databaseport" placeholder="">
+					</div>
+				</div>
+				<div class="form-group row">
+					<label for="databasename" class="col-sm-2 col-form-label">数据库名称</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" id="databasename" placeholder="">
+					</div>
+				</div>
+				<div class="form-group row">
+					<label for="tablename" class="col-sm-2 col-form-label">表单名称</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" id="tablename" placeholder="">
+					</div>
+				</div>
+			</div>
+
+
+			 <fieldset class="form-group">
+				<div class="row">
+					<label class="col-sm-2 col-form-label">文件访问控制</label>
+					<div class="col-sm-10">
+						<div class="radio">
+						 <label><input name="radio" value="1" type="radio">公开</label>
+						</div>
+						<div class="radio">
+						 <label><input name="radio" value="2" type="radio">部分公开</label>
+						</div>
+						<div class="radio">
+						 <label><input name="radio" value="3" type="radio">仅自己单位可见</label>
+						</div>
+					</div>
+				</div>
+			 </fieldset>
+
+			<fieldset class="form-group" id="partialpublic" style="display: none;">
+				<div class="row">
+					<label class="col-sm-2 col-form-label">选择文件可访问的单位</label>
+					<div class="col-sm-10">
+						<div class="row">
+							<div class="col-sm-2">
+									<label style="width: 100%;"><input type="checkbox" name="au_department" value="1" checked> <span class="label-text">教育局</span></label>
+									<label style="width: 100%;"><input type="checkbox" name="au_department" value="2"><span class="label-text">公安局</span></label>
+									<label style="width: 100%;"><input type="checkbox" name="au_department" value="3"><span class="label-text">财政局</span></label>
+									<label style="width: 100%;"><input type="checkbox" name="au_department" value="4"><span class="label-text">卫生局</span></label>
+									<label style="width: 100%;"><input type="checkbox" name="au_department" value="5"><span class="label-text">文化局</span></label>
+							</div>
+							<div class="col-sm-2">
+									<label style="width: 100%;"><input type="checkbox" name="au_department" value="6"><span class="label-text">体育局</span></label>
+									<label style="width: 100%;"><input type="checkbox" name="au_department" value="7"><span class="label-text">民政局</span></label>
+									<label style="width: 100%;"><input type="checkbox" name="au_department" value="8"><span class="label-text">司法局</span></label>
+									<label style="width: 100%;"><input type="checkbox" name="au_department" value="9"><span class="label-text">监察局</span></label>
+									<label style="width: 100%;"><input type="checkbox" name="au_department" value="10"><span class="label-text">旅游局</span></label>
+							</div>
+							<div class="col-sm-2">
+									<label><input type="checkbox" name="au_department" value="11"><span class="label-text">交通委员会</span></label>
+									<label><input type="checkbox" name="au_department" value="12"><span class="label-text">环境保护局</span></label>
+									<label><input type="checkbox" name="au_department" value="13"><span class="label-text">建设委员会</span></label>
+									<label><input type="checkbox" name="au_department" value="14"><span class="label-text">农业委员会</span></label>
+							</div>
+							<div class="col-sm-2">
+									<label><input type="checkbox" name="au_department" value="15"><span class="label-text">外事办公室</span></label>
+									<label><input type="checkbox" name="au_department" value="16"><span class="label-text">广播电视局</span></label>
+									<label><input type="checkbox" name="au_department" value="17"><span class="label-text">科学技术局</span></label>
+									<label><input type="checkbox" name="au_department" value="18"><span class="label-text">新闻出版局</span></label>
+							</div>
+						</div>
+					</div>
+				</div>
+			</fieldset>
+		</div>
 
 
 
@@ -857,11 +840,6 @@
 
 	</div>
 </div>
-
-
-
-
-
 
 
 <div class="container" id="outer-wrap" style="display: block;">
@@ -912,7 +890,7 @@
 	<div class="modal-dialog modal-sm" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+				<h5 class="modal-title" id="exampleModalLabel">查看文件</h5>
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 				<span aria-hidden="true">&times;</span>
 				</button>
