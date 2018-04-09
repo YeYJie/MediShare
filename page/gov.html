@@ -322,6 +322,29 @@
 			showUploadPannel();
 		})
 
+		var getAuthorizationPattern = function() {
+			return $('input[name="radio"]:checked').val();
+		}
+
+		var getAuthorizedDepartmentList = function() {
+			var res = [];
+
+			var pattern = getAuthorizationPattern();
+			if(pattern === "1")
+				return res;
+			else if(pattern === "3") {
+				res.push("1")
+				return res;
+			}
+
+			var departmentList = document.getElementsByName("au_department");
+			if(!departmentList) return res;
+			for(var i = 0; i < departmentList.length; i++) {
+				if(departmentList[i].checked)
+					res.push(departmentList[i].value);
+			}
+			return res;
+		}
 
 		var uploadNormal = function() {
 			console.log('uploadNormal');
@@ -354,32 +377,9 @@
 			var b = myDate.getTime();
 			var uploadTime = Math.floor(new Date().valueOf() / 1000).toString();
 
-			//database insert
-			console.log("RRRRRRRRR");
-			var authorization;
-			var authorization_department = new Array();
-			var c =  document.getElementsByName('radio');
-			var d =  document.getElementsByName('au_department');
-			var num=0;
-			for(var i=0;i<c.length;i++){
-				if(c[i].checked == true){
-					authorization = c[i].value;
-					if(c[i].value == "2"){//choose partial public
-						for(var j=0;j<d.length;j++){
-							if(d[j].checked == true){
-								authorization_department[num] = d[j].value;
-								num++;
-							}
-						}
-					}
-					else if(c[i].value == "3"){//secret
-						authorization_department[0] = "1";
-					}
-				}
-			}
-			console.log(authorization);//true
-			console.log("RRRRRRRRR");
-			console.log(authorization_department);//true
+			var authorization = getAuthorizationPattern();
+			var authorization_department = getAuthorizedDepartmentList();
+			console.log(authorization, authorization_department);
 
 			console.log("emit upload " );
 			socket.emit('upload',{fileName:fileName,fileSize:fileSize,fileChecksum:fileChecksum,
@@ -419,35 +419,15 @@
 			var b = myDate.getTime();
 			var uploadTime = Math.floor(new Date().valueOf() / 1000).toString();
 
-			//database insert
-			console.log("RRRRRRRRR");
-			var authorization1;
-			var authorization_department1 = new Array();
-			var c =  document.getElementsByName('radio1');
-			var d =  document.getElementsByName('au_department1');
-			var num=0;
-			for(var i=0;i<c.length;i++){
-				if(c[i].checked == true){
-					authorization1 = c[i].value;
-					if(c[i].value == "2"){//choose partial public
-						for(var j=0;j<d.length;j++){
-							if(d[j].checked == true){
-								authorization_department1[num] = d[j].value;
-								num++;
-							}
-						}
-					}
-					else if(c[i].value == "3"){//secret
-						authorization_department1[0] = "1";
-					}
-				}
-			}
-			console.log(authorization1);//true
-			console.log("RRRRRRRRR");
-			console.log(authorization_department1);//true
+			var authorization1 = getAuthorizationPattern();
+			var authorization_department1 = getAuthorizedDepartmentList();
+			console.log(authorization1, authorization_department1);//true
 
 			console.log("emit upload " );
-			socket.emit('upload1',{datacontent:datacontent,databaseip:databaseip,databaseport:databaseport,databasename:databasename,tablename:tablename,uploader:uploader,uploadTime:uploadTime,authorization1:authorization1,authorization_department1:authorization_department1});
+			socket.emit('upload1',{datacontent:datacontent,databaseip:databaseip,
+				databaseport:databaseport,databasename:databasename,tablename:tablename,
+				uploader:uploader,uploadTime:uploadTime,authorization1:authorization1,
+				authorization_department1:authorization_department1});
 		}
 
 		$("#upload-button").click(function(){
