@@ -262,9 +262,6 @@
 		}
 
 		$('#login-button').click(function(){
-
-			// $("#myModal").modal('show');
-
 			document.getElementById("outer-wrap").style.display = "none";
 			document.getElementById("nav").style.display = "block";
 			document.getElementById("sidebar").style.display = "block";
@@ -380,9 +377,9 @@
 			console.log(authorization_department);//true
 
 			console.log("emit upload " );
-			socket.emit('upload',{fileName:fileName,fileSize:fileSize,fileChecksum:fileChecksum,uploader:uploader,uploadTime:uploadTime,authorization:authorization,authorization_department:authorization_department});
-
-
+			socket.emit('upload',{fileName:fileName,fileSize:fileSize,fileChecksum:fileChecksum,
+				uploader:uploader,uploadTime:uploadTime,authorization:authorization,
+				authorization_department:authorization_department});
 
 			$.ajax({
 				type: "POST",
@@ -565,9 +562,31 @@
 
 
 		<div class="col-md-2 sidebar" id="sidebar" style="display: none;">
-			<p><input type="radio" name="filelist_filetype" value="normal" checked>文件</p>
+<!-- 			<p><input type="radio" name="filelist_filetype" value="normal" checked>文件</p>
 			<p><input type="radio" name="filelist_filetype" value="db">数据库入口</p>
-			<p><button id="logout">退出登录</button></p>
+			<p><button id="logout">退出登录</button></p> -->
+			<ul class="nav">
+						<li class="active">
+							<a href="#">
+							<i class="glyphicon glyphicon-home"></i>
+							Overview </a>
+						</li>
+						<li>
+							<a href="#">
+							<i class="glyphicon glyphicon-user"></i>
+							Account Settings </a>
+						</li>
+						<li>
+							<a href="#" target="_blank">
+							<i class="glyphicon glyphicon-ok"></i>
+							Tasks </a>
+						</li>
+						<li>
+							<a href="#">
+							<i class="glyphicon glyphicon-flag"></i>
+							Help </a>
+						</li>
+					</ul>
 		</div>
 
 		<div class="col-md-10 main">
