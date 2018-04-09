@@ -269,7 +269,7 @@
 			id = document.getElementById("login-id").value;
 			role = $('input[name=identity]:checked').val();
 			ftype = "normal";
-			$('input[name="filelist_filetype"]')[0].checked =  true
+			// $('input[name="filelist_filetype"]')[0].checked =  true
 			showFileListPannel();
 
 			$('#login-pwd').val("");
@@ -281,6 +281,7 @@
 
 
 		$('#logout').click(function(){
+			document.getElementById("nav").style.display = "none";
 			document.getElementById("sidebar").style.display = "none";
 			document.getElementById("outer-wrap").style.display = "block";
 			hideFileListPannel();
@@ -298,6 +299,10 @@
 
 
 		$('.fileList-search').click(function(){
+			if(ftype === "normal")
+				document.getElementById("search-pageHeader").innerHTML = "查找文件";
+			else if(ftype === "db")
+				document.getElementById("search-pageHeader").innerHTML = "查找数据库入口";
 			hideFileListPannel();
 			showSearchPannel();
 		})
@@ -318,8 +323,8 @@
 		})
 
 
-		var uploadDb = function() {
-			console.log('uploadDb');
+		var uploadNormal = function() {
+			console.log('uploadNormal');
 
 			var formData = new FormData();
 			formData.append("uploadText", $('#uploadText').val());
@@ -401,8 +406,8 @@
 			});
 		}
 
-		var uploadNormal = function() {
-			console.log('uploadNormal');
+		var uploadDb = function() {
+			console.log('uploadDb');
 			var datacontent = document.getElementById('datacontent').value;
 			var databaseip = document.getElementById('databaseip').value;
 			var databaseport = document.getElementById('databaseport').value;
@@ -529,13 +534,19 @@
 			socket.emit('login', {id: $('#login-id').val(), pwd: $('#login-pwd').val()});
 		})
 
-		$('input[name="filelist_filetype"]').click(function(){
-			ftype = $('input[name="filelist_filetype"]:checked').val();
-			console.log(ftype);
+		$("#normal-sidebar").click(function(){
+			ftype = "normal";
 			hideUploadPannel();
 			hideSearchPannel();
 			showFileListPannel();
 		});
+		$("#db-sidebar").click(function(){
+			ftype = "db";
+			hideUploadPannel();
+			hideSearchPannel();
+			showFileListPannel();
+		});
+
 
 		$('input[name="radio"]').click(function(){
 			var val = $('input[name="radio"]:checked').val();
@@ -566,27 +577,18 @@
 			<p><input type="radio" name="filelist_filetype" value="db">数据库入口</p>
 			<p><button id="logout">退出登录</button></p> -->
 			<ul class="nav">
-						<li class="active">
-							<a href="#">
-							<i class="glyphicon glyphicon-home"></i>
-							Overview </a>
-						</li>
-						<li>
-							<a href="#">
-							<i class="glyphicon glyphicon-user"></i>
-							Account Settings </a>
-						</li>
-						<li>
-							<a href="#" target="_blank">
-							<i class="glyphicon glyphicon-ok"></i>
-							Tasks </a>
-						</li>
-						<li>
-							<a href="#">
-							<i class="glyphicon glyphicon-flag"></i>
-							Help </a>
-						</li>
-					</ul>
+				<li style="width: 100%;">
+					<a href="#" id="normal-sidebar"><h4>文件</h4></a>
+				</li>
+				<li style="width: 100%;">
+					<a href="#" id="db-sidebar"><h4>数据库入口</h4></a>
+				</li>
+				<li style="width: 100%;">
+					<a href="#" id="logout"><h4>退出登录</h4></a>
+				</li>
+			</ul>
+
+
 		</div>
 
 		<div class="col-md-10 main">
@@ -661,7 +663,7 @@
 
 
 		<div id="search" style="display: none;">
-			<h2 class="page-header" style="margin-top: 20px;">查找文件</h2>
+			<h2 class="page-header" style="margin-top: 20px;" id="search-pageHeader">查找文件</h2>
 
 			<p><fieldset>
 			<legend>按文件名查找:</legend>
@@ -860,8 +862,8 @@
 
 
 <div class="container" id="outer-wrap" style="display: block;">
-	<div class="row">
-	<!-- <div class="row" style="padding-top:100px;"> -->
+	<!-- <div class="row"> -->
+	<div class="row" style="padding-top:100px;">
 		<div class="col-md-4 col-md-offset-4">
 			<div class="panel panel-default">
 				<div class="panel-heading">
