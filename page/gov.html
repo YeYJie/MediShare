@@ -29,7 +29,7 @@
 
 		var socket = io();
 
-		var buildRowHTML = function(fileId, fileName, fileVersion, fileSize, department, uploader,
+		var buildNormalRowHTML = function(fileId, fileName, fileVersion, fileSize, department, uploader,
 							time, needAuthorization, buttonId) {
 			var date = new Date(parseInt(time) * 1000);
 			console.log("data    "+date);
@@ -45,9 +45,9 @@
 					+'<td>' + y + '-' + m + '-' + d +'</td>'
 					+'<td>' + needAuthorization +'</td>'
 					+'<td><button id="' + buttonId + '" fileSize="' + fileSize + '" data-fileId="' + fileId
-					+ '" needAuthorization="' + needAuthorization + '" fileName="'+fileName+'">查看文件</button></td></tr>'
+					+ '" needAuthorization="' + needAuthorization + '" fileName="'+fileName+'" class="btn btn-lg btn-primary btn-block">查看文件</button></td></tr>'
 		};
-		var buildRowHTML1 = function(fileId, fileName, fileVersion, department, uploader,
+		var buildDbRowHTML = function(fileId, fileName, fileVersion, department, uploader,
 							time, needAuthorization, buttonId) {
 			var date = new Date(parseInt(time) * 1000);
 			console.log("data    "+date);
@@ -63,7 +63,7 @@
 					+'<td>' + y + '-' + m + '-' + d +'</td>'
 					+'<td>' + needAuthorization +'</td>'
 					+'<td><button id="' + buttonId + '" fileSize="' + fileSize + '" data-fileId="' + fileId
-					+ '" needAuthorization="' + needAuthorization + '" fileName="'+fileName+'">数据库入口</button></td></tr>'
+					+ '" needAuthorization="' + needAuthorization + '" fileName="'+fileName+'" class="btn btn-lg btn-primary btn-block">数据库入口</button></td></tr>'
 		};
 
 		socket.on('show', function(data) {
@@ -91,14 +91,12 @@
 				//
 				var e = file.FileSize;
 				if (e =="-1"){
-					var fileHTML = buildRowHTML1(file.FileId, file.FileName, file.FileVersion, c,file.Uploader, file.UploadTime, d,"fileList-request-button-"+file.FileId);
-					var row = document.getElementById("dbTable").insertRow(1);
-					row.innerHTML = fileHTML;
+					var fileHTML = buildDbRowHTML(file.FileId, file.FileName, file.FileVersion, c,file.Uploader, file.UploadTime, d,"fileList-request-button-"+file.FileId);
+					$('#dbTable > tbody:last').append(fileHTML);
 				}
 				else{
-					var fileHTML = buildRowHTML(file.FileId, file.FileName, file.FileVersion, file.FileSize, c,file.Uploader, file.UploadTime, d,"fileList-request-button-"+file.FileId);
-					var row = document.getElementById("normalTable").insertRow(1);
-					row.innerHTML = fileHTML;
+					var fileHTML = buildNormalRowHTML(file.FileId, file.FileName, file.FileVersion, file.FileSize, c,file.Uploader, file.UploadTime, d,"fileList-request-button-"+file.FileId);
+					$('#normalTable > tbody:last').append(fileHTML);
 				}
 
 				$('#fileList-request-button-' + file.FileId).click(function(){
@@ -156,14 +154,14 @@
 				//
 				var e = file.FileSize;
 				if (e =="-1"){
-					var fileHTML = buildRowHTML1(file.FileId, file.FileName, file.FileVersion, c,file.Uploader, file.UploadTime, d,"searchResult-request-button-"+file.FileId);
-					var row = document.getElementById("searchResult-table1").insertRow(1);
-					row.innerHTML = fileHTML;
+					var fileHTML = buildDbRowHTML(file.FileId, file.FileName, file.FileVersion, c,file.Uploader, file.UploadTime, d,"searchResult-request-button-"+file.FileId);
+					// var row = document.getElementById("searchResult-table1").insertRow(1);
+					// row.innerHTML = fileHTML;
+					$('#dbTable > tbody:last').append(fileHTML);
 				}
 				else{
-					var fileHTML = buildRowHTML(file.FileId, file.FileName, file.FileVersion, file.FileSize, c,file.Uploader, file.UploadTime, d,"searchResult-request-button-"+file.FileId);
-					var row = document.getElementById("searchResult-table").insertRow(1);
-					row.innerHTML = fileHTML;
+					var fileHTML = buildNormalRowHTML(file.FileId, file.FileName, file.FileVersion, file.FileSize, c,file.Uploader, file.UploadTime, d,"searchResult-request-button-"+file.FileId);
+					$('#normalTable > tbody:last').append(fileHTML);
 				}
 				$('#searchResult-request-button-' + file.FileId).click(function(){
 					var needAuthorization = $(this).attr('needAuthorization');
@@ -208,33 +206,26 @@
 			console.log(data);
 			console.log("EEEEEEEE  "+entry);
 			console.log("EEEEEEEE  "+fileSize);
-			//entry = "http://127.0.0.1" + entry.substring(16);
 
-			//var fileContentHTML = '<img src="' + entry + '"/>'
-			//<a href="/images/myw3schoolimage.jpg" download="w3logo">
-			//var fileContentHTML = '<a href="' + entry + '"  download="' + fileName + '">Click to download</a>'
 			if(fileSize == "-1"){
-				document.getElementById("fileContent1").style.display = "block";
 				entry = entry + "/table.txt";
 				console.log("fileSize  -1");
 				console.log(entry);
-				var fileContentHTML = '<a href="' + entry + '" target="_blank">直接查看数据库文件</a>'
-				document.getElementById("fileContent-p1").innerHTML = fileContentHTML;
-				var fileContentHTML1 = '<a href="' + entry + '" download="table.txt" target="_blank">下载数据库文件</a>'
-				document.getElementById("fileContent-p2").innerHTML = fileContentHTML1;
+				$("#modal-check").attr("href", entry);
+				$("#modal-check").attr("target",  "_blank");
+				$("#modal-download").attr("download", "table.txt");
+				$("#modal-download").attr("target",  "_blank");
 			}
 			else{
-				document.getElementById("fileContent").style.display = "block";
 				entry = entry + "/" + fileName;
 				console.log(entry);
-				var fileContentHTML = '<a href="' + entry + '" target="_blank">直接浏览文件</a>'
-				//fileList-request-button-3ced6d85bf4a945b335aa036585e293d3a831eb4
-				document.getElementById("fileContent-p").innerHTML = fileContentHTML;
-				//document.getElementById('fileList-request-button-' + fileId).innerHTML = fileContentHTML;
-				var fileContentHTML1 = '<a href="' + entry + '" download="' + fileName + '" target="_blank">下载文件</a>'
-				//fileList-request-button-3ced6d85bf4a945b335aa036585e293d3a831eb4
-				document.getElementById("fileContent-pp").innerHTML = fileContentHTML1;
+				$("#modal-check").attr("href", entry);
+				$("#modal-check").attr("target",  "_blank");
+				$("#modal-download").attr("href", entry);
+				$("#modal-download").attr("download", fileName);
+				$("#modal-download").attr("target",  "_blank");
 			}
+			$("#myModal").modal('show');
 		});
 
 		var id;
@@ -572,17 +563,7 @@
 			document.getElementById("search").style.display = "block";
 			//$("#searchResult-table").find("tr:gt(0)").remove();
 		})
-		// $('#searchResult-goback1').click(function(){
-		// 	document.getElementById("searchResult1").style.display = "none";
-		// 	document.getElementById("search1").style.display = "block";
-		// 	//$("#searchResult-table").find("tr:gt(0)").remove();
-		// })
-		$('#fileContent-goback').click(function(){
-			document.getElementById("fileContent").style.display = "none";
-		})
-		// $('#fileContent-goback1').click(function(){
-		// 	document.getElementById("fileContent1").style.display = "none";
-		// })
+
 		$('#upload-goback').click(function(){
 			hideUploadPannel();
 			showFileListPannel();
@@ -592,7 +573,6 @@
 			$("#dbTable tr:not(:first)").empty("");
 			socket.emit('login', {id: $('#login-id').val(), pwd: $('#login-pwd').val()});
 		})
-
 
 		$('input[name="filelist_filetype"]').click(function(){
 			ftype = $('input[name="filelist_filetype"]:checked').val();
@@ -887,23 +867,27 @@
 
 <!-- <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"> -->
 <div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        ...
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
-      </div>
-    </div>
-  </div>
+	<div class="modal-dialog modal-sm" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<div class="form-group">
+					<a id="modal-check" class="form-control btn btn-lg btn-success btn-block">直接查看</a>
+				</div>
+				<div class="form-group">
+					<a id="modal-download" class="form-control btn btn-lg btn-success btn-block">下载</a>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">返回</button>
+			</div>
+		</div>
+	</div>
 </div>
 
 
