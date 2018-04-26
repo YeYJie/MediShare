@@ -1,0 +1,198 @@
+<div id="diagnose" style="display: none;">
+	<div id="diagnose-inspection"></div>
+	<div class="row">
+		<div style="height: 3vh;"></div>
+	</div>
+
+	<div class="row">
+		<div class="col-md-10">
+			<div class="form-group">
+				<label><h3>主诉</h3></label>
+				<textarea class="form-control" id="zhusu" rows="3"></textarea>
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-md-10">
+			<div class="form-group">
+				<label><h3>现病史</h3></label>
+				<textarea class="form-control" id="xianbingshi" rows="3"></textarea>
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-md-10">
+			<div class="form-group">
+				<label><h3>既往史</h3></label>
+				<textarea class="form-control" id="jiwangshi" rows="3"></textarea>
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-md-10">
+			<div class="form-group">
+				<label><h3>诊断</h3></label>
+				<textarea class="form-control" id="zhenduan" rows="3"></textarea>
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-md-10">
+			<div class="form-group">
+				<label><h3>治疗意见</h3></label>
+				<textarea class="form-control" id="zhiliaoyijian" rows="3"></textarea>
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-md-10">
+			<div class="form-group">
+				<label><h3>处方</h3></label>
+				<textarea class="form-control" id="chufang" rows="3"></textarea>
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-md-10">
+			<div class="form-group">
+				<label>
+					<h3>上传附件</h3></label>
+				<div class="input-group">
+					<span class="input-group-btn">
+				<span class="btn btn-default btn-file">
+					选择文件&hellip; <input type="file" id="attachmentFiles">
+				</span>
+					</span>
+					<input type="text" class="form-control" readonly id="attachmentFilesName">
+				</div>
+				<img id='attachmentFilesPreview' />
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<div style="position: fixed; right: 50px; bottom: 50px; height: 100px; width: 300px;">
+			<p>
+				<button id="diagnose-submit" class="btn btn-lg btn-primary btn-block">提交</button>
+			</p>
+			<p>
+				<button id="diagnose-goback" class="btn btn-lg btn-primary btn-block">返回</button>
+			</p>
+		</div>
+	</div>
+</div>
+
+
+<script type="text/javascript">
+
+	$(document).on('change', '.btn-file :file', function() {
+		var input = $(this);
+		var label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+		input.trigger('fileselect', [label]);
+	});
+	$('.btn-file :file').on('fileselect', function(event, label) {
+		var input = $(this).parents('.input-group').find(':text');
+		var log = label;
+		if (input.length) {
+			input.val(log);
+		} else {
+			if (log) alert(log);
+		}
+
+	});
+	var readURL = function(input) {
+		if (input.files && input.files[0]) {
+			var reader = new FileReader();
+			reader.onload = function(e) {
+				$('#attachmentFilesPreview').attr('src', e.target.result);
+			}
+			reader.readAsDataURL(input.files[0]);
+		}
+	};
+	$("#attachmentFiles").change(function() {
+		readURL(this);
+	});
+
+
+	socket.on('newInspection', function(data){
+		console.log("newInspection", data);
+		var inspection = data.data;
+		if(patientInspection[inspection.pid])
+			patientInspection[inspection.pid].push(inspection);
+		else
+			patientInspection[inspection.pid] = [inspection];
+		console.log('newInspection patientInspection[inspection.pid]: ', patientInspection[inspection.pid]);
+		document.getElementById("diagnose-inspection").innerHTML = showInspections(globalPid);
+	});
+
+	var gatherDiagnose = function() {
+		var formData = new FormData();
+
+		formData.append('did', globalDid);
+		formData.append('pid', globalPid);
+
+		formData.append('jianyan', JSON.stringify(patientInspection[globalPid]));
+		formData.append('zhusu', $("#zhusu").val());
+		formData.append('xianbingshi', $("#xianbingshi").val());
+		formData.append('jiwangshi', $("#jiwangshi").val());
+		formData.append('zhenduan', $("#zhenduan").val());
+		formData.append('zhiliaoyijian', $("#zhiliaoyijian").val());
+		formData.append('chufang', $("#chufang").val());
+
+		$.each($("#attachmentFiles")[0].files, function(i, file) {
+			formData.append('attachmentFiles', file);
+		});
+
+		clearDiagnose();
+		return formData;
+	};
+
+	var clearDiagnose = function() {
+		$("#zhusu").val(""); $("#xianbingshi").val(""); $("#jiwangshi").val("");
+		$("#zhenduan").val(""); $("#zhiliaoyijian").val(""); $("#chufang").val("");
+		document.getElementById("diagnose-inspection").innerHTML = "";
+		document.getElementById("attachmentFilesName").value = "";
+		document.getElementById("attachmentFilesPreview").src = "";
+	};
+
+	$(function(){
+
+		$("#diagnose-submit").click(function(){
+			document.getElementById("diagnose").style.display = "none";
+			document.getElementById("patientRecords").style.display = "block";
+
+			console.log('diagnose-submit-button click')
+			var formData = gatherDiagnose();
+			for (var pair of formData.entries()) {
+				console.log(pair[0]+ ': ' + pair[1]);
+			}
+
+			$.ajax({
+				type: "POST",
+				url: "/upload",
+				data: formData,
+				contentType: false,
+				processData: false,
+				success: function(text) {
+					console.log(text);
+					return false;
+				},
+				error: function(xhr) {
+				}
+			});
+		});
+
+		$("#diagnose-goback").click(function(){
+			document.getElementById("diagnose").style.display = "none";
+			document.getElementById("patientRecords").style.display = "block";
+			clearDiagnose();
+		});
+
+	});
+</script>

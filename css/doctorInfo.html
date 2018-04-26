@@ -1,0 +1,49 @@
+<div id="doctorInfo" class="col-sm-3 col-md-2 sidebar" style="display: block;">
+	<div class="row">
+		<div class="col-md-6 col-md-offset-3">
+			<ul id="doctorInfoHeader" class="nav nav-sidebar"></ul>
+		</div>
+	</div>
+
+	<ul id="doctorInfoDetail" class="nav nav-sidebar"></ul>
+
+	<div class="row">
+		<ul class="nav nav-sidebar">
+			<li>
+				<a>
+					<button id="doctor-logout-button" class="btn btn-default btn-lg btn-block">登出</button>
+				</a>
+			</li>
+		</ul>
+	</div>
+</div>
+
+<script type="text/javascript">
+	$(function() {
+
+		$("#doctor-logout-button").click(function() {
+			document.getElementById("nav").style.display = "none";
+			document.getElementById("before-login").style.display = "block";
+			document.getElementById("after-login").style.display = "none";
+			$("#patientList-table").find("tr:gt(0)").remove();
+			socket.emit("doctorLogout", {
+				did: globalDid
+			});
+		});
+
+		socket.on('doctorInfo', function(data) {
+			console.log('doctorInfo', data);
+			var doctorInfo = JSON.parse(data.doctorInfo);
+			document.getElementById("doctorInfoHeader").innerHTML = '<li><a><img src="/header/' + doctorInfo.id + '" /></a></li>';
+			var doctorInfoDetailHTML = '<li><a><h4>姓名: ' + doctorInfo.name + '</h4></a></li>';
+			doctorInfoDetailHTML += '<li><a><h4>科室: ' + doctorInfo.keshi + '</h4></a></li>';
+			doctorInfoDetailHTML += '<li><a><h4>职位: ' + doctorInfo.title + '</h4></a></li>';
+			doctorInfoDetailHTML += '<li><a><h4>电话: ' + doctorInfo.phone + '</h4></a></li>';
+			doctorInfoDetailHTML += '<li><a><h4>邮箱: ' + doctorInfo.email + '</h4></a></li>';
+			doctorInfoDetailHTML += '<li><a><h4>住址: ' + doctorInfo.addr + '</h4></a></li>';
+			document.getElementById("doctorInfoDetail").innerHTML = doctorInfoDetailHTML;
+			document.getElementById("hospital-name").innerHTML = data.hospitalName;
+		});
+
+	});
+</script>

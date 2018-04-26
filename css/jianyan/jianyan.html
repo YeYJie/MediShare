@@ -1,0 +1,266 @@
+<div id="diagnose" style="display: none;">
+	<div class="col-md-2">
+		<label class="col-form-label"><h3>检验项目</h3></label>
+		<ul class="nav nav-sidebar">
+			<li><a href="#" id="xuechanggui"><h4>血常规</h4></a></li>
+			<li><a href="#" id="gangongneng"><h4>肝功能</h4></a></li>
+			<li><a href="#" id="liangduiban"><h4>两对半</h4></a></li>
+		</ul>
+	</div>
+	<div class="col-md-10">
+
+		<div id="xuechanggui-table" class="col-md-8">
+			<label class="col-form-label"><h3>血常规</h3></label>
+			<table class="table table-striped">
+				<thead>
+					<th class="col-md-2">测试项目</th>
+					<th class="col-md-1">缩写</th>
+					<th class="col-md-2">结果</th>
+					<th class="col-md-1">单位</th>
+					<th class="col-md-1">提示</th>
+					<th class="col-md-1">参考范围</th>
+				</thead>
+				<tbody>
+					<tr><td>谷草转氨酶</td><td>AST</td><td><input id="xuechanggui-AST" /></td><td>U/L</td><td>H</td><td>15~40</td></tr>
+					<tr><td>谷丙转氨酶</td><td>ALT</td><td><input id="xuechanggui-ALT" /></td><td>U/L</td><td></td><td>3~35</td></tr>
+					<tr><td>谷草/谷丙转氨酶比值</td><td>S/L</td><td><input id="xuechanggui-SL" /></td><td></td><td></td><td>0.91~2.25</td></tr>
+					<tr><td>总蛋白</td><td>TPROT</td><td><input id="xuechanggui-TPROT" /></td><td>g/L</td><td></td><td>61.0~82.0</td></tr>
+					<tr><td>白蛋白</td><td>ALB</td><td><input id="xuechanggui-ALB" /></td><td>g/L</td><td></td><td>36.0~51.0</td></tr>
+					<tr><td>球蛋白</td><td>GLB</td><td><input id="xuechanggui-GLB" /></td><td>g/L</td><td></td><td>25.0~35.0</td></tr>
+					<tr><td>白蛋白/球蛋白</td><td>A/G</td><td><input id="xuechanggui-AG" /></td><td></td><td></td><td>1.2~2.5</td></tr>
+					<tr><td>总胆红素</td><td>TBILI</td><td><input id="xuechanggui-TBILI" /></td><td>umol/L</td><td></td><td>4.0~23.9</td></tr>
+					<tr><td>直接胆红素</td><td>DBILI</td><td><input id="xuechanggui-DBILI" /></td><td>umol/L</td><td></td><td>0~6.8</td></tr>
+					<tr><td>间接胆红素</td><td>IBILI</td><td><input id="xuechanggui-IBILI" /></td><td>umol/L</td><td></td><td>2.6~20.9</td></tr>
+					<tr><td>谷氨酰转肽酶</td><td>GGT</td><td><input id="xuechanggui-GGT" /></td><td>U/L</td><td>H</td><td>10~60</td></tr>
+					<tr><td>总胆汁酸</td><td>TBA</td><td><input id="xuechanggui-TBA" /></td><td>umol/L</td><td></td><td>0~14.0</td></tr>
+					<tr><td>磷</td><td>IPHOS</td><td><input id="xuechanggui-IPHOS" /></td><td>umol/L</td><td></td><td>0.74~1.52</td></tr>
+					<tr><td>尿素氮</td><td>BUN</td><td><input id="xuechanggui-BUN" /></td><td>umol/L</td><td></td><td>2.4~8.2</td></tr>
+					<tr><td>肌酐(酶法)</td><td>CREAT</td><td><input id="xuechanggui-CREAT" /></td><td>umol/L</td><td></td><td>31.8~116.0</td></tr>
+					<tr><td>磷酸肌酸激酶</td><td>CK</td><td><input id="xuechanggui-CK" /></td><td>U/L</td><td></td><td>24~184</td></tr>
+				</tbody>
+			</table>
+		</div>
+
+
+		<div id="gangongneng-table" class="col-md-8" style="display: none;">
+			<label class="col-form-label"><h3>肝功能</h3></label>
+			<table class="table table-striped">
+				<thead>
+					<th class="col-md-2">测试项目</th>
+					<th class="col-md-1">缩写</th>
+					<th class="col-md-2">结果</th>
+					<th class="col-md-1">单位</th>
+					<th class="col-md-1">提示</th>
+					<th class="col-md-1">参考范围</th>
+				</thead>
+				<tbody>
+					<tr><td>丙氨酸氨基转移酶</td><td>ALT</td><td><input id="gangongneng-ALT" /></td><td>U/L</td><td>阳性</td><td>0~40</td></tr>
+					<tr><td>天门冬氨酸氨基转移酶</td><td>AST</td><td><input id="gangongneng-AST" /></td><td>U/L</td><td>阴性</td><td>0~40</td></tr>
+					<tr><td>转氨酶比</td><td>AST:ALT</td><td><input id="gangongneng-AA" /></td><td></td><td></td><td>0.6~1.5</td></tr>
+					<tr><td>总胆红素</td><td>TBIL</td><td><input id="gangongneng-TBIL" /></td><td>umol/L</td><td>阴性</td><td>1.71~17.1</td></tr>
+					<tr><td>直接胆红素</td><td>DBIL</td><td><input id="gangongneng-DBIL" /></td><td>umol/L</td><td>阴性</td><td>0.51~3.24</td></tr>
+					<tr><td>间接胆红素</td><td>IBIL</td><td><input id="gangongneng-IBIL" /></td><td>umol/L</td><td>阴性</td><td>1.71~13.8</td></tr>
+					<tr><td>乙肝表面抗原</td><td>HBsAg</td><td><input id="gangongneng-HBsAg" /></td><td></td><td>阴性</td><td></td></tr>
+					<tr><td>葡萄糖</td><td>GLU</td><td><input id="gangongneng-GLU" /></td><td>mmol/L</td><td></td><td>3.6~6.1</td></tr>
+					<tr><td>球蛋白</td><td>GLO</td><td><input id="gangongneng-GLO" /></td><td>g/L</td><td></td><td>23~30</td></tr>
+					<tr><td>白球比</td><td>A/G</td><td><input id="gangongneng-AG" /></td><td></td><td></td><td>1.5~2.5</td></tr>
+					<tr><td>a-L-岩藻糖苷酶</td><td>AFU</td><td><input id="gangongneng-AFU" /></td><td>nKat/L</td><td></td><td>52~170</td></tr>
+				</tbody>
+			</table>
+		</div>
+
+		<div id="liangduiban-table" class="col-md-7" style="display: none;">
+			<label class="col-form-label"><h3>两对半</h3></label>
+			<table class="table table-striped">
+				<thead>
+					<th class="col-md-2">测试项目</th>
+					<th class="col-md-1">缩写</th>
+					<th class="col-md-1">检验方法</th>
+					<th class="col-md-2">结果</th>
+					<th class="col-md-1">参考值</th>
+				</thead>
+				<tbody>
+					<tr><td>乙肝表面抗原</td><td>HBsAg</td><td>酶免法</td><td><input id="liangduiban-HBsAg" /></td><td>阴性</td></tr>
+					<tr><td>乙肝表面抗体</td><td>HBsAb</td><td>酶免法</td><td><input id="liangduiban-HBsAb" /></td><td>阴性</td></tr>
+					<tr><td>乙肝e抗原</td><td>HBeAg</td><td>酶免法</td><td><input id="liangduiban-HBeAg" /></td><td>阴性</td></tr>
+					<tr><td>乙肝e抗体</td><td>HBeAb</td><td>酶免法</td><td><input id="liangduiban-HBeAb" /></td><td>阴性</td></tr>
+					<tr><td>乙肝核心抗体</td><td>HBcAb</td><td>酶免法</td><td><input id="liangduiban-HBcAb" /></td><td>阴性</td></tr>
+				</tbody>
+			</table>
+		</div>
+
+
+		<div class="row">
+			<div class="col-md-10">
+				<div class="form-group">
+					<label for="analysis"><h3>结果分析</h3></label>
+					<textarea class="form-control" id="analysis" rows="3"></textarea>
+				</div>
+				<div class="form-group">
+					<label><h3>上传附件</h3></label>
+					<div class="input-group">
+						<span class="input-group-btn">
+							<span class="btn btn-default btn-file">
+								选择文件&hellip; <input type="file" id="attachmentFiles">
+							</span>
+						</span>
+						<input type="text" class="form-control" readonly id="attachmentFilesName">
+					</div>
+					<img id='attachmentFilesPreview' />
+				</div>
+
+			</div>
+		</div>
+
+		<div class="row">
+			<div style="height: 5vh;"></div>
+			<div style="position: fixed; right: 50px; bottom: 50px; height: 100px; width: 200px;">
+				<p>
+					<button id="diagnose-submit" class="btn btn-lg btn-primary btn-block">提交</button>
+				</p>
+				<p>
+					<button id="diagnose-goback" class="btn btn-lg btn-primary btn-block">返回</button>
+				</p>
+			</div>
+		</div>
+
+	</div>
+</div>
+
+
+<script type="text/javascript">
+
+	$(document).on('change', '.btn-file :file', function() {
+		var input = $(this);
+		var label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+		input.trigger('fileselect', [label]);
+	});
+	$('.btn-file :file').on('fileselect', function(event, label) {
+		var input = $(this).parents('.input-group').find(':text');
+		var log = label;
+		if (input.length) {
+			input.val(log);
+		} else {
+			if (log) alert(log);
+		}
+
+	});
+	var readURL = function(input) {
+		if (input.files && input.files[0]) {
+			var reader = new FileReader();
+			reader.onload = function(e) {
+				$('#attachmentFilesPreview').attr('src', e.target.result);
+			}
+			reader.readAsDataURL(input.files[0]);
+		}
+	};
+	$("#attachmentFiles").change(function() {
+		readURL(this);
+	});
+
+	var inspection = "xuechanggui";
+	var showTable = function(tableName) {
+		// console.log("showTable: " + tableName);
+		inspection = tableName;
+		var tables = ["xuechanggui", "gangongneng", "liangduiban"];
+		for(var i = 0; i < tables.length; i++)
+			document.getElementById(tables[i] + "-table").style.display = "none";
+		document.getElementById(tableName + "-table").style.display = "block";
+	};
+
+	$(function() {
+
+		$(".diagnose").click(function() {
+			document.getElementById("doctorInfo").style.display = "none";
+			document.getElementById("patientInfo").style.display = "block";
+			document.getElementById("patientList").style.display = "none";
+			document.getElementById("patientRecords").style.display = "block";
+		});
+
+		var gatherItems = function(prefix, items, formData) {
+			for(var i = 0; i < items.length; i++) {
+				var inputId = prefix + "-" + items[i];
+				formData.append(items[i], $("#" + inputId).val());
+				$("#" + inputId).val("");
+			}
+		}
+
+		var gatherXuechanggui = function(formData) {
+			var xuechangguiItems = ["AST", "ALT", "SL", "TPROT", "ALB", "GLB", "AG", "TBILI", "DBILI", "IBILI", "GGT", "TBA", "IPHOS", "BUN", "CREAT", "CK"];
+			gatherItems("xuechanggui", xuechangguiItems, formData);
+		}
+
+		var gatherGangongneng = function(formData) {
+			var gangongnengItems = ["ALT", "AST", "AA", "TBIL", "DBIL", "IBIL", "HBsAg", "GLU", "GLO", "AG", "AFU"];
+			gatherItems("gangongneng", gangongnengItems, formData);
+		}
+
+		var gatherLiangduiban = function(formData) {
+			var liangduibanItems = ["HBsAg", "HBsAb", "HBeAg", "HBeAb", "HBcAb"];
+			gatherItems("liangduiban", liangduibanItems, formData);
+		}
+
+		var gatherInputData = function() {
+			var formData = new FormData();
+			formData.append("pid", globalPid);
+			formData.append("inspection", inspection);
+			formData.append("analysis", $("#analysis").val());
+			$.each($("#attachmentFiles")[0].files, function(i, file) {
+				formData.append('attachmentFiles', file);
+			});
+			if(inspection === "xuechanggui")
+				gatherXuechanggui(formData);
+			else if(inspection === "gangongneng")
+				gatherGangongneng(formData);
+			else if(inspection === "liangduiban")
+				gatherLiangduiban(formData);
+			return formData;
+		}
+
+		$("#diagnose-submit").click(function() {
+			document.getElementById("diagnose").style.display = "none";
+			document.getElementById("patientList").style.display = "block";
+
+			var formData = gatherInputData();
+			for (var pair of formData.entries()) {
+				console.log(pair[0]+ ': ' + pair[1]);
+			}
+
+			$.ajax({
+				type: "POST",
+				url: "/jianyankeUpload",
+				data: formData,
+				contentType: false,
+				processData: false,
+				success: function(text) {
+					console.log(text);
+					return false;
+				},
+				error: function(xhr) {}
+			});
+		});
+		$("#diagnose-goback").click(function() {
+			document.getElementById("analysis").value = "";
+			document.getElementById("attachmentFilesName").value = "";
+			document.getElementById("attachmentFilesPreview").src = "";
+
+			document.getElementById("diagnose").style.display = "none";
+			document.getElementById("patientList").style.display = "block";
+
+			document.getElementById("patientInfo").style.display = "none";
+			document.getElementById("doctorInfo").style.display = "block";
+		});
+
+		$("#xuechanggui").click(function(){
+			showTable("xuechanggui");
+		});
+		$("#gangongneng").click(function(){
+			showTable("gangongneng");
+		});
+		$("#liangduiban").click(function(){
+			showTable("liangduiban");
+		});
+
+	});
+
+</script>

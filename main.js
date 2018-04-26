@@ -171,8 +171,10 @@ app.get('/getDoctorsPatients/:id', function(req, res){
 	var id = req.params.id;
 	console.log('/getDoctorsPatients/:id ', id);
 	var patients = doctorPatients[id];
-	if(!patients || !util.isArray(patients))
+	if(!patients || !util.isArray(patients) || typeof patients == 'undefined') {
 		res.send({patients:[]});
+		return;
+	}
 	var temp = [];
 	for(var i = 0; i < patients.length; i++) {
 		temp[i] = {name: patientIdToName[patients[i]], id: patients[i]};
@@ -180,13 +182,15 @@ app.get('/getDoctorsPatients/:id', function(req, res){
 	res.send({patients: temp});
 });
 
-app.get('/header/:id', function(req, res){
+function doGetHeader(req, res) {
 	id = req.params.id;
 	console.log('/header/:id ', id);
 	res.sendFile(__dirname + '/header/' + id + '.png');
-});
+};
 
-app.get('/requestDetail/:txid', function(req, httpRes){
+app.get('/header/:id', doGetHeader);
+
+function doRequestDetail(req, httpRes) {
 	txid = req.params.txid;
 	console.log('/requestDetail/:txid ', txid);
 	MongoClient.connect(MongoURL, function(err, db) {
@@ -194,6 +198,10 @@ app.get('/requestDetail/:txid', function(req, httpRes){
 		var dbo = db.db(dbname);
 		dbo.collection("index").findOne({txid: txid}, function(err, res) {
 			if (err) throw err;
+			if(!res) {
+				setTimeout(doRequestDetail(req, httpRes), 50);
+				return;
+			}
 			var rid = res.rid;
 			console.log("find mongodb [index] rid: ", rid);
 			dbo.collection("data").findOne({rid: rid}, function(err, res) {
@@ -204,7 +212,9 @@ app.get('/requestDetail/:txid', function(req, httpRes){
 			});
 		});
 	});
-});
+}
+
+app.get('/requestDetail/:txid', doRequestDetail);
 
 app.get('/getPatientNameFromId/:pid', function(req, res){
 	var pid = req.params.pid;
@@ -228,34 +238,24 @@ app.get('/file/:fileName', function(req, res){
 const fileUpload = require('express-fileupload');
 app.use(fileUpload());
 
-
-
 app.post('/upload', function(req, res){
 
 	var currentTime = Math.floor(new Date() / 1000).toString();
 	var did = req.body.did;
 	var pid = req.body.pid;
 	var recordId = [currentTime, did, pid].join("-");
-	var data = {did: did,
-				pid: pid,
-				rid: recordId,
-				inspections: req.body.inspections,
-				inspection: req.body.inspection,
-				// result: req.body.result,
-				symptom: req.body.symptom,
-				analysis: req.body.analysis,
-				prescription: req.body.prescription,
-				files: []
-			};
+
+	var data = req.body;
+	data.rid = recordId;
+	data.files = null;
+	data.attachmentFiles = [];
 
 	if(req.files) {
-		// console.log(req.files);
-		if(util.isArray(req.files.file)) {
-			// console.log("more than one file");
-			var files = req.files.file;
+		if(util.isArray(req.files.attachmentFiles)) {
+			var files = req.files.attachmentFiles;
 			for(var i = 0; i < files.length; i++) {
 				var filename = [recordId, i.toString(), files[i].name].join('$$');
-				data.files[i] = "http://172.18.232.124:" + port + "/file/" + filename;
+				data.attachmentFiles[i] = "http://172.18.232.124:" + port + "/file/" + filename;
 				files[i].mv('./file/'+filename,  function(err){
 					if(err)
 						return res.status(500).send(err);
@@ -263,10 +263,9 @@ app.post('/upload', function(req, res){
 			}
 		}
 		else {
-			// console.log("single file");
-			var file = req.files.file;
+			var file = req.files.attachmentFiles;
 			var filename = [recordId, "0", file.name].join('_');
-			data.files[0] = "http://172.18.232.124:" + port + "/file/" + filename;
+			data.attachmentFiles[0] = "http://172.18.232.124:" + port + "/file/" + filename;
 			file.mv('./file/'+filename,  function(err){
 				if(err)
 					return res.status(500).send(err);
@@ -281,7 +280,7 @@ app.post('/upload', function(req, res){
 			if (err) throw err;
 			console.log("insert into mongodb [data] success");
 			// db.close();
-			var cmd = ['./bishe/newRecord.sh', hospital, did, pid, data.inspection].join(' ');
+			var cmd = ['./bishe/newRecord.sh', hospital, did, pid, data.zhenduan].join(' ');
 			asyncExec(cmd, function(result){
 				// res.send("upload files success");
 				var txid = result.stdout;
@@ -301,28 +300,20 @@ app.post('/upload', function(req, res){
 app.post('/jianyankeUpload', function(req, res){
 
 	var currentTime = Math.floor(new Date() / 1000).toString();
-	// var did = req.body.did;
 	var pid = req.body.pid;
 	var did = patientDoctor[pid];
-	// var recordId = [currentTime, did, pid].join("-");
-	var data = {did: did,
-				pid: pid,
-				// rid: recordId,
-				inspection: req.body.inspection,
-				resultText: req.body.resultText,
-				reportText: req.body.reportText,
-				// prescription: req.body.prescription,
-				// files: []
-				resultFiles: [],
-				reportFiles: []
-			};
+
+	var data = req.body;
+	data.files = null;
+	data.did = did;
+	data.attachmentFiles = [];
 
 	if(req.files) {
 		// console.log(req.files);
-		if(util.isArray(req.files.resultFile)) {
-			req.files.resultFile.forEach(function(file, i){
+		if(util.isArray(req.files.attachmentFiles)) {
+			req.files.attachmentFiles.forEach(function(file, i){
 				var filename = [currentTime, i.toString(), file.name].join('$$');
-				data.resultFiles[i] = "http://172.18.232.124:" + port + "/file/" + filename;
+				data.attachmentFiles[i] = "http://172.18.232.124:" + port + "/file/" + filename;
 				file.mv('./file/'+filename,  function(err){
 					if(err)
 						return res.status(500).send(err);
@@ -330,29 +321,9 @@ app.post('/jianyankeUpload', function(req, res){
 			});
 		}
 		else {
-			var file = req.files.resultFile;
+			var file = req.files.attachmentFiles;
 			var filename = [currentTime, "0", file.name].join('_');
-			data.resultFiles[0] = "http://172.18.232.124:" + port + "/file/" + filename;
-			file.mv('./file/'+filename,  function(err){
-				if(err)
-					return res.status(500).send(err);
-			});
-		}
-
-		if(util.isArray(req.files.reportFile)) {
-			req.files.reportFile.forEach(function(file, i){
-				var filename = [currentTime, i.toString(), file.name].join('$$');
-				data.reportFiles[i] = "http://172.18.232.124:" + port + "/file/" + filename;
-				file.mv('./file/'+filename,  function(err){
-					if(err)
-						return res.status(500).send(err);
-				});
-			});
-		}
-		else {
-			var file = req.files.reportFile;
-			var filename = [currentTime, "0", file.name].join('_');
-			data.reportFiles[0] = "http://172.18.232.124:" + port + "/file/" + filename;
+			data.attachmentFiles[0] = "http://172.18.232.124:" + port + "/file/" + filename;
 			file.mv('./file/'+filename,  function(err){
 				if(err)
 					return res.status(500).send(err);
@@ -361,9 +332,8 @@ app.post('/jianyankeUpload', function(req, res){
 	}
 
 	console.log('jianyankeUpload', [pid, did], data);
-
 	doctorSocket[did].emit("newInspection", {data: data});
-
+	doctorSocket[did].emit("debug", {msg: "shit"});
 	res.send("upload file success");
 });
 

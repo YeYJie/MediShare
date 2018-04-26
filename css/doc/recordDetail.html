@@ -1,0 +1,61 @@
+<div id="recordDetail" style="display: none;">
+	<h1 class="page-header">记录详情</h1>
+	<div id="recordDetail-content"></div>
+	<div class="row">
+		<div style="position: fixed; right: 50px; bottom: 0px; height: 100px; width: 300px;">
+			<p><button id="recordDetail-goback" class="btn btn-lg btn-primary btn-block">返回</button></p>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+
+	var buildDetail = function(detail) {
+
+		var htmlHelper = function(label, value) {
+			return ''
+					+'<div class="row">'
+					+'	<div class="col-md-10">'
+					+'		<div class="form-group">'
+					+'			<label><h3>' + label + '</h3></label>'
+					+'			<textarea class="form-control" readonly rows="3">' + value + '</textarea>'
+					+'		</div>'
+					+'	</div>'
+					+'</div>';
+		};
+
+		var res = '';
+		res += htmlHelper("主诉", detail.zhusu);
+		res += htmlHelper("现病史", detail.xianbingshi);
+		res += htmlHelper("既往史", detail.jiwangshi);
+		res += htmlHelper("诊断", detail.zhenduan);
+		res += htmlHelper("治疗意见", detail.zhiliaoyijian);
+		res += htmlHelper("处方", detail.chufang);
+
+		var inspections = JSON.parse(detail.jianyan);
+		if(!inspections) return res;
+		inspections.forEach(function(ins){
+			res += buildInspection(ins);
+		});
+		return res;
+	};
+
+
+	$(function(){
+
+		socket.on('recordDetail', function(data){
+			var detail = JSON.parse(data.recordDetail);
+			console.log('recordDetail detail: ', detail);
+			document.getElementById("recordDetail-content").innerHTML = buildDetail(detail);
+
+			document.getElementById("recordDetail").style.display = "block";
+			document.getElementById("patientRecords").style.display = "none";
+		});
+
+		$("#recordDetail-goback").click(function(){
+			document.getElementById("recordDetail").style.display = "none";
+			document.getElementById("patientRecords").style.display = "block";
+		});
+	});
+
+</script>

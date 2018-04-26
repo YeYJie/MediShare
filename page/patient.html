@@ -1,297 +1,309 @@
-
 <!DOCTYPE html>
 <html lang="zh-CN">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-    <link href="dashboard.css" rel="stylesheet">
-    <link href="signin.css" rel="stylesheet">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 
+	<link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+	<link href="/someCSS.css" rel="stylesheet">
 
-  </head>
+</head>
 
-  <body>
+<body>
 
-  <div id="onRegister" class="container-fluid" style="display: none;">
-    <div class="row">
-      <div class="col-md-6 col-md-offset-3">
-        <div class="row" id="header-row">
-        <div class="col-md-2 col-md-offset-5">
-          <img src="/header/14301036">
-        </div>
-        </div>
-        <div class="row" id="room-row">
-          <div style="height: 5vh;"></div>
-          <div id="room-div" class="col-md-12 center-block text-center">
-            <center>
-              <h3 id="room-text">请前往<span id="room"></span></h3>
-            </center>
-          </div>
-        </div>
-        <div class="row" id="doctor-row">
-          <div style="height: 5vh;"></div>
-          <div id="doctor-div" class="col-md-8 col-md-offset-2">
-          <div class="center-block text-center">
-            <center>
-            <h4 id="name"></h4>
-            <p><span><strong>职称：</strong><span id="title"></span></span></p>
-            <p><span><strong>科室：</strong><span id="keshi"></span></span></p>
-              <p><span id="doctor-text"><strong>详细介绍： </strong><span id="detail"></span></span></p>
-            </center>
-          </div>
-          </div>
-        </div>
-        <div class="row" id="revoke-row">
-          <div style="height: 5vh;"></div>
-          <div class="col-md-6 col-md-offset-3">
-           <button class="btn btn-lg btn-primary btn-block" id="deRegister-button">撤销挂号</button>
-         </div>
-        </div>
-      </div>
-    </div>
-  </div>
+	<div id="onRegister" class="container-fluid" style="display: none;">
+		<div class="row">
+			<div class="col-md-6 col-md-offset-3">
+				<div class="row" id="header-row">
+					<div class="col-md-2 col-md-offset-5">
+						<img src="/header/14301036">
+					</div>
+				</div>
+				<div class="row" id="room-row">
+					<div style="height: 5vh;"></div>
+					<div id="room-div" class="col-md-12 center-block text-center">
+						<center>
+							<h3 id="room-text">请前往<span id="room"></span></h3>
+						</center>
+					</div>
+				</div>
+				<div class="row" id="doctor-row">
+					<div style="height: 5vh;"></div>
+					<div id="doctor-div" class="col-md-8 col-md-offset-2">
+						<div class="center-block text-center">
+							<center>
+								<h4 id="name"></h4>
+								<p><span><strong>职称：</strong><span id="title"></span></span></p>
+								<p><span><strong>科室：</strong><span id="keshi"></span></span></p>
+								<p><span id="doctor-text"><strong>详细介绍： </strong><span id="detail"></span></span></p>
+							</center>
+						</div>
+					</div>
+				</div>
+				<div class="row" id="revoke-row">
+					<div style="height: 5vh;"></div>
+					<div class="col-md-6 col-md-offset-3">
+						<button class="btn btn-lg btn-primary btn-block" id="deRegister-button">撤销挂号</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 
-      <div class="container-fluid">
+	<div class="container-fluid">
 
-            <div class="row" id="before-register">
-              <div style="height: 10vh;"></div>
-                <div class="col-md-4 col-md-offset-4">
-                  <div class="panel panel-login">
+		<div class="row" id="before-register">
+			<div style="height: 10vh;"></div>
+			<div class="col-md-4 col-md-offset-4">
+				<div class="panel panel-login">
 
-  <div class="form-group">
-    <div class="col-md-5 col-md-offset-4">
-  <h3 id="hname"></h3>
-  <div style="height:3vh;"></div>
-      </div>
-    </div>
+					<div class="form-group">
+						<div class="col-md-5 col-md-offset-4">
+							<h3 id="hname"></h3>
+							<div style="height:3vh;"></div>
+						</div>
+					</div>
 
+					<div class="panel-heading">
+						<div class="row">
+							<div class="col-xs-6">
+								<a href="#" class="active" id="login-form-link">挂号</a>
+							</div>
+							<div class="col-xs-6">
+								<a href="#" id="register-form-link">注册</a>
+							</div>
+						</div>
+						<hr>
+					</div>
+					<div class="panel-body">
+						<div class="row">
+							<div class="col-lg-12">
 
-                    <div class="panel-heading">
-                      <div class="row">
-                        <div class="col-xs-6">
-                          <a href="#" class="active" id="login-form-link">挂号</a>
-                        </div>
-                        <div class="col-xs-6">
-                          <a href="#" id="register-form-link">注册</a>
-                        </div>
-                      </div>
-                      <hr>
-                    </div>
-                    <div class="panel-body">
-                      <div class="row">
-                        <div class="col-lg-12">
+								<div id="login-form" style="display: block;">
+									<div class="form-group">
+										<input type="text" name="username" id="login-id" tabindex="1" class="form-control" placeholder="Id" value="">
+									</div>
+									<div class="form-group">
+										<input type="password" name="password" id="login-pwd" tabindex="2" class="form-control" placeholder="Password">
+									</div>
+									<div class="form-group">
+										<div class="row">
+											<div class="col-md-3">
+												<a>内科</a>
+											</div>
+											<div id="neike"></div>
+										</div>
+									</div>
+									<div class="form-group">
+										<div class="row">
+											<div class="col-md-3">
+												<a>外科</a>
+											</div>
+											<div id="waike"></div>
+										</div>
+									</div>
+									<div class="form-group">
+										<div class="row">
+											<div class="col-sm-6 col-sm-offset-3">
+												<button id="login-button" class="btn btn-lg btn-primary btn-block" type="submit">挂号</button>
+											</div>
+										</div>
+									</div>
+								</div>
 
+								<div id="register-form" style="display: none;">
+									<div class="form-group">
+										<input type="text" id="signupId" class="form-control" placeholder="身份证" value="">
+									</div>
+									<div class="form-group">
+										<input type="text" id="signupName" class="form-control" placeholder="姓名" value="">
+									</div>
+									<div class="form-group">
+										<input type="password" id="signupPwd" class="form-control" placeholder="密码">
+									</div>
+									<div class="form-group">
+										<input type="password" id="confirm-password" class="form-control" placeholder="确认密码">
+									</div>
+									<div class="form-group">
+										<input type="email" id="signupEmail" class="form-control" placeholder="邮箱" value="">
+									</div>
+									<div class="form-group">
+										<input type="text" id="signupPhone" class="form-control" placeholder="联系电话" value="">
+									</div>
+									<div class="form-group">
+										<input type="text" id="signupAddr" class="form-control" placeholder="住址" value="">
+									</div>
+									<div class="form-group">
+										<div class="row">
+											<div class="col-sm-6 col-sm-offset-3">
+												<button id="signup-button" class="btn btn-lg btn-primary btn-block" type="submit">病人注册</button>
+											</div>
+										</div>
+									</div>
+								</div>
 
-                          <div id="login-form" style="display: block;">
-                            <div class="form-group">
-                              <input type="text" name="username" id="login-id" tabindex="1" class="form-control" placeholder="Id" value="">
-                            </div>
-                            <div class="form-group">
-                              <input type="password" name="password" id="login-pwd" tabindex="2" class="form-control" placeholder="Password">
-                            </div>
-                            <div class="form-group">
-                                <div class="row">
-                                    <div class="col-md-3">
-                                        <a>内科</a>
-                                    </div>
-                                    <div id="neike"></div>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <div class="row">
-                                    <div class="col-md-3">
-                                        <a>外科</a>
-                                    </div>
-                                    <div id="waike"></div>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                              <div class="row">
-                                <div class="col-sm-6 col-sm-offset-3">
-                                <button id="login-button" class="btn btn-lg btn-primary btn-block" type="submit">挂号</button>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 
+	<script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+	<script>
+		window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')
+	</script>
+	<script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
+</body>
+<script src="/socket.io/socket.io.js"></script>
 
-                          <div id="register-form" style="display: none;">
-                            <div class="form-group">
-                              <input type="text" id="signupId" class="form-control" placeholder="身份证" value="">
-                            </div>
-                            <div class="form-group">
-                              <input type="text" id="signupName" class="form-control" placeholder="姓名" value="">
-                            </div>
-                            <div class="form-group">
-                              <input type="password" id="signupPwd" class="form-control" placeholder="密码">
-                            </div>
-                            <div class="form-group">
-                              <input type="password" id="confirm-password" class="form-control" placeholder="确认密码">
-                            </div>
-                            <div class="form-group">
-                              <input type="email" id="signupEmail" class="form-control" placeholder="邮箱" value="">
-                            </div>
-                            <div class="form-group">
-                              <input type="text" id="signupPhone" class="form-control" placeholder="联系电话" value="">
-                            </div>
-                            <div class="form-group">
-                              <input type="text" id="signupAddr" class="form-control" placeholder="住址" value="">
-                            </div>
-                            <div class="form-group">
-                              <div class="row">
-                                <div class="col-sm-6 col-sm-offset-3">
-                                  <button id="signup-button" class="btn btn-lg btn-primary btn-block" type="submit">病人注册</button>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
+<script type="text/javascript">
+	$(function() {
 
+		$('#login-form-link').click(function(e) {
+			$("#login-form").delay(100).fadeIn(100);
+			$("#register-form").fadeOut(100);
+			$('#register-form-link').removeClass('active');
+			$(this).addClass('active');
+			e.preventDefault();
+		});
+		$('#register-form-link').click(function(e) {
+			$("#register-form").delay(100).fadeIn(100);
+			$("#login-form").fadeOut(100);
+			$('#login-form-link').removeClass('active');
+			$(this).addClass('active');
+			e.preventDefault();
+		});
 
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-            </div>
-    </div>
+		var socket = io();
 
+		socket.emit("newPatient", {});
 
-    <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
-    <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
-    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+		var globalDid;
+		var globalPid;
 
+		$("#login-button").click(function() {
+			var pid = $("#login-id").val();
+			$("#login-id").val("");
+			var pwd = $("#login-pwd").val();
+			$("#login-pwd").val("");
+			var did = $('input[name="doctor"]:checked').val();
+			globalPid = pid;
+			globalDid = did;
+			console.log([pid, pwd, did]);
+			socket.emit('register', {
+				pid: pid,
+				did: did,
+				pwd: pwd
+			});
+			document.getElementById("before-register").style.display = "none";
+			document.getElementById("onRegister").style.display = "block";
+		});
 
-  </body>
-   <script src="/socket.io/socket.io.js"></script>
+		$("#deRegister-button").click(function() {
+			document.getElementById("onRegister").style.display = "none";
+			document.getElementById("before-register").style.display = "block";
+			$("#onRegisterMsg").text("Wait for Register");
+			socket.emit('deRegister', {
+				id: globalPid,
+				did: globalDid,
+				time: (Math.floor(new Date() / 1000)).toString(),
+				sig: "deRegisterSig",
+				pkc: "patientPKC"
+			});
+		})
 
-   <script type="text/javascript">
+		$("#signup-button").click(function() {
+			var id = $("#signupId").val();
+			var name = $("#signupName").val();
+			var pwd = $("#signupPwd").val();
+			var email = $("#signupEmail").val();
+			var phone = $("#signupPhone").val();
+			var addr = $("#signupAddr").val();
+			$("#signupId").val("");
+			$("#signupName").val("");
+			$("#signupPwd").val("");
+			$("#confirm-password").val("");
+			$("#signupEmail").val("");
+			$("#signupPhone").val("");
+			$("#signupAddr").val("");
+			console.log("sign up ", [id, name, pwd, email, phone, addr]);
+			socket.emit("signup", {
+				role: "patient",
+				id: id,
+				name: name,
+				pwd: pwd,
+				email: email,
+				phone: phone,
+				addr: addr
+			});
+		});
 
+		socket.on("signUpSuccess", function(data) {
+			alert("注册成功!");
+			$("#login-form").delay(100).fadeIn(100);
+			$("#register-form").fadeOut(100);
+			$('#register-form-link').removeClass('active');
+			$('#login-form-link').addClass('active');
+		});
 
-  $(function () {
+		var doctorOnPage = [];
 
-      $('#login-form-link').click(function(e) {
-      $("#login-form").delay(100).fadeIn(100);
-      $("#register-form").fadeOut(100);
-      $('#register-form-link').removeClass('active');
-      $(this).addClass('active');
-      e.preventDefault();
-    });
-    $('#register-form-link').click(function(e) {
-      $("#register-form").delay(100).fadeIn(100);
-      $("#login-form").fadeOut(100);
-      $('#login-form-link').removeClass('active');
-      $(this).addClass('active');
-      e.preventDefault();
-    });
+		var processDoctor = function(doctor) {
+			var did = doctor.did;
+			var keshi;
+			if (doctor.keshi === "内科") keshi = "neike";
+			else if (doctor.keshi === "外科") keshi = "waike";
+			var index = doctorOnPage.indexOf(did);
+			if (index < 0) {
+				doctorOnPage.push(did);
+				var divHTML = document.getElementById(keshi).innerHTML;
+				divHTML += '<div class="col-md-3" id="' + did + '"><input type="radio" name="doctor" value="' + did + '">' + doctor.name + '</div>';
+				document.getElementById(keshi).innerHTML = divHTML;
+			}
+		}
 
-    var socket = io();
+		socket.on("doctors", function(data) {
+			console.log("doctors: ", data.doctors);
+			if (data.doctors) {
+				for (var i = 0; i < data.doctors.length; i++) {
+					console.log(data.doctors[i]);
+					processDoctor(data.doctors[i]);
+				}
+			}
+			document.getElementById("hname").innerHTML = "欢迎来到" + data.hname;
+		});
+		socket.on("newWorkingDoctor", function(data) {
+			console.log("newWorkingDoctor", data.doctor);
+			processDoctor(data.doctor);
+		});
+		socket.on("doctorLogout", function(data) {
+			console.log("doctorLogout", data, doctorOnPage);
+			var did = data.did;
+			var index = doctorOnPage.indexOf(did);
+			if (index > -1) {
+				doctorOnPage.splice(index, 1);
+				console.log("remove doctor from page ", doctorOnPage);
+				document.getElementById(did).outerHTML = "";
+			}
+		});
 
-    socket.emit("newPatient", {});
+		socket.on('doctorInfo', function(data) {
+			console.log("doctorInfo", data.doctorInfo);
+			var doctorInfo = JSON.parse(data.doctorInfo);
+			console.log([doctorInfo.name, doctorInfo.room]);
+			document.getElementById("room").innerHTML = doctorInfo.room;
+			document.getElementById("name").innerHTML = doctorInfo.name;
+			document.getElementById("title").innerHTML = doctorInfo.title;
+			document.getElementById("keshi").innerHTML = doctorInfo.keshi;
+			document.getElementById("detail").innerHTML = doctorInfo.detail;
+		});
 
-    var globalDid;
-    var globalPid;
-
-    $("#login-button").click(function(){
-      var pid = $("#login-id").val(); $("#login-id").val("");
-      var pwd = $("#login-pwd").val(); $("#login-pwd").val("");
-      var did = $('input[name="doctor"]:checked').val();
-      globalPid = pid; globalDid = did;
-      console.log([pid, pwd, did]);
-      socket.emit('register', {pid: pid, did: did, pwd: pwd});
-      document.getElementById("before-register").style.display = "none";
-      document.getElementById("onRegister").style.display = "block";
-    });
-
-    $("#deRegister-button").click(function(){
-      document.getElementById("onRegister").style.display = "none";
-      document.getElementById("before-register").style.display = "block";
-      $("#onRegisterMsg").text("Wait for Register");
-      socket.emit('deRegister', {id: globalPid, did: globalDid,
-        time: (Math.floor(new Date() / 1000)).toString(),
-        sig: "deRegisterSig", pkc: "patientPKC"});
-    })
-
-    $("#signup-button").click(function(){
-      var id = $("#signupId").val();
-      var name = $("#signupName").val();
-      var pwd = $("#signupPwd").val();
-      var email = $("#signupEmail").val();
-      var phone = $("#signupPhone").val();
-      var addr = $("#signupAddr").val();
-      $("#signupId").val("");$("#signupName").val("");$("#signupPwd").val("");$("#confirm-password").val("");
-      $("#signupEmail").val("");$("#signupPhone").val("");$("#signupAddr").val("");
-      console.log("sign up ", [id, name, pwd, email, phone, addr]);
-      socket.emit("signup", {role: "patient", id: id, name: name, pwd: pwd, email: email, phone: phone, addr: addr});
-    });
-
-    socket.on("signUpSuccess", function(data){
-      alert("注册成功!");
-      $("#login-form").delay(100).fadeIn(100);
-      $("#register-form").fadeOut(100);
-      $('#register-form-link').removeClass('active');
-      $('#login-form-link').addClass('active');
-    });
-
-    var doctorOnPage = [];
-
-    var processDoctor = function(doctor) {
-          var did = doctor.did;
-          var keshi;
-          if(doctor.keshi === "内科") keshi = "neike";
-          else if(doctor.keshi === "外科") keshi = "waike";
-          var index = doctorOnPage.indexOf(did);
-          if(index < 0) {
-            doctorOnPage.push(did);
-            var divHTML = document.getElementById(keshi).innerHTML;
-            divHTML += '<div class="col-md-3" id="'+did+'"><input type="radio" name="doctor" value="'+did+'">'+doctor.name+'</div>';
-            document.getElementById(keshi).innerHTML = divHTML;
-          }
-    }
-
-    socket.on("doctors", function(data){
-      console.log("doctors: ", data.doctors);
-      if(data.doctors) {
-        for(var i = 0; i < data.doctors.length; i++) {
-          console.log(data.doctors[i]);
-          processDoctor(data.doctors[i]);
-        }
-      }
-      document.getElementById("hname").innerHTML = "欢迎来到" + data.hname;
-    });
-    socket.on("newWorkingDoctor", function(data){
-      console.log("newWorkingDoctor", data.doctor);
-      processDoctor(data.doctor);
-    });
-    socket.on("doctorLogout", function(data){
-      console.log("doctorLogout", data, doctorOnPage);
-      var did = data.did;
-      var index = doctorOnPage.indexOf(did);
-      if(index > -1) {
-        doctorOnPage.splice(index, 1);
-        console.log("remove doctor from page ", doctorOnPage);
-        document.getElementById(did).outerHTML = "";
-      }
-    });
-
-  socket.on('doctorInfo', function(data){
-    console.log("doctorInfo", data.doctorInfo);
-    var doctorInfo = JSON.parse(data.doctorInfo);
-    console.log([doctorInfo.name, doctorInfo.room]);
-    document.getElementById("room").innerHTML = doctorInfo.room;
-    document.getElementById("name").innerHTML = doctorInfo.name;
-    document.getElementById("title").innerHTML = doctorInfo.title;
-    document.getElementById("keshi").innerHTML = doctorInfo.keshi;
-    document.getElementById("detail").innerHTML = doctorInfo.detail;
-  });
-
-
-  })
-
-   </script>
-
+	})
+</script>
 
 </html>
