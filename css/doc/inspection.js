@@ -139,7 +139,7 @@ var liangduibanInspection = function(ins) {
 
 	var res = '<div class="row">'
 		+'<div class="col-md-7">'
-		+'	<label class="col-form-label"><h3>两对半检测报告</h3></label>'
+		+'	<label class="col-form-label"><h3>乙肝五项检测报告</h3></label>'
 		+'	<table class="table table-striped">'
 		+'		<thead>'
 		+'			<th class="col-md-2">测试项目</th>'

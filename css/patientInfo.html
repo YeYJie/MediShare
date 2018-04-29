@@ -5,9 +5,31 @@
 		</div>
 	</div>
 	<ul id="patientInfoDetail" class="nav nav-sidebar"></ul>
+<!-- 	<table>
+		<thead>
+		</thead>
+		<tbody id="patientInfoTableBody"></tbody>
+	</table> -->
 </div>
 
 <script type="text/javascript">
+
+	// var buildPatientDetailTable = function(patient) {
+	// 	return ''
+	// 		+'<tr><td><a><h4>姓名:</h4></a></td><td><a><h4>' + patient.name + '</h4></a></td></tr>'
+	// 		+'<tr><td><a><h4>性别:</h4></a></td><td><a><h4>' + patient.gender + '</h4></a></td></tr>'
+	// 		+'<tr><td><a><h4>生日:</h4></a></td><td><a><h4>' + patient.birth + '</h4></a></td></tr>'
+	// 		+'<tr><td><a><h4>婚姻状况:</h4></a></td><td><a><h4>' + patient.maritalStatus + '</h4></a></td></tr>'
+	// 		+'<tr><td><a><h4>民族:</h4></a></td><td><a><h4>' + patient.minzu + '</h4></a></td></tr>'
+	// 		+'<tr><td><a><h4>教育情况:</h4></a></td><td><a><h4>' + patient.educationalLevel + '</h4></a></td></tr>'
+	// 		+'<tr><td><a><h4>职业:</h4></a></td><td><a><h4>' + patient.occupation + '</h4></a></td></tr>'
+	// 		+'<tr><td><a><h4>工作单位:</h4></a></td><td><a><h4>' + patient.company + '</h4></a></td></tr>'
+	// 		+'<tr><td><a><h4>药物过敏史:</h4></a></td><td><a><h4>' + patient.allergy + '</h4></a></td></tr>'
+	// 		+'<tr><td><a><h4>电话:</h4></a></td><td><a><h4>' + patient.phone + '</h4></a></td></tr>'
+	// 		+'<tr><td><a><h4>邮箱:</h4></a></td><td><a><h4>' + patient.email + '</h4></a></td></tr>'
+	// 		+'<tr><td><a><h4>住址:</h4></a></td><td><a><h4>' + patient.addr + '</h4></a></td></tr>';
+	// }
+
 	$(function() {
 
 		socket.on('patientInfo', function(data) {
@@ -29,6 +51,8 @@
 			document.getElementById("patientInfoDetail").innerHTML = patientInfoDetailHTML;
 			document.getElementById("doctorInfo").style.display = "none";
 			document.getElementById("patientInfo").style.display = "block";
+
+			// document.getElementById("patientInfoTableBody").innerHTML = buildPatientDetailTable(patientInfo);
 		});
 
 	});

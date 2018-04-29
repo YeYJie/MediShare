@@ -293,7 +293,7 @@
 		});
 
 		socket.on('doctorInfo', function(data) {
-			console.log("doctorInfo", data.doctorInfo);
+			console.log("doctorInfo", data);
 			var doctorInfo = JSON.parse(data.doctorInfo);
 			console.log([doctorInfo.name, doctorInfo.room]);
 			document.getElementById("room").innerHTML = doctorInfo.room;
