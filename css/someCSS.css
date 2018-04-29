@@ -4,7 +4,8 @@
 
 /* Move down content because we have a fixed navbar that is 50px tall */
 body {
-	padding-top: 50px;
+	/*padding-top: 50px;*/
+	font-size: 18px;
 }
 
 
@@ -30,7 +31,7 @@ body {
  */
 
 /* Hide for mobile, show later */
-.sidebar {
+/*.sidebar {
 	display: none;
 }
 @media (min-width: 768px) {
@@ -43,15 +44,15 @@ body {
 		display: block;
 		padding: 20px;
 		overflow-x: hidden;
-		overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
+		overflow-y: auto;
 		background-color: #f5f5f5;
 		border-right: 1px solid #eee;
 	}
-}
+}*/
 
 /* Sidebar navigation */
-.nav-sidebar {
-	margin-right: -21px; /* 20px padding + 1px border */
+/*.nav-sidebar {
+	margin-right: -21px;
 	margin-bottom: 20px;
 	margin-left: -20px;
 }
@@ -64,14 +65,14 @@ body {
 .nav-sidebar > .active > a:focus {
 	color: #fff;
 	background-color: #428bca;
-}
+}*/
 
 
 /*
  * Main content
  */
 
-.main {
+/*.main {
 	padding: 20px;
 }
 @media (min-width: 768px) {
@@ -82,7 +83,7 @@ body {
 }
 .main .page-header {
 	margin-top: 0;
-}
+}*/
 
 
 /*

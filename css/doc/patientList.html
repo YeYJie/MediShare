@@ -1,30 +1,37 @@
-<div id="patientList" style="display: block;">
+<div id="patientList">
 	<h1 class="page-header">挂号病人</h1>
-	<div class="row">
-		<div style="height: 5vh;"></div>
+	<div class="row" id="patient-blocks">
+		<div class="col-md-12">
+			<ul class="nav nav-pills nav-stacked" id="patientList-ul">
+<!-- 				<li><a href="#" data-toggle="tab"><h4>叶永杰</h4></a></li>
+				<li><a href="#" data-toggle="tab"><h4>李小明</h4></a></li>
+				<li><a href="#" data-toggle="tab"><h4>王小强</h4></a></li>
+				<li><a href="#" data-toggle="tab"><h4>李丽</h4></a></li> -->
+			</ul>
+		</div>
 	</div>
-	<div class="row" id="patient-blocks"></div>
 </div>
 
 <script type="text/javascript">
 	var myPatients = [];
 
 	var buildPatientBlockHelper = function(patient) {
-	return '<div class="col-md-3" id="patient-block-'+patient.id+'">'
-		+  '  <div class="row">'
-		+  '    <div class="col-md-6 col-md-offset-5">'
-		+  '      <ul id="patientInfoHeader" class="nav nav-sidebar"><img src="/header/' + patient.id + '"></ul>'
-		+  '    </div>'
-		+  '  </div>'
-		+  '  <div class="row">'
-		+  '    <div class="col-md-6 col-md-offset-3">'
-		+  '      <ul id="patientInfoContent" class="nav nav-sidebar">'
-		+  '        <li><a>姓名: '+patient.name+'</a></li>'
-		+  '        <li><button id="patientList-'+patient.id+'" data-pid="'+patient.id+'" class="btn btn-default btn-lg btn-block">检验</button></li>'
-		+  '      </ul>'
-		+  '    </div>'
-		+  '  </div>'
-		+  '</div>';
+	// return '<div class="col-md-3" id="patient-block-'+patient.id+'">'
+	// 	+  '  <div class="row">'
+	// 	+  '    <div class="col-md-6 col-md-offset-5">'
+	// 	+  '      <ul id="patientBlockHeader" class="nav nav-sidebar"><img src="/header/' + patient.id + '"></ul>'
+	// 	+  '    </div>'
+	// 	+  '  </div>'
+	// 	+  '  <div class="row">'
+	// 	+  '    <div class="col-md-6 col-md-offset-3">'
+	// 	+  '      <ul id="patientInfoContent" class="nav nav-sidebar">'
+	// 	+  '        <li><a>姓名: '+patient.name+'</a></li>'
+	// 	+  '        <li><button id="patientList-'+patient.id+'" data-pid="'+patient.id+'" class="btn btn-default btn-lg btn-block">检验</button></li>'
+	// 	+  '      </ul>'
+	// 	+  '    </div>'
+	// 	+  '  </div>'
+	// 	+  '</div>';
+		return '<li><a href="#" data-toggle="tab"data-pid="' + patient.id + '" id="patientList-'+patient.id+'"><h4>' + patient.name + '</h4></a></li>';
 	};
 
 	var buildPatientBlock = function(patient) {
@@ -35,17 +42,19 @@
 			type: "GET",
 			url: "/getPatientInfo/" + patient.id,
 			success: function(text) {
-				var patientHTML = buildPatientBlockHelper(text);
-				if(!patientHTML) return;
-				console.log(patientHTML);
-				document.getElementById("patient-blocks").innerHTML += patientHTML;
+				// var patientHTML = buildPatientBlockHelper(text);
+				// if(!patientHTML) return;
+				// console.log(patientHTML);
+				// document.getElementById("patient-blocks").innerHTML += patientHTML;
+				document.getElementById("patientList-ul").innerHTML += buildPatientBlockHelper(text);
 
 				$('#patientList-' + patient.id.toString()).click(function(){
+					clearDiagnose();
 					var patientId = $(this).data('pid').toString();
 					globalPid = patientId;
+					console.log("patientList click: " + patientId);
 					socket.emit('getPatientRecords', {patientId: patientId, doctorId: globalDid});
-					document.getElementById("patientList").style.display = "none";
-					document.getElementById("patientRecords").style.display = "block";
+					document.getElementById("diagnose-submit").disabled = false;
 				});
 			},
 			error: function(xhr) {

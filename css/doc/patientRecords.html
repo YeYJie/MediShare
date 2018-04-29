@@ -1,53 +1,79 @@
-<div id="patientRecords" style="display: none;">
+<div id="patientRecords">
 	<div id="patientRecords-record">
 		<h1 class="page-header">病历记录</h1>
-		<table id="patientRecords-table" class="table table-striped">
+		<table id="patientRecords-table" class="table">
 			<thead>
-					<th>医院</th>
-					<th>医生</th>
+					<th>就诊医院</th>
 					<th>时间</th>
+					<th>诊断</th>
 					<th>检查项目</th>
 					<th></th>
 			</thead>
-			<tbody></tbody>
+			<tbody>
+
+			</tbody>
 		</table>
 	 </div>
-	<div class="row" id="patientRecords-diagnose">
+<!-- 	<div class="row" id="patientRecords-diagnose">
 		<div style="position: fixed; right: 50px; bottom: 50px; height: 100px; width: 300px;">
 			<p><button id="patientRecords-diagnose-button" class="btn btn-lg btn-primary btn-block">诊疗</button></p>
 			<p><button id="patientRecords-goback" class="btn btn-lg btn-primary btn-block">返回</button></p>
 		</div>
-	</div>
+	</div> -->
 </div>
 
 <script type="text/javascript">
 
-	var hospitalIdToName = function(hid) {
-		if(hid === "1") return "广东省中医院";
-		else if(hid === "2") return "中山大学附属第三医院";
-		else return "未知医院";
-	}
 
 	socket.on('patientRecords', function(data){
+
+		var hospitalIdToName = function(hid) {
+			if(hid === "1") return "广东省中医院";
+			else if(hid === "2") return "中山大学附属第三医院";
+			else return "未知医院";
+		}
+
 		$("#patientRecords-table").find("tr:gt(0)").remove();
 		console.log('patientRecords', data);
 		var patientRecords = data.records;
-		var buildRecordHTML = function(record) {
-			var date = new Date(parseInt(record.RecordTime) * 1000);
+
+		// var buildRecordHTML = function(record) {
+		// 	return '<tr><td>' + hospitalIdToName(record.Hospital) + '</td><td>' + record.Doctor
+		// 		+ '</td><td>' + unixSecondToString(record.RecordTime) + '</td><td>' + record.Inspection
+		// 		+ '</td><td><button id="patientRecord-'+record.RecordId+'" data-rid="'
+		// 		+ record.RecordId + '" data-pid="' + data.id + '" data-th="'
+		// 		+ record.Hospital + '" class="btn btn-default btn-lg btn-block">查看细节</button></td>';
+		// };
+
+		var unixSecondToString = function(unixSecond) {
+			var date = new Date(parseInt(unixSecond) * 1000);
 			var y = date.getFullYear();
 			var m = date.getMonth() + 1;
 			var d = date.getDate();
-			return '<tr><td>' + hospitalIdToName(record.Hospital) + '</td><td>' + record.Doctor
-				+ '</td><td>' + y + '-' + m + '-' + d + '</td><td>' + record.Inspection
-				+ '</td><td><button id="patientRecord-'+record.RecordId+'" data-rid="'
-				+ record.RecordId + '" data-pid="' + data.id + '" data-th="'
-				+ record.Hospital + '" class="btn btn-default btn-lg btn-block">查看细节</button></td>';
-		};
+			return y + '-' + m + '-' + d;
+		}
+
+		var buildRecordRow = function(record) {
+			return ''
+				+'<tr>'
+				+'	<td><h4>' + hospitalIdToName(record.Hospital) + '</h4></td>'
+				+'	<td><h4>' + unixSecondToString(record.RecordTime) + '</h4></td>'
+				+'	<td><h4>' + record.Inspection + '</h4></td>'
+				+'	<td><h4>' + record.Inspections + '</h4></td>'
+				+'	<td><button id="patientRecord-"' + record.RecordId
+				+ '" data-rid="' + record.RecordId + '" data-pid="' + data.id
+				+ '" data-th="' + record.Hospital
+				+ '" class="btn btn-default btn-lg btn-block">查看细节</button></td>'
+				+'</tr>';
+		}
+
+
 		if(!patientRecords) return;
 		for(var i = 0; i < patientRecords.length; i++) {
-			var recordHTML = buildRecordHTML(patientRecords[i]);
+			// var recordRow = buildRecordHTML(patientRecords[i]);
+			var recordRow = buildRecordRow(patientRecords[i]);
 			var row = document.getElementById("patientRecords-table").insertRow(1);
-			row.innerHTML = recordHTML;
+			row.innerHTML = recordRow;
 			$("#patientRecord-"+patientRecords[i].RecordId).click(function(){
 				var rid = $(this).data('rid').toString();
 				var pid = $(this).data('pid').toString();
@@ -61,20 +87,20 @@
 
 	$(function(){
 
-		$("#patientRecords-diagnose-button").click(function(){
-			document.getElementById("patientRecords").style.display = "none";
-			document.getElementById("diagnose").style.display = "block";
+		// $("#patientRecords-diagnose-button").click(function(){
+		// 	document.getElementById("patientRecords").style.display = "none";
+		// 	document.getElementById("diagnose").style.display = "block";
 
-			document.getElementById("diagnose-inspection").innerHTML = showInspections(globalPid);
-		});
+		// 	document.getElementById("diagnose-inspection").innerHTML = showInspections(globalPid);
+		// });
 
-		$("#patientRecords-goback").click(function(){
-			document.getElementById("patientRecords").style.display = "none";
-			document.getElementById("patientInfo").style.display = "none";
-			document.getElementById("patientList").style.display = "block";
-			document.getElementById("doctorInfo").style.display = "block";
-			$("#patientRecords-table").find("tr:gt(0)").remove();
-		});
+		// $("#patientRecords-goback").click(function(){
+		// 	document.getElementById("patientRecords").style.display = "none";
+		// 	document.getElementById("patientInfo").style.display = "none";
+		// 	document.getElementById("patientList").style.display = "block";
+		// 	document.getElementById("doctorInfo").style.display = "block";
+		// 	$("#patientRecords-table").find("tr:gt(0)").remove();
+		// });
 
 	});
 </script>

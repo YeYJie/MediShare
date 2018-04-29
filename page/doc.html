@@ -10,20 +10,29 @@
 </head>
 
 <body>
-	<div id="nav-bar-div"></div>
+	<div id="nav-bar-div" style="display: none;"></div>
 
 	<div class="container-fluid">
-		<div id="before-login-div"></div>
-		<div class="row" id="after-login" style="display: none;">
-			<div class="col-sm-3 col-md-2 sidebar">
-				<div id="doctorInfo-sidebar-div"></div>
-				<div id="patientInfo-sidebar-div"></div>
+		<div id="before-login-div" style="display: block;"></div>
+		<div id="after-login" class="row" style="display: none;">
+			<div class="col-md-2" sidebar>
+				<div class="row">
+					<div id="doctorInfo-sidebar-div"></div>
+				</div>
+				<div class="row">
+					<div id="patientList-div"></div>
+				</div>
 			</div>
-			<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-				<div id="patientList-div"></div>
-				<div id="patientRecords-div"></div>
-				<div id="diagnose-div"></div>
-				<div id="recordDetail-div"></div>
+			<div class="col-md-10" main>
+				<div class="row">
+					<div class="col-md-6" id="middle-div">
+						<div id="diagnose-div"></div>
+					</div>
+					<div class="col-md-6" id="right-div">
+						<div id="patientInfo-sidebar-div"></div>
+						<div id="patientRecords-div"></div>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -51,6 +60,19 @@
 	$("#patientRecords-div").load("/doc/patientRecords.html");
 	$("#diagnose-div").load("/doc/diagnose.html");
 	$("#recordDetail-div").load("/doc/recordDetail.html");
+
+	// var changeDivVisibility = function(show, hide) {
+	// 	for(var i = 0; i < show.length; i++) {
+	// 		var div = show[i];
+	// 		console.log("changeDivVisibility: show ", div);
+	// 		document.getElementById(div).style.display = "block";
+	// 	}
+	// 	for(var i = 0; i < hide.length; i++) {
+	// 		var div = hide[i];
+	// 		console.log("changeDivVisibility: hide ", div);
+	// 		document.getElementById(div).style.display = "none";
+	// 	}
+	// }
 
 	socket.on('event', function(data) {
 		console.log(data);
