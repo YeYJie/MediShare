@@ -1,5 +1,5 @@
 <div id="patientList">
-	<h1 class="page-header">挂号病人</h1>
+	<h3 class="page-header">挂号病人</h3>
 	<div class="row" id="patient-blocks">
 		<div class="col-md-12">
 			<ul class="nav nav-pills nav-stacked" id="patientList-ul">
@@ -31,7 +31,7 @@
 	// 	+  '    </div>'
 	// 	+  '  </div>'
 	// 	+  '</div>';
-		return '<li><a href="#" data-toggle="tab"data-pid="' + patient.id + '" id="patientList-'+patient.id+'"><h4>' + patient.name + '</h4></a></li>';
+		return '<li><a href="#" data-toggle="tab"data-pid="' + patient.id + '" id="patientList-'+patient.id+'">' + patient.name + '</a></li>';
 	};
 
 	var buildPatientBlock = function(patient) {
@@ -54,7 +54,9 @@
 					globalPid = patientId;
 					console.log("patientList click: " + patientId);
 					socket.emit('getPatientRecords', {patientId: patientId, doctorId: globalDid});
+
 					document.getElementById("diagnose-submit").disabled = false;
+					document.getElementById("recordDetail").style.display = "none";
 				});
 			},
 			error: function(xhr) {

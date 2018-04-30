@@ -246,3 +246,7 @@ body {
 #img-upload {
 	width: 100%;
 }
+
+td {
+     vertical-align: middle !important;
+}

@@ -35,12 +35,12 @@
 			console.log('doctorInfo', data);
 			var doctorInfo = JSON.parse(data.doctorInfo);
 			document.getElementById("doctorInfoHeader").innerHTML = '<li><a><img src="/header/' + doctorInfo.id + '" /></a></li>';
-			var doctorInfoDetailHTML = '<li><a><h4>姓名: ' + doctorInfo.name + '</h4></a></li>';
-			doctorInfoDetailHTML += '<li><a><h4>科室: ' + doctorInfo.keshi + '</h4></a></li>';
-			doctorInfoDetailHTML += '<li><a><h4>职位: ' + doctorInfo.title + '</h4></a></li>';
-			doctorInfoDetailHTML += '<li><a><h4>电话: ' + doctorInfo.phone + '</h4></a></li>';
-			doctorInfoDetailHTML += '<li><a><h4>邮箱: ' + doctorInfo.email + '</h4></a></li>';
-			doctorInfoDetailHTML += '<li><a><h4>住址: ' + doctorInfo.addr + '</h4></a></li>';
+			var doctorInfoDetailHTML = '<li><a>姓名: ' + doctorInfo.name + '</a></li>';
+			doctorInfoDetailHTML += '<li><a>科室: ' + doctorInfo.keshi + '</a></li>';
+			doctorInfoDetailHTML += '<li><a>职位: ' + doctorInfo.title + '</a></li>';
+			doctorInfoDetailHTML += '<li><a>电话: ' + doctorInfo.phone + '</a></li>';
+			doctorInfoDetailHTML += '<li><a>邮箱: ' + doctorInfo.email + '</a></li>';
+			doctorInfoDetailHTML += '<li><a>住址: ' + doctorInfo.addr + '</a></li>';
 			document.getElementById("doctorInfoDetail").innerHTML = doctorInfoDetailHTML;
 			document.getElementById("hospital-name").innerHTML = data.hospitalName;
 		});

@@ -560,7 +560,8 @@ io.on('connection', function(socket){
 				console.log(cmd);
 				asyncExec(cmd, function(result){
 					console.log(cmd, result.stdout);
-					socket.emit('recordDetail', {did: did, pid:pid, txid: txid, targetHospital: targetHospital, recordDetail: result.stdout});
+					socket.emit('recordDetail', {did: did, pid:pid, txid: txid,
+						rid: rid, targetHospital: targetHospital, recordDetail: result.stdout});
 				});
 			}
 

@@ -1,36 +1,46 @@
-<div id="recordDetail">
-	<h1 class="page-header">记录详情</h1>
+<div id="recordDetail" style="display: none;">
+	<h3 class="page-header">记录详情</h3>
 	<div id="recordDetail-content"></div>
-<!-- 	<div class="row">
-		<div style="position: fixed; right: 50px; bottom: 0px; height: 100px; width: 300px;">
-			<p><button id="recordDetail-goback" class="btn btn-lg btn-primary btn-block">返回</button></p>
-		</div>
-	</div> -->
 </div>
 
 <script type="text/javascript">
+	var detailCache = {};
+	var recordDetailTargetHospitalName = "";
+	var recordDetailDoctorName = "";
+	var recordDetailTime = "";
 
 	var buildDetail = function(detail) {
 
-		var htmlHelper = function(label, value) {
-			return ''
-					+'<div class="row">'
-					+'	<div class="col-md-10">'
-					+'		<div class="form-group">'
-					+'			<label><h3>' + label + '</h3></label>'
-					+'			<textarea class="form-control" readonly rows="3">' + value + '</textarea>'
-					+'		</div>'
-					+'	</div>'
-					+'</div>';
-		};
+		var buildDetailTableRow = function(name, value) {
+			if(!value || value === "")
+				value = "无";
+			return '<tr><td class="col-md-3">' + name + ':</td><td colspan="3">' + value + '</td></tr>';
+		}
+
+		var buildDetailTable = function(detail) {
+			var table = ''
+				+'<table class="table table-bordered">'
+				+'	<tbody>'
+				+'		<tr>'
+				+'			<td>就诊医院:</td><td colspan="3">' + recordDetailTargetHospitalName + '</td>'
+				+'		</tr>'
+				+'		<tr>'
+				+'			<td>接诊医生:</td><td>' + recordDetailDoctorName + '</td>'
+				+'			<td>时间:</td><td>' + recordDetailTime + '</td>'
+				+'		</tr>';
+			table += buildDetailTableRow("主诉", detail.zhusu);
+			table += buildDetailTableRow("现病史", detail.xianbingshi);
+			table += buildDetailTableRow("既往史", detail.jiwangshi);
+			table += buildDetailTableRow("诊断", detail.zhenduan);
+			table += buildDetailTableRow("治疗意见", detail.zhiliaoyijian);
+			table += buildDetailTableRow("处方", detail.chufang);
+			table += '	</tbody>'
+					+'</table>';
+			return table;
+		}
 
 		var res = '';
-		res += htmlHelper("主诉", detail.zhusu);
-		res += htmlHelper("现病史", detail.xianbingshi);
-		res += htmlHelper("既往史", detail.jiwangshi);
-		res += htmlHelper("诊断", detail.zhenduan);
-		res += htmlHelper("治疗意见", detail.zhiliaoyijian);
-		res += htmlHelper("处方", detail.chufang);
+		res += buildDetailTable(detail);
 
 		var inspections = JSON.parse(detail.jianyan);
 		if(!inspections) return res;
@@ -41,21 +51,40 @@
 	};
 
 
-	$(function(){
+	var updateDetailCache = function(pid, targetHospital, rid, detail) {
+		var cacheIndex = pid + targetHospital.toString() + rid;
+		detailCache[cacheIndex] = detail;
+		console.log("updateDetailCache ", detailCache);
+	}
 
-		socket.on('recordDetail', function(data){
-			var detail = JSON.parse(data.recordDetail);
-			console.log('recordDetail detail: ', detail);
+	var requestDetail = function(pid, targetHospital, rid) {
+		var requestArgs = {rid: rid, did: globalDid, pid: pid, targetHospital: targetHospital};
+		console.log("requestDetail args: ", requestArgs);
+		socket.emit('requestDetail', requestArgs);
+	}
+
+	socket.on('recordDetail', function(data){
+		var detail = JSON.parse(data.recordDetail);
+		console.log('recordDetail data: ', data);
+		updateDetailCache(data.pid, data.targetHospital, data.rid, detail);
+		showRecordDetail(data.pid, data.targetHospital, data.rid);
+	});
+
+	var showRecordDetail = function(pid, targetHospital, rid) {
+		var cacheIndex = pid + targetHospital.toString() + rid;
+		var detail = detailCache[cacheIndex];
+		// console.log("showRecordDetail detail:", detail);
+		if(detail) {
+			// console.log("showRecordDetail cache hit: ", cacheIndex);
 			document.getElementById("recordDetail-content").innerHTML = buildDetail(detail);
-
 			document.getElementById("recordDetail").style.display = "block";
-			document.getElementById("patientRecords").style.display = "none";
-		});
+		} else {
+			// console.log("showRecordDetail cache miss: ", cacheIndex);
+			requestDetail(pid, targetHospital, rid);
+		}
+	};
 
-		// $("#recordDetail-goback").click(function(){
-		// 	document.getElementById("recordDetail").style.display = "none";
-		// 	document.getElementById("patientRecords").style.display = "block";
-		// });
+	$(function(){
 	});
 
 </script>

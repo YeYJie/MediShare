@@ -1,13 +1,13 @@
 <div id="patientRecords">
 	<div id="patientRecords-record">
-		<h1 class="page-header">病历记录</h1>
+		<h3 class="page-header media-heading" style="">病历记录</h3>
 		<table id="patientRecords-table" class="table">
 			<thead>
-					<th>就诊医院</th>
-					<th>时间</th>
-					<th>诊断</th>
-					<th>检查项目</th>
-					<th></th>
+				<th>就诊医院</th>
+				<th>时间</th>
+				<th>诊断</th>
+				<th>检查项目</th>
+				<th></th>
 			</thead>
 			<tbody>
 
@@ -37,13 +37,6 @@
 		console.log('patientRecords', data);
 		var patientRecords = data.records;
 
-		// var buildRecordHTML = function(record) {
-		// 	return '<tr><td>' + hospitalIdToName(record.Hospital) + '</td><td>' + record.Doctor
-		// 		+ '</td><td>' + unixSecondToString(record.RecordTime) + '</td><td>' + record.Inspection
-		// 		+ '</td><td><button id="patientRecord-'+record.RecordId+'" data-rid="'
-		// 		+ record.RecordId + '" data-pid="' + data.id + '" data-th="'
-		// 		+ record.Hospital + '" class="btn btn-default btn-lg btn-block">查看细节</button></td>';
-		// };
 
 		var unixSecondToString = function(unixSecond) {
 			var date = new Date(parseInt(unixSecond) * 1000);
@@ -54,53 +47,44 @@
 		}
 
 		var buildRecordRow = function(record) {
+			var hospitalName = hospitalIdToName(record.Hospital);
+			var recordTime = unixSecondToString(record.RecordTime);
 			return ''
 				+'<tr>'
-				+'	<td><h4>' + hospitalIdToName(record.Hospital) + '</h4></td>'
-				+'	<td><h4>' + unixSecondToString(record.RecordTime) + '</h4></td>'
-				+'	<td><h4>' + record.Inspection + '</h4></td>'
-				+'	<td><h4>' + record.Inspections + '</h4></td>'
-				+'	<td><button id="patientRecord-"' + record.RecordId
-				+ '" data-rid="' + record.RecordId + '" data-pid="' + data.id
+				+'	<td>' + hospitalName + '</td>'
+				+'	<td>' + recordTime + '</td>'
+				+'	<td>' + record.Inspection + '</td>'
+				+'	<td>' + record.Inspections + '</td>'
+				+'	<td><a id="patientRecord-' + record.RecordId
+				+ '" data-rid="' + record.RecordId
+				+ '" data-pid="' + data.id
 				+ '" data-th="' + record.Hospital
-				+ '" class="btn btn-default btn-lg btn-block">查看细节</button></td>'
+				+ '" data-doctorname="' + record.Doctor
+				+ '" data-targethospitalname="' + hospitalName
+				+ '" data-time="' + recordTime
+				+ '" class="btn btn-default btn-lg btn-block">查看细节</a></td>'
 				+'</tr>';
 		}
 
 
 		if(!patientRecords) return;
 		for(var i = 0; i < patientRecords.length; i++) {
-			// var recordRow = buildRecordHTML(patientRecords[i]);
 			var recordRow = buildRecordRow(patientRecords[i]);
 			var row = document.getElementById("patientRecords-table").insertRow(1);
 			row.innerHTML = recordRow;
 			$("#patientRecord-"+patientRecords[i].RecordId).click(function(){
+				recordDetailTargetHospitalName = $(this).data('targethospitalname');
+				recordDetailDoctorName = $(this).data('doctorname');
+				recordDetailTime = $(this).data('time');
+
 				var rid = $(this).data('rid').toString();
 				var pid = $(this).data('pid').toString();
 				var targetHospital = $(this).data('th');
-				console.log([rid, pid, targetHospital]);
-				socket.emit('requestDetail', {rid: rid, did: globalDid, pid: pid,
-										targetHospital: targetHospital});
+				showRecordDetail(pid, targetHospital, rid);
 			});
 		}
 	});
 
 	$(function(){
-
-		// $("#patientRecords-diagnose-button").click(function(){
-		// 	document.getElementById("patientRecords").style.display = "none";
-		// 	document.getElementById("diagnose").style.display = "block";
-
-		// 	document.getElementById("diagnose-inspection").innerHTML = showInspections(globalPid);
-		// });
-
-		// $("#patientRecords-goback").click(function(){
-		// 	document.getElementById("patientRecords").style.display = "none";
-		// 	document.getElementById("patientInfo").style.display = "none";
-		// 	document.getElementById("patientList").style.display = "block";
-		// 	document.getElementById("doctorInfo").style.display = "block";
-		// 	$("#patientRecords-table").find("tr:gt(0)").remove();
-		// });
-
 	});
 </script>
