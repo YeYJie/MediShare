@@ -78,7 +78,7 @@ var xuechangguiInspection = function(ins) {
 		+'		<div class="form-group">';
 
 		ins.attachmentFiles.forEach(function(f){
-			res += '<img src="' + f + '" />';
+			res += '<img src="' + f + '" class="img-responsive"/>';
 		});
 
 	res	+='		</div>'
