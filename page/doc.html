@@ -62,19 +62,6 @@
 	$("#diagnose-div").load("/doc/diagnose.html");
 	$("#recordDetail-div").load("/doc/recordDetail.html");
 
-	// var changeDivVisibility = function(show, hide) {
-	// 	for(var i = 0; i < show.length; i++) {
-	// 		var div = show[i];
-	// 		console.log("changeDivVisibility: show ", div);
-	// 		document.getElementById(div).style.display = "block";
-	// 	}
-	// 	for(var i = 0; i < hide.length; i++) {
-	// 		var div = hide[i];
-	// 		console.log("changeDivVisibility: hide ", div);
-	// 		document.getElementById(div).style.display = "none";
-	// 	}
-	// }
-
 	socket.on('event', function(data) {
 		console.log(data);
 		if (data.EventType === "deRegister") {
@@ -92,10 +79,7 @@
 			if (payload.Doctor === globalDid) {
 				console.log("patient register to me", payload.Patient);
 				var pid = payload.Patient;
-				buildPatientBlock({
-					id: pid,
-					name: ""
-				});
+				addPatient({id: pid});
 			}
 		} else if (data.EventType === "newRecord") {
 			var payload = JSON.parse(data.Payload);

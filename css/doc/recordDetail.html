@@ -15,7 +15,7 @@
 			if(!value || value === "")
 				value = "无";
 			return '<tr><td class="col-md-3">' + name + ':</td><td colspan="3">' + value + '</td></tr>';
-		}
+		};
 
 		var buildDetailTable = function(detail) {
 			var table = ''
@@ -37,16 +37,39 @@
 			table += '	</tbody>'
 					+'</table>';
 			return table;
+		};
+
+		var buildAttachmentFile = function(attachmentFile) {
+			return ''
+			+'<div class="row">'
+			+'	<div class="col-md-12">'
+			+'		<div class="form-group">'
+			+'			<img src="' + attachmentFile + '" class="img-responsive"/>'
+			+'		</div>'
+			+'	</div>'
+			+'</div>';
 		}
 
 		var res = '';
 		res += buildDetailTable(detail);
 
-		var inspections = JSON.parse(detail.jianyan);
-		if(!inspections) return res;
-		inspections.forEach(function(ins){
-			res += buildInspection(ins);
-		});
+		if(detail.jianyan !== "undefined") {
+			var inspections = JSON.parse(detail.jianyan);
+			if(inspections) {
+				inspections.forEach(function(ins){
+					res += buildInspection(ins);
+				});
+			}
+		}
+
+		var attachmentFiles = detail.attachmentFiles;
+		console.log("[buildDetail] attachmentFiles: ", attachmentFiles);
+		if(attachmentFiles.length > 0) {
+			attachmentFiles.forEach(function(af){
+				res += buildAttachmentFile(af);
+			});
+		}
+
 		return res;
 	};
 

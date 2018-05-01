@@ -159,8 +159,6 @@
 	$(function(){
 
 		$("#diagnose-submit").click(function(){
-			document.getElementById("diagnose").style.display = "none";
-			document.getElementById("patientRecords").style.display = "block";
 
 			console.log('diagnose-submit-button click')
 			var formData = gatherDiagnose();
@@ -181,12 +179,6 @@
 				error: function(xhr) {
 				}
 			});
-		});
-
-		$("#diagnose-goback").click(function(){
-			document.getElementById("diagnose").style.display = "none";
-			document.getElementById("patientRecords").style.display = "block";
-			clearDiagnose();
 		});
 
 	});
