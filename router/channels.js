@@ -17,6 +17,7 @@
 var util = require('util');
 var log4js = require('log4js');
 var logger = log4js.getLogger('channelRouter');
+logger.setLevel('ERROR');
 var express = require('express');
 var router = express.Router();
 var query=require('../app/query.js');
@@ -210,7 +211,7 @@ router.post('/channels/:channelName/chaincodes', function(req, res) {
 // Invoke transaction on chaincode on target peers
 router.post('/channels/:channelName/chaincodes/:chaincodeName', function(req, res) {
     logger.debug('==================== INVOKE ON CHAINCODE ==================');
-    console.log(req.body)
+    // console.log(req.body)
     var peers = req.body.peers;
     var chaincodeName = req.params.chaincodeName;
     var channelName = req.params.channelName;
@@ -445,86 +446,5 @@ router.get('/channels/:channelName/height', function(req, res) {
             res.send(message);
         });
 });
-
-// router.get('/myregister', function(req, res) {
-//     logger.warn('========== get myregister ==========');
-//     let eventName = req.query.event;
-//     myEventListener.myRegisterEventListener('org1', eventName);
-//     res.send("myRegisterEventListener return")
-// });
-
-
-// var mongo = require("../app/mongo.js");
-// router.get('/hospital/getPatientData', function(req, res) {
-//     logger.warn('============== get patient data ===============');
-//     logger.warn(req.query.doctor);
-//     logger.warn(req.query.txid);
-//     mongo.find(req.query.doctor, req.query.txid).then(
-//         (data) => {
-//             logger.warn('get patient data done');
-//             logger.warn(data);
-//             res.send(data);
-//         },
-//         (reason) => {
-//             logger.warn('get patient data fails');
-//             res.send("fail to get patient data");
-//         }
-//     );
-// });
-
-// router.get('/register', function(req, res) {
-//     let patient = req.query.patient;
-//     let h = req.query.hospital;
-//     let doctor = req.query.doctor;
-//     let patientTime = req.query.patientTime;
-//     let patientSig = req.query.patientSig;
-//     hospital.myregister(patient, h, doctor, patientTime, patientSig);
-//     res.send("register return");
-// });
-
-
-
-// var exec = require('child-process-promise').exec;
-
-// router.get('/ajaxtest/:patient', function(req, res){
-
-//     var patient = req.params.patient;
-
-//     // doctor.getPatientRecord(patient);
-//     var cmd = "./demo/getPatientRecord.sh ./demo/doctorPri d1 h1 " + patient + " ./demo/doctorProf";
-
-//     exec(cmd)
-//         .then(function (result) {
-//             var stdout = result.stdout;
-//             // var stderr = result.stderr;
-//             console.log('stdout: ', stdout);
-//             // console.log('stderr: ', stderr);
-//             var tokens = stdout.split(", ");
-//             var buildHTML = function(full, patient, targetHospital, recordId) {
-//                 var res = '<form method="POST" action="/apis/getPatientRecord">';
-//                 res += full;
-//                 res += '<input type="hidden" name="patient" value="' + patient + '">';
-//                 res += '<input type="hidden" name="targetHospital" value="' + targetHospital + '">';
-//                 res += '<input type="hidden" name="recordId" value="' + recordId + '">';
-//                 res += '<input type="submit" value="Submit" onclick="shit()"></form>'
-//                 return res;
-//             };
-//             res.send(buildHTML(stdout, patient, tokens[0], tokens[2]));
-//         })
-//         .catch(function (err) {
-//             console.error('ERROR: ', err);
-//         });
-//     // res.send("shit");
-// });
-
-// router.post('/getPatientRecord', function(req, res) {
-//     var patient = req.body.patient;
-//     var targetHospital = req.body.targetHospital;
-//     var recordId = req.body.recordId;
-//     console.log(patient);
-//     console.log(targetHospital);
-//     console.log(recordId);
-//     res.send("getPatientRecord return");
-// });
 
 module.exports = router;

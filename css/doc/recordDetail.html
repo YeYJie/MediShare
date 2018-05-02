@@ -87,8 +87,8 @@
 	}
 
 	socket.on('recordDetail', function(data){
-		var detail = JSON.parse(data.recordDetail);
 		console.log('recordDetail data: ', data);
+		var detail = JSON.parse(data.recordDetail);
 		updateDetailCache(data.pid, data.targetHospital, data.rid, detail);
 		showRecordDetail(data.pid, data.targetHospital, data.rid);
 	});

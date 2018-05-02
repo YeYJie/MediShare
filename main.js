@@ -12,8 +12,6 @@ var util = require('util');
 require('./socket/websocketserver.js')(http)
 
 var timer=require('./timer/timer.js')
-// timer.start()
-
 
 var query=require('./app/query.js');
 var ledgerMgr=require('./utils/ledgerMgr.js')
@@ -22,7 +20,7 @@ var statusMertics=require('./service/metricservice.js')
 
 var channelsRouter=require('./router/channels.js')
 
-// app.use(express.static(path.join(__dirname,'explorer_client')));
+
 app.use(express.static('css'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -42,11 +40,12 @@ var dbname = process.env.DBNAME;
 
 console.log([host, port, hospital, hospitalName, dbname]);
 
-// var mongodb = require('./app/mongo.js');
-var MongoClient = require('mongodb').MongoClient;
+
+var mongo = require('mongodb')
+var MongoClient = mongo.MongoClient;
 var MongoURL = "mongodb://localhost:27017/";
 
-// var exec = require('await-exe');
+
 const cp = require('child_process')
 
 function exec(command, options = { log: false, cwd: process.cwd() }) {
@@ -80,31 +79,14 @@ var asyncExec = function(cmd, callback) {
 		});
 };
 
-var doctorIdToName = new Map;
-doctorIdToName["14301036"] = "董文广";
-doctorIdToName["14301037"] = "詹文华";
-doctorIdToName["14301038"] = "万加生";
-doctorIdToName["14301039"] = "胡作军";
-doctorIdToName["14301040"] = "王劲松";
-var patientIdToName = new Map;
-patientIdToName["24301030"] = "王勇";
-patientIdToName["24301031"] = "张静";
-patientIdToName["24301032"] = "李杰";
-patientIdToName["24301033"] = "李桂英";
-patientIdToName["24301034"] = "张艳";
-patientIdToName["24301035"] = "张秀英";
-patientIdToName["24301036"] = "张伟";
+
 
 
 var doctorSocket = new Map;
 var patientSocket = new Map;
 
-var doctorPatients = new Map;
-var patientDoctor = new Map;
-var registerdPatients = [];
 var jianyanke = [];
 
-var workingDoctors = [];
 var patientsNotRegister = [];
 
 var eventWatcher = [];
@@ -112,42 +94,15 @@ var eventWatcher = [];
 var currentBlock;
 var latestBlock = [];
 
-var register = function(pid, did) {
-	if(did === "0") {
-		did = "14301036";
-	}
-	if(util.isArray(doctorPatients[did])) {
-		doctorPatients[did].push(pid);
-	} else {
-		doctorPatients[did] = [pid];
-	}
-	console.log(register, [pid, did], doctorPatients[did]);
-	return did;
-};
-var deRegister = function(pid, did) {
-	var patients = doctorPatients[did];
-	if(!patients)
-		return;
-	var index = patients.indexOf(pid);
-	if (index > -1) {
-		doctorPatients[did].splice(index, 1);
-	}
-	console.log(deRegister, [pid, did], doctorPatients[did]);
-};
 
-
-
-app.get('/doctorPage', function(req, res){
-	res.sendFile(__dirname + '/page/doctor.html-old');
-});
 
 app.get('/doc', function(req, res){
-	console.log('/doc');
+	// console.log('/doc');
 	res.sendFile(__dirname + '/page/doc.html');
 });
 
 app.get('/patient', function(req, res){
-	console.log('/patient')
+	// console.log('/patient')
 	res.sendFile(__dirname + '/page/patient.html');
 });
 
@@ -155,11 +110,12 @@ app.get('/jianyanke', function(req, res){
 	res.sendFile(__dirname + '/page/jianyanke.html');
 });
 
-
 app.get('/blockchain', function(req, res){
-	console.log('/blockchain')
+	// console.log('/blockchain')
 	res.sendFile(__dirname + '/page/blockchain.html');
 });
+
+
 
 const asyncMiddlewareThreeArgs = fn =>
 	(req, res, next) => {
@@ -171,45 +127,66 @@ const asyncMiddlewareOneArgs = fn =>
 		Promise.resolve(fn(req)).catch();
 	};
 
+
+
+async function getDoctorInfo(did) {
+	var db = await MongoClient.connect(MongoURL);
+	var res = await db.db(dbname).collection("doctor").findOne({id: did}, {header: 0, prikey: 0, pkc: 0, _id: 0});
+	return res;
+};
+
 app.get('/getDoctorInfo/:id', asyncMiddlewareThreeArgs(async function(req, res, next) {
 	var id = req.params.id;
-	console.log('/getDoctorInfo/:id ', id);
-	var db = await MongoClient.connect(MongoURL);
-	var mongoRes = await db.db(dbname).collection("doctor").findOne({id: id}, {header: 0, prikey: 0, pkc: 0});
-	res.send(mongoRes);
+	console.log('[getDoctorInfo] id: ', id);
+	var doctorInfo = await getDoctorInfo(id);
+	res.send(doctorInfo);
 }));
+
+
+
+async function getPatientInfo(pid) {
+	var db = await MongoClient.connect(MongoURL);
+	var res = await db.db("patient").collection("patient").findOne({id: pid}, {header: 0, prikey: 0, pkc: 0, _id: 0});
+	return res;
+};
 
 app.get('/getPatientInfo/:id', asyncMiddlewareThreeArgs(async function(req, res, next) {
 	var id = req.params.id;
 	console.log('[getPatientInfo] id: ', id);
-	var db = await MongoClient.connect(MongoURL);
-	var mongoRes = await db.db("patient").collection("patient").findOne({id: id}, {header: 0, prikey: 0, pkc: 0});
-	res.send(mongoRes);
+	var patientInfo = await getPatientInfo(id);
+	res.send(patientInfo);
 }));
 
 
-app.get('/getDoctorsPatients/:id', function(req, res){
+
+
+async function getDoctorsPatients(did) {
+	var db = await MongoClient.connect(MongoURL);
+	var result = await db.db(dbname).collection("doctor_patients")
+						.find({did: did}, {_id: 0}).toArray();
+	console.log("[getDoctorsPatients] result: ", result);
+	return result;
+}
+
+app.get('/getDoctorsPatients/:id', asyncMiddlewareThreeArgs(async function(req, res, next){
 	var id = req.params.id;
-	console.log('/getDoctorsPatients/:id ', id);
-	var patients = doctorPatients[id];
-	if(!patients || !util.isArray(patients) || typeof patients == 'undefined') {
-		res.send({patients:[]});
-		return;
-	}
-	var temp = [];
-	for(var i = 0; i < patients.length; i++) {
-		temp[i] = {name: patientIdToName[patients[i]], id: patients[i]};
-	}
-	res.send({patients: temp});
-});
+	console.log('[getDoctorsPatients] id: ', id);
+	var doctorPatients = await getDoctorsPatients(id);
+	res.send({patients: doctorPatients});
+}));
+
+
 
 function doGetHeader(req, res) {
 	id = req.params.id;
-	console.log('/header/:id ', id);
 	res.sendFile(__dirname + '/header/' + id + '.png');
 };
 
 app.get('/header/:id', doGetHeader);
+
+
+
+const timeout = ms => new Promise(res => setTimeout(res, ms));
 
 async function doRequestDetail(req, res, next) {
 	var txid = req.params.txid;
@@ -219,62 +196,41 @@ async function doRequestDetail(req, res, next) {
 	var index = await db.db(dbname).collection("index").findOne({txid: txid});
 	if(!index) {
 		console.log("[doRequestDetail] index not exists, txid: ", txid);
-		setTimeout(doRequestDetail(req, res, next), 50);
-		return;
+		await timeout(5000);
+		doRequestDetail(req, res, next);
 	}
 	var rid = index.rid;
 	console.log("[doRequestDetail] rid: ", rid);
 	var detail = await db.db(dbname).collection("data").findOne({rid: rid});
-	console.log("[doRequestDetail] detail: ", detail);
+	console.log("[doRequestDetail] detail before: ", detail);
+
+		var jianyan = [];
+		var jianyanIds = detail.jianyanIds;
+		if(jianyanIds) {
+			// for(var i = 0; i < jianyanIds.length; i++) {
+				// var jianyanId = jianyanIds[i];
+				var jianyanId = jianyanIds;
+				var ins = await db.db(dbname).collection("jianyan").findOne({'_id': new mongo.ObjectID(jianyanId)});
+				jianyan.push(ins);
+			// }
+		}
+		detail.jianyan = JSON.stringify(jianyan);
+
+	console.log("[doRequestDetail] detail after: ", detail);
+
 	res.send(detail);
-	// MongoClient.connect(MongoURL, function(err, db) {
-	// 	if (err) throw err;
-	// 	var dbo = db.db(dbname);
-	// 	dbo.collection("index").findOne({txid: txid}, function(err, res) {
-	// 		if (err) throw err;
-	// 		if(!res) {
-	// 			setTimeout(doRequestDetail(req, httpRes), 50);
-	// 			return;
-	// 		}
-	// 		var rid = res.rid;
-	// 		console.log("find mongodb [index] rid: ", rid);
-	// 		dbo.collection("data").findOne({rid: rid}, function(err, res) {
-	// 			if(err) throw err;
-	// 			console.log("find mongodb [data] ", res);
-	// 			httpRes.send(res);
-	// 			db.close();
-	// 		});
-	// 	});
-	// });
 }
 
 app.get('/requestDetail/:txid', asyncMiddlewareThreeArgs(doRequestDetail));
 
-// app.get('/getPatientNameFromId/:pid', function(req, res){
-// 	var pid = req.params.pid;
-// 	// res.send(patientIdToName[pid]);
-// 	MongoClient.connect(MongoURL, function(err, db) {
-// 		if (err) throw err;
-// 		var dbo = db.db("patient");
-// 		dbo.collection("patient").findOne({id: pid}, {name: 1},  function(err, mres) {
-// 			if (err) throw err;
-// 			res.send(mres.name);
-// 			db.close();
-// 		});
-// 	});
-// });
 
-app.get('/getPatientNameFromId/:pid', asyncMiddlewareThreeArgs(async function(req, res, next){
-	var pid = req.params.pid;
-	var db = await MongoClient.connect(MongoURL);
-	var name = await db.db("patient").collection("patient").findOne({id: pid}, {name: 1});
-	res.send(name.name);
-}));
 
 app.get('/file/:fileName', function(req, res){
 	var fileName = req.params.fileName;
 	res.sendFile(__dirname + '/file/' + fileName);
 });
+
+
 
 const fileUpload = require('express-fileupload');
 app.use(fileUpload());
@@ -283,7 +239,9 @@ app.post('/upload', asyncMiddlewareThreeArgs(async function(req, res){
 
 	var currentTime = Math.floor(new Date() / 1000).toString();
 	var did = req.body.did;
+	var dname = req.body.dname;
 	var pid = req.body.pid;
+	var pname = req.body.pname;
 	var recordId = [currentTime, did, pid].join("-");
 
 	var data = req.body;
@@ -314,30 +272,11 @@ app.post('/upload', asyncMiddlewareThreeArgs(async function(req, res){
 		}
 	}
 
-	// MongoClient.connect(MongoURL, function(err, db) {
-	// 	if (err) throw err;
-	// 	var dbo = db.db(dbname);
-	// 	dbo.collection("data").insertOne(data, function(err, res) {
-	// 		if (err) throw err;
-	// 		console.log("insert into mongodb [data] success");
-	// 		// db.close();
-
-	// 		var cmd = ['./bishe/newRecord.sh', hospital, did, pid, data.zhenduan].join(' ');
-	// 		asyncExec(cmd, function(result){
-	// 			// res.send("upload files success");
-	// 			var txid = result.stdout;
-	// 			var chaincodeIdToRid = {rid: recordId, chaincodeId: txid};
-	// 			dbo.collection("chaincodeIdToRid").insertOne(chaincodeIdToRid, function(err, res){
-	// 				if(err) throw err;
-	// 				console.log("insert into mongodb [chaincodeIdToRid] success");
-	// 				db.close();
-	// 			});
-	// 		});
-	// 	});
-	// });
 	var db = await MongoClient.connect(MongoURL);
 	db.db(dbname).collection("data").insertOne(data);
-	var cmd = ['./bishe/newRecord.sh', hospital, did, pid, data.zhenduan].join(' ');
+
+	var cmd = ['./bishe/newRecord.sh', hospital, hospitalName,
+					did, dname, pid, pname, data.zhenduan, data.jianyanNames].join(' ');
 	var execResult = await exec(cmd);
 	var txid = execResult.stdout;
 	var chaincodeIdToRidRecord = {rid: recordId, chaincodeId: txid};
@@ -346,21 +285,14 @@ app.post('/upload', asyncMiddlewareThreeArgs(async function(req, res){
 	res.send("upload file success");
 }));
 
-app.get('/execAwaitTest', asyncMiddlewareThreeArgs(async function(req, res){
-	var echo = await exec('echo "shit"');
-	res.send(echo);
-}));
 
 
-app.post('/jianyankeUpload', function(req, res){
+app.post('/jianyankeUpload', asyncMiddlewareThreeArgs(async function(req, res, next){
 
 	var currentTime = Math.floor(new Date() / 1000).toString();
-	var pid = req.body.pid;
-	var did = patientDoctor[pid];
 
 	var data = req.body;
 	data.files = null;
-	data.did = did;
 	data.attachmentFiles = [];
 
 	if(req.files) {
@@ -386,11 +318,18 @@ app.post('/jianyankeUpload', function(req, res){
 		}
 	}
 
-	console.log('jianyankeUpload', [pid, did], data);
+	var db = await MongoClient.connect(MongoURL);
+	var doc = await db.db(dbname).collection("jianyan").insertOne(data);
+
+	var jianyanId = doc.ops[0]._id;
+	data.jianyanId = jianyanId;
+
+	var did = data.did;
 	doctorSocket[did].emit("newInspection", {data: data});
-	doctorSocket[did].emit("debug", {msg: "shit"});
 	res.send("upload file success");
-});
+}));
+
+
 
 
 var io = require('socket.io')(http);
@@ -437,194 +376,164 @@ io.on('connection', function(socket){
 	// 	}
 
 	// });
-	// socket.on('signupState', function(req) {
-	// 	var role = req.role;
-	// 	var id = req.id;
-	// 	var name = "yeyongjie";
-	// 	console.log('signupState', [role, id]);
-	// 	var prikey = "prikey";
-	// 	var pkc = "pkc";
-	// 	socket.emit('signUpSuccess', {role: role, id: id, name: name, prikey: prikey, pkc: pkc});
-	// });
+
 
 
 	/*
 	*	For Patient
 	*/
-	socket.on('newPatient', function(req){
+	async function getWorkingDoctors() {
+		var db = await MongoClient.connect(MongoURL);
+		var workingDoctors = await db.db(dbname).collection("working_doctor").find().toArray();
+		return workingDoctors;
+	}
+
+	socket.on('newPatient', asyncMiddlewareOneArgs(async function(req){
 		patientsNotRegister.push(socket);
+		var workingDoctors = await getWorkingDoctors();
 		socket.emit('doctors', {doctors: workingDoctors, hname: hospitalName});
-	});
+	}));
 	socket.on('register', asyncMiddlewareOneArgs(async function(req){
 		var pid = req.pid;
 		var did = req.did;
 		var time = req.time;
 		var sig = req.sig;
 		var pkc = req.pkc;
-		patientSocket[pid] = socket;
-		did = register(pid, did);
-		console.log('patient register', [pid, did, time, sig, pkc]);
-		var cmd = ['./bishe/register.sh', pid, did, hospital].join(' ');
-		asyncExec(cmd, function(result){
-			var index = patientsNotRegister.indexOf(socket);
-			if (index > -1) {
-				patientsNotRegister.splice(index, 1);
-			}
-		});
 
-		cmd = './bishe/getDoctorInfo.sh ' + did;
-		console.log(cmd);
-		// asyncExec(cmd, function(result){
-		// 	console.log('./bishe/getDoctorInfo.sh result: ', result.stdout);
-		// 	socket.emit('doctorInfo', {did: did, hospitalName: hospitalName, doctorInfo: result.stdout});
-		// });
-		var execResult = await exec(cmd);
-		var doctorInfo = execResult.stdout;
+		patientSocket[pid] = socket;
+
+		var patientInfo = await getPatientInfo(pid);
+		var doctorInfo = await getDoctorInfo(did);
+
 		socket.emit('doctorInfo', {did: did, hospitalName: hospitalName, doctorInfo: doctorInfo});
 
-		registerdPatients.push(pid);
-		patientDoctor[pid] = did;
+		var db = await MongoClient.connect(MongoURL);
+		db.db(dbname).collection("doctor_patients")
+				.insertOne({did: did, dname: doctorInfo.name,
+							pid: pid, pname: patientInfo.name,
+							keshi: doctorInfo.keshi, registerTime: time,
+							status: "onRegistered"});
+
+		var cmd = ['./bishe/register.sh', pid, did, hospital].join(' ');
+		await exec(cmd);
+		var index = patientsNotRegister.indexOf(socket);
+		if (index > -1) {
+			patientsNotRegister.splice(index, 1);
+		}
+
 		jianyanke.forEach(function(socket){
 			if(!socket || typeof socket == undefined) return;
-			socket.emit('patients', {patients:[{id: pid, name: patientIdToName[pid]}]});
+			socket.emit('patients', {patients:[{pid: pid, pname: patientInfo.name,
+				did: did, dname: doctorInfo.name, keshi: doctorInfo.keshi, registerTime: time}]});
 		});
 	}));
-	socket.on('deRegister', function(req){
+
+
+	socket.on('deRegister', asyncMiddlewareOneArgs(async function(req){
 		var pid = req.id;
 		var did = req.did;
 		var time = req.time;
 		var sig = req.sig;
 		var pkc = req.pkc;
-		deRegister(pid, did);
-		console.log('patient deRegister', [pid, did, time, sig, pkc]);
-		var cmd = ['./bishe/deRegister.sh', pid, did, hospital].join(' ');
-		// asyncExec(cmd, function(result){
-		// 	console.log("patient deRegister success");
-		// });
-		exec(cmd);
 
-		var index = registerdPatients.indexOf(pid);
-		if(index > -1)
-			registerdPatients.splice(index, 1);
-		delete patientDoctor[pid];
+		var cmd = ['./bishe/deRegister.sh', pid, did, hospital].join(' ');
+		await exec(cmd);
+
+		var db = await MongoClient.connect(MongoURL);
+		db.db(dbname).collection("doctor_patients")
+				.updateOne({did: did, pid: pid},
+							{$set: {status: "deRegistered", deRegisterTime: time}});
+
 		delete patientSocket[pid];
 		jianyanke.forEach(function(socket){
 			if(!socket || typeof socket == undefined) return;
 			socket.emit('deRegister', {pid: pid});
 		});
-	});
+	}));
+
+
+
 
 	/*
 	*	For jianyanke
 	*/
-	socket.on('jianyanke', function(req){
+	socket.on('jianyanke', asyncMiddlewareOneArgs(async function(req){
 		jianyanke.push(socket);
-		var patients = [];
-		registerdPatients.forEach(function(pid) {
-			patients.push({id: pid, name: patientIdToName[pid]});
-		});
+
+		var db = await MongoClient.connect(MongoURL);
+		var patients = await db.db(dbname).collection("doctor_patients")
+						.find({status: "onRegistered"}, {_id: 0}).toArray();
 		socket.emit('patients', {patients: patients});
-	});
+	}));
+
 
 
 	/*
 	*	For Doctor
 	*/
 
+	async function newWorkingDoctor(doctorInfo) {
+		var time = Math.floor(new Date() / 1000).toString();
+		var db = await MongoClient.connect(MongoURL);
+		var mongoRes = db.db(dbname).collection("working_doctor")
+			.insertOne({did: doctorInfo.id, dname: doctorInfo.name, keshi: doctorInfo.keshi, time: time});
+		return mongoRes;
+	}
+
+
 	socket.on('login', asyncMiddlewareOneArgs(async function(req){
 		var id = req.id;
 		var pwd = req.pwd;
-		console.log('login', [id, pwd]);
 		doctorSocket[id] = socket;
 		eventWatcher.push(socket);
-		// myEventListener.myRegisterEventListener('org1', "d1", doctor.doctorHandler, socket);
-		var cmd = './bishe/getDoctorInfo.sh ' + id;
-		console.log(cmd);
-		// asyncExec(cmd, function(result){
-		// 	console.log('./bishe/getDoctorInfo.sh result: ', result.stdout);
-		// 	var doctorInfo = JSON.parse(result.stdout);
-		// 	workingDoctors.push({did: id, name: doctorInfo.name, keshi: doctorInfo.keshi});
-		// 	console.log('doctor login', workingDoctors);
-		// 	socket.emit('doctorInfo', {id: id, hospitalName: hospitalName, doctorInfo: result.stdout});
-		// 	for(var i = 0; i < patientsNotRegister.length; i++) {
-		// 		patientsNotRegister[i].emit("newWorkingDoctor", {doctor: {did: id, name: doctorInfo.name, keshi: doctorInfo.keshi}});
-		// 	}
-		// })
 
-		var execResult = await exec(cmd);
-		var doctorInfo = JSON.parse(execResult.stdout);
+		var doctorInfo = await getDoctorInfo(id);
+		socket.emit('doctorInfo', {id: id, hospitalName: hospitalName, doctorInfo: doctorInfo});
 
-		workingDoctors.push({did: id, name: doctorInfo.name, keshi: doctorInfo.keshi});
-		console.log('doctor login', workingDoctors);
-		socket.emit('doctorInfo', {id: id, hospitalName: hospitalName, doctorInfo: execResult.stdout});
+		await newWorkingDoctor(doctorInfo);
 
 		for(var i = 0; i < patientsNotRegister.length; i++) {
-			patientsNotRegister[i].emit("newWorkingDoctor", {doctor: {did: id, name: doctorInfo.name, keshi: doctorInfo.keshi}});
+			patientsNotRegister[i].emit("newWorkingDoctor",
+					{doctor: {did: id, dname: doctorInfo.name, keshi: doctorInfo.keshi}});
 		}
 
-
-		cmd = './bishe/getDoctorsPatients.sh ' + id;
-		console.log(cmd);
-		// asyncExec(cmd, function(result){
-		// 	console.log('./bishe/getDoctorsPatients.sh result: ', result.stdout);
-		// 	socket.emit('doctorPatients', {id: id, patients: JSON.parse(result.stdout).patients});
-		// });
-		execResult = await exec(cmd);
-		var doctorPatients = JSON.parse(execResult.stdout).patients;
-		console.log("[socket.on doc login] doctorPatients: ", doctorPatients);
-		socket.emit('doctorPatients', {id: id, patients: doctorPatients});
+		var doctorPatients = await getDoctorsPatients(id);
+		socket.emit('patients', {id: id, patients: doctorPatients});
 	}));
 
-	socket.on("doctorLogout", function(req) {
+
+	socket.on("doctorLogout", asyncMiddlewareOneArgs(async function(req) {
 		var did = req.did;
 		delete doctorSocket[did];
-		for(var i = 0; i < workingDoctors.length; i++) {
-			if(workingDoctors[i].did === did) {
-				workingDoctors.splice(i, 1);
-				break;
-			}
-		}
+
 		for(var i = 0; i < patientsNotRegister.length; i++) {
 			patientsNotRegister[i].emit("doctorLogout", {did: did});
 		}
-		console.log("doctorLogout", did, workingDoctors);
-	});
+
+		var db = await MongoClient.connect(MongoURL);
+		await db.db(dbname).collection("working_doctor")
+				.deleteOne({did: did});
+	}));
+
 
 	socket.on('getPatientRecords', asyncMiddlewareOneArgs(async function(req){
 		var doctorId = req.doctorId;
 		var patientId = req.patientId;
-		console.log('getPatientRecords', [doctorId, patientId]);
-		var cmd = './bishe/getPatientInfo.sh ' + patientId;
-		console.log(cmd);
-		// asyncExec(cmd, function(result){
-		// 	console.log('./bishe/getPatientInfo.sh result: ', result.stdout);
-		// 	socket.emit('patientInfo', {id: patientId, hospital: hospital, patientInfo: result.stdout});
-		// })
-		var execResult = await exec(cmd);
-		var patientInfo = execResult.stdout;
+
+		var patientInfo = await getPatientInfo(patientId);
 		socket.emit('patientInfo', {id: patientId, hospital: hospital, patientInfo: patientInfo});
 
 		var end = Math.floor(new Date() / 1000);
 		cmd = './bishe/getPatientRecords.sh ' + doctorId + ' ' + hospital + ' ' + patientId + ' 0 ' + end.toString();
-		// asyncExec(cmd, function(result) {
-		// 	console.log('./bishe/getPatientRecords.sh result: ', result.stdout);
-		// 	var records = JSON.parse(result.stdout).Records;
-		// 	if(records) {
-		// 		for(var i = 0; i < records.length; i++)
-		// 			records[i].Doctor = doctorIdToName[records[i].Doctor];
-		// 	}
-		// 	socket.emit('patientRecords', {id: patientId, records: records});
-		// });
-
+		console.log("socket.on getPatientRecords cmd: ", cmd);
 		execResult = await exec(cmd);
 		var patientRecords = JSON.parse(execResult.stdout).Records;
 		console.log("[socket.on getPatientRecords] patientRecords: ", patientRecords);
-		if(patientRecords) {
-			for(var i = 0; i < patientRecords.length; i++)
-				patientRecords[i].Doctor = doctorIdToName[patientRecords[i].Doctor];
-		}
+
 		socket.emit('patientRecords', {id: patientId, records: patientRecords});
 	}));
+
+
 
 	socket.on('requestDetail', asyncMiddlewareOneArgs(async function(req){
 		var rid = req.rid;
@@ -649,34 +558,13 @@ io.on('connection', function(socket){
 		cmd = 'curl -sS ' + targetHospitalIpPort + '/requestDetail/' + txid;
 		execResult = await exec(cmd);
 		var recordDetail = execResult.stdout;
-		console.log("[socket.on requestDetail] recordDetail: ", recordDetail);
+		console.log("[socket.on requestDetail] recordDetail : ", recordDetail);
+
 		socket.emit('recordDetail', {did: did, pid:pid, txid: txid,
 			rid: rid, targetHospital: targetHospital, recordDetail: recordDetail});
-
-
-		// asyncExec(cmd, function(result) {
-		// 	console.log(cmd, result.stdout);
-
-		// 	if(result.stdout.indexOf(' ') >= 0) {
-		// 		console.log('requestDetail failed');
-		// 	} else {
-		// 		var txid = result.stdout;
-
-		// 		var targetHospitalIpPort = "http://172.18.232.124:8080";
-		// 		if(targetHospital.toString() === "2")
-		// 			targetHospitalIpPort = "http://172.18.232.124:8181";
-
-		// 		cmd = 'curl -sS ' + targetHospitalIpPort + '/requestDetail/' + txid;
-		// 		console.log(cmd);
-		// 		asyncExec(cmd, function(result){
-		// 			console.log(cmd, result.stdout);
-		// 			socket.emit('recordDetail', {did: did, pid:pid, txid: txid,
-		// 				rid: rid, targetHospital: targetHospital, recordDetail: result.stdout});
-		// 		});
-		// 	}
-
-		// });
 	}));
+
+
 
 	socket.on('search-time', function(req) {
 		console.log("search-time", [req.type, req.begin, req.end]);
@@ -733,25 +621,10 @@ var eventCallback = async function(event) {
 			var chaincodeIdToRid =  await db.db(dbname).collection("chaincodeIdToRid").findOne({chaincodeId: ccid});
 			var rid = chaincodeIdToRid.rid;
 			db.db(dbname).collection("index").insertOne({txid: e.TxId, rid: rid});
-
-			// MongoClient.connect(MongoURL, function(err, db) {
-			// 	if (err) throw err;
-			// 	var dbo = db.db(dbname);
-			// 	dbo.collection("chaincodeIdToRid").findOne({chaincodeId: ccid}, function(err, res) {
-			// 		if (err) throw err;
-			// 		var rid = res.rid;
-			// 		console.log("find mongodb [chaincodeIdToRid] rid: ", rid);
-			// 		dbo.collection("index").insertOne({txid: e.TxId, rid: rid}, function(err, res) {
-			// 			if(err) throw err;
-			// 			console.log("insert into mongodb [index] success", [e.TxId, rid]);
-			// 			db.close();
-			// 		});
-			// 	});
-			// });
-
 		}
 	}
 };
+
 
 
 function updateBlock() {
@@ -790,7 +663,15 @@ setInterval(updateBlock, 1000);
 
 // ============= start server =======================
 
-var server = http.listen(port, function() {
+var server = http.listen(port, async function() {
+	try {
+		var db = await MongoClient.connect(MongoURL);
+		await db.db(dbname).collection("working_doctor").remove({});
+		await db.db(dbname).collection("doctor_patients").remove({});
+	}
+	catch(e) {
+		console.log("failed to clean mongodb: ", e);
+	}
 	console.log(`Please open Internet explorer to access ：http://${host}:${port}/`);
 	myEventListener.myRegisterEventListener('org1', "event", asyncMiddlewareThreeArgs(eventCallback), null);
 });

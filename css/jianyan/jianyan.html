@@ -153,6 +153,12 @@
 
 	var inspection = "xuechanggui";
 
+	var inspectionName = {
+		"xuechanggui": "血常规检查",
+		"gangongneng": "肝功能检查",
+		"liangduiban": "乙肝五项"
+	};
+
 	var jianyanItems = {
 		"xuechanggui": ["AST", "ALT", "SL", "TPROT", "ALB", "GLB", "AG", "TBILI", "DBILI", "IBILI", "GGT", "TBA", "IPHOS", "BUN", "CREAT", "CK"],
 		"gangongneng": ["ALT", "AST", "AA", "TBIL", "DBIL", "IBIL", "HBsAg", "GLU", "GLO", "AG", "AFU"],
@@ -161,8 +167,14 @@
 
 	var gatherInputData = function() {
 		var formData = new FormData();
-		formData.append("pid", globalPid);
+		formData.append("pid", currentPatient.pid);
+		formData.append("pname", currentPatient.pname);
+		formData.append("did", currentPatient.did);
+		formData.append("dname", currentPatient.dname);
+		formData.append("keshi", currentPatient.keshi);
+		formData.append("jid", globalDid);
 		formData.append("inspection", inspection);
+		formData.append("jianyan", inspectionName[inspection]);
 		formData.append("analysis", $("#" + inspection + "-analysis").val());
 		$.each($("#attachmentFiles")[0].files, function(i, file) {
 			formData.append('attachmentFiles', file);

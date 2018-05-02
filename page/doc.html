@@ -77,13 +77,20 @@
 		} else if (data.EventType === "register") {
 			var payload = JSON.parse(data.Payload);
 			if (payload.Doctor === globalDid) {
-				console.log("patient register to me", payload.Patient);
-				var pid = payload.Patient;
-				addPatient({id: pid});
+				$.ajax({
+					type: "GET",
+					url: "/getDoctorsPatients/" + globalDid,
+					success: function(doctorPatients) {
+						console.log("[ajax getDoctorsPatients]: ", doctorPatients);
+						processPatients(doctorPatients.patients);
+					},
+					error: function(xhr) {
+					}
+				});
 			}
 		} else if (data.EventType === "newRecord") {
 			var payload = JSON.parse(data.Payload);
-			if (payload.Doctor === globalDid && payload.Patient === globalPid) {
+			if (payload.Did === globalDid && payload.Pid === globalPid) {
 				console.log("patient has new record");
 				socket.emit('getPatientRecords', {
 					doctorId: globalDid,

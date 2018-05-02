@@ -118,10 +118,17 @@
 	socket.on('newInspection', function(data){
 		console.log("newInspection", data);
 		var inspection = data.data;
+		var name = inspection.jianyan;
+		var id = inspection.jianyanId;
+		var ins = {
+			name: name,
+			id: id,
+			detail: inspection
+		}
 		if(patientInspection[inspection.pid])
-			patientInspection[inspection.pid].push(inspection);
+			patientInspection[inspection.pid].push(ins);
 		else
-			patientInspection[inspection.pid] = [inspection];
+			patientInspection[inspection.pid] = [ins];
 		console.log('newInspection patientInspection[inspection.pid]: ', patientInspection[inspection.pid]);
 		document.getElementById("diagnose-inspection").innerHTML = showInspections(globalPid);
 	});
@@ -132,7 +139,23 @@
 		formData.append('did', globalDid);
 		formData.append('pid', globalPid);
 
-		formData.append('jianyan', JSON.stringify(patientInspection[globalPid]));
+		formData.append('pname', currentPatient.pname);
+		formData.append('dname', currentPatient.dname);
+
+		// formData.append('jianyan', JSON.stringify(patientInspection[globalPid]));
+		var jianyanNames = "无";
+		var jianyanIds = [];
+		if(patientInspection[globalPid]) {
+			jianyanNames = "";
+			var patientInspections = patientInspection[globalPid];
+			for(var i = 0; i < patientInspections.length; i++) {
+				jianyanNames += " " + patientInspections[i].name;
+				jianyanIds.push(patientInspections[i].id);
+			}
+		}
+		formData.append('jianyanNames', jianyanNames);
+		formData.append('jianyanIds', jianyanIds);
+
 		formData.append('zhusu', $("#zhusu").val());
 		formData.append('xianbingshi', $("#xianbingshi").val());
 		formData.append('jiwangshi', $("#jiwangshi").val());
@@ -162,9 +185,9 @@
 
 			console.log('diagnose-submit-button click')
 			var formData = gatherDiagnose();
-			for (var pair of formData.entries()) {
-				console.log(pair[0]+ ': ' + pair[1]);
-			}
+			// for (var pair of formData.entries()) {
+			// 	console.log(pair[0]+ ': ' + pair[1]);
+			// }
 
 			$.ajax({
 				type: "POST",

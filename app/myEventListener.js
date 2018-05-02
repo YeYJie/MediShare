@@ -23,6 +23,7 @@ var EventHub = require('fabric-client/lib/EventHub.js');
 var config = require('../config.json');
 var helper = require('./helper.js');
 var logger = helper.getLogger('myRegisterEventListener');
+logger.setLevel('ERROR');
 
 if(config.enableTls){
     hfc.addConfigFile(path.join(__dirname, 'network-config-tls.json'));

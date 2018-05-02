@@ -198,7 +198,8 @@
 			socket.emit('register', {
 				pid: pid,
 				did: did,
-				pwd: pwd
+				pwd: pwd,
+				time: Math.floor(new Date() / 1000).toString()
 			});
 			document.getElementById("before-register").style.display = "none";
 			document.getElementById("onRegister").style.display = "block";
@@ -262,7 +263,7 @@
 			if (index < 0) {
 				doctorOnPage.push(did);
 				var divHTML = document.getElementById(keshi).innerHTML;
-				divHTML += '<div class="col-md-3" id="' + did + '"><input type="radio" name="doctor" value="' + did + '">' + doctor.name + '</div>';
+				divHTML += '<div class="col-md-3" id="' + did + '"><input type="radio" name="doctor" value="' + did + '">' + doctor.dname + '</div>';
 				document.getElementById(keshi).innerHTML = divHTML;
 			}
 		}
@@ -294,7 +295,7 @@
 
 		socket.on('doctorInfo', function(data) {
 			console.log("doctorInfo", data);
-			var doctorInfo = JSON.parse(data.doctorInfo);
+			var doctorInfo = data.doctorInfo;
 			console.log([doctorInfo.name, doctorInfo.room]);
 			document.getElementById("room").innerHTML = doctorInfo.room;
 			document.getElementById("name").innerHTML = doctorInfo.name;

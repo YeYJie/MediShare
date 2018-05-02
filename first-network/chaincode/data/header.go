@@ -57,18 +57,30 @@ func (t *RequestDetailArgs) GetDoctorSigContent() string {
 }
 
 type NewRecordArgs struct {
-	Hospital		string
-	Doctor			string
-	Patient			string
-	// RecordId		string
-	Inspection		string
+	// Hospital		string
+	// Doctor			string
+	// Patient			string
+	// // RecordId		string
+	// Inspection		string
+	// HospitalTime	string
+	// HospitalSig		string
+	// HospitalPKC		string
+
+	Hid				string
+	Hname			string
+	Did				string
+	Dname			string
+	Pid 			string
+	Pname 			string
+	Zhenduan		string
+	Jianyan			string
 	HospitalTime	string
 	HospitalSig		string
 	HospitalPKC		string
 }
 
 func (t *NewRecordArgs) GetHospitalSigContent() string {
-	return strings.Join([]string{t.Hospital, t.Doctor, t.Patient, t.Inspection, t.HospitalTime}, "!!")
+	return strings.Join([]string{t.Hid, t.Hname, t.Did, t.Dname, t.Pid, t.Pname, t.Zhenduan, t.Jianyan, t.HospitalTime}, "!!")
 }
 
 type GetPatientRecordsArgs struct {
@@ -93,10 +105,13 @@ func (t *GetPatientRecordsArgs) GetDoctorSigContent() string {
 }
 
 type PatientRecordSummary struct {
-	Hospital 		string
-	Doctor 			string
+	Hid 			string
+	Hname 			string
+	Did 			string
+	Dname 			string
 	RecordId 		string
-	Inspection 		string
+	Zhenduan 		string
+	Jianyan 		string
 	RecordTime 		string
 }
 

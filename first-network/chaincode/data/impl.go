@@ -207,28 +207,45 @@ func (t *SimpleAsset) newRecord(stub shim.ChaincodeStubInterface, args []string)
 
 	txTimestamp := t.getTxTimestampSecond(stub)
 
-	err = t.insertIndex(stub, err, []string{"index4", newRecordArgs.Patient, txTimestamp}, recordId)
-	err = t.insertIndex(stub, err, []string{"index5", newRecordArgs.Doctor, txTimestamp}, recordId)
-	err = t.insertIndex(stub, err, []string{"index6", newRecordArgs.Hospital, txTimestamp}, recordId)
+	err = t.insertIndex(stub, err, []string{"index4", newRecordArgs.Pid, txTimestamp}, recordId)
+	err = t.insertIndex(stub, err, []string{"index5", newRecordArgs.Did, txTimestamp}, recordId)
+	err = t.insertIndex(stub, err, []string{"index6", newRecordArgs.Hid, txTimestamp}, recordId)
 	err = t.insertIndex(stub, err, []string{"index10", txTimestamp}, recordId)
 	if err != nil {
 		return shim.Error("failed to insertIndex: " + err.Error())
 	}
 
 	type NewRecordEvent struct {
-		Hospital		string
-		Doctor			string
-		Patient			string
-		RecordId		string
-		Inspection		string
+		// Hospital		string
+		// Doctor			string
+		// Patient			string
+		// Inspection		string
 		HospitalTime	string
+
+		RecordId		string
+
+		Hid				string
+		Hname			string
+		Did				string
+		Dname			string
+		Pid 			string
+		Pname 			string
+		Zhenduan		string
+		Jianyan			string
 	}
 	newRecordEvent := NewRecordEvent {
-		Hospital		: newRecordArgs.Hospital,
-		Doctor			: newRecordArgs.Doctor,
-		Patient			: newRecordArgs.Patient,
+		// Hospital		: newRecordArgs.Hname,
+		// Doctor			: newRecordArgs.Doctor,
+		// Patient			: newRecordArgs.Patient,
+		Hid 			: newRecordArgs.Hid,
+		Hname 			: newRecordArgs.Hname,
+		Pid 			: newRecordArgs.Pid,
+		Pname 			: newRecordArgs.Pname,
+		Did 			: newRecordArgs.Did,
+		Dname 			: newRecordArgs.Dname,
 		RecordId		: recordId,
-		Inspection		: newRecordArgs.Inspection,
+		Zhenduan		: newRecordArgs.Zhenduan,
+		Jianyan 		: newRecordArgs.Jianyan,
 		HospitalTime	: newRecordArgs.HospitalTime,
 	}
 	newRecordEventJson, err := json.Marshal(newRecordEvent)
@@ -340,9 +357,12 @@ func (t *SimpleAsset) getRecord(stub shim.ChaincodeStubInterface,
 	if err != nil {
 		return patientRecordSummary, err
 	}
-	patientRecordSummary.Hospital = newRecordArgs.Hospital
-	patientRecordSummary.Doctor = newRecordArgs.Doctor
-	patientRecordSummary.Inspection = newRecordArgs.Inspection
+	patientRecordSummary.Hid = newRecordArgs.Hid
+	patientRecordSummary.Hname = newRecordArgs.Hname
+	patientRecordSummary.Did = newRecordArgs.Did
+	patientRecordSummary.Dname = newRecordArgs.Dname
+	patientRecordSummary.Zhenduan = newRecordArgs.Zhenduan
+	patientRecordSummary.Jianyan = newRecordArgs.Jianyan
 	patientRecordSummary.RecordId = value
 	patientRecordSummary.RecordTime = keyTokens[2]
 	return patientRecordSummary, nil

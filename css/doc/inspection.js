@@ -6,7 +6,7 @@ var showInspections = function(pid) {
 	var res = "";
 	if(!inspections) return res;
 	inspections.forEach(function(ins){
-		res += buildInspection(ins);
+		res += buildInspection(ins.detail);
 	});
 	return res;
 };

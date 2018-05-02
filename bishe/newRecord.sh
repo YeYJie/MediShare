@@ -3,18 +3,22 @@
 BASEDIR=$(dirname "$0")
 SIGNDIR=$BASEDIR/../../pki
 
-Hospital=$1
-Doctor=$2
-Patient=$3
-Inspection=$4
+Hid=$1
+Hname=$2
+Did=$3
+Dname=$4
+Pid=$5
+Pname=$6
+Zhenduan=$7
+Jianyan=$8
 HospitalTime=$(date +'%s')
-HospitalSig=$($SIGNDIR/sign "$SIGNDIR/$1.key" "$Hospital!!$Doctor!!$Patient!!$Inspection!!$HospitalTime")
+HospitalSig=$($SIGNDIR/sign "$SIGNDIR/$1.key" "$Hid!!$Hname!!$Did!!$Dname!!$Pid!!$Pname!!$Zhenduan!!$Jianyan!!$HospitalTime")
 HospitalPKC="hospitalPKC"
 
 args='{
 	"peers":["127.0.0.1:7051", "127.0.0.1:8051"],
 	"fcn":"newRecord",
-	"args":["{\"Hospital\":\"'$Hospital'\",\"Doctor\":\"'$Doctor'\",\"Patient\":\"'$Patient'\",\"Inspection\":\"'$Inspection'\",\"HospitalTime\":\"'$HospitalTime'\",\"HospitalSig\":\"'$HospitalSig'\",\"HospitalPKC\":\"'$HospitalPKC'\"}"]
+	"args":["{\"Hid\":\"'$Hid'\",\"Hname\":\"'$Hname'\",\"Did\":\"'$Did'\",\"Dname\":\"'$Dname'\",\"Pid\":\"'$Pid'\",\"Pname\":\"'$Pname'\",\"Zhenduan\":\"'$Zhenduan'\",\"Jianyan\":\"'$Jianyan'\",\"HospitalTime\":\"'$HospitalTime'\",\"HospitalSig\":\"'$HospitalSig'\",\"HospitalPKC\":\"'$HospitalPKC'\"}"]
 }
 '
 

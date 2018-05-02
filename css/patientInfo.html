@@ -9,9 +9,9 @@
 
 	var processPatientInfo = function(patient) {
 		var patientInfoHeader = '<img src="/header/' + patient.id + '" />';
-		console.log("processPatientInfo header: " + patientInfoHeader);
+		// console.log("processPatientInfo header: " + patientInfoHeader);
 		document.getElementById("patientInfoHeader").innerHTML = patientInfoHeader;
-		console.log(document.getElementById("patientInfoHeader").innerHTML);
+		// console.log(document.getElementById("patientInfoHeader").innerHTML);
 		var patientInfoTable = ''
 			+'<table class="table table-bordered">'
 			+'	<tbody>'
@@ -44,8 +44,7 @@
 
 		socket.on('patientInfo', function(data) {
 			console.log('patientInfo', data);
-			var patientInfo = JSON.parse(data.patientInfo);
-			processPatientInfo(patientInfo);
+			processPatientInfo(data.patientInfo);
 		});
 
 	});

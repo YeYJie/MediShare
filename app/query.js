@@ -22,6 +22,8 @@ var EventHub = require('fabric-client/lib/EventHub.js');
 var config = require('../config.json');
 var helper = require('./helper.js');
 var logger = helper.getLogger('Query');
+logger.setLevel('ERROR');
+
 
 var peerFailures = 0;
 var queryChaincode = function(peer, channelName, chaincodeName, fcn, args, username, org) {
