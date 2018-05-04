@@ -116,6 +116,10 @@ app.get('/blockchain', function(req, res){
 });
 
 
+app.get('/getHospitalName', function(req, res){
+	res.send(hospitalName);
+});
+
 
 const asyncMiddlewareThreeArgs = fn =>
 	(req, res, next) => {
@@ -325,7 +329,15 @@ app.post('/jianyankeUpload', asyncMiddlewareThreeArgs(async function(req, res, n
 	data.jianyanId = jianyanId;
 
 	var did = data.did;
-	doctorSocket[did].emit("newInspection", {data: data});
+	if(doctorSocket[did]) {
+		doctorSocket[did].emit("newInspection", {data: data});
+	}
+
+	var pid = data.pid;
+	if(patientSocket[pid]) {
+		patientSocket[pid].emit("newInspection", {data: data});
+	}
+
 	res.send("upload file success");
 }));
 
@@ -393,6 +405,14 @@ io.on('connection', function(socket){
 		var workingDoctors = await getWorkingDoctors();
 		socket.emit('doctors', {doctors: workingDoctors, hname: hospitalName});
 	}));
+
+	async function notifyJianyankeForNewPatient(patient) {
+		jianyanke.forEach(function(socket){
+			if(!socket || typeof socket == undefined) return;
+			socket.emit('patients', {patients:[patient]});
+		});
+	}
+
 	socket.on('register', asyncMiddlewareOneArgs(async function(req){
 		var pid = req.pid;
 		var did = req.did;
@@ -403,8 +423,9 @@ io.on('connection', function(socket){
 		patientSocket[pid] = socket;
 
 		var patientInfo = await getPatientInfo(pid);
-		var doctorInfo = await getDoctorInfo(did);
+		socket.emit('patientInfo', {patientInfo: patientInfo});
 
+		var doctorInfo = await getDoctorInfo(did);
 		socket.emit('doctorInfo', {did: did, hospitalName: hospitalName, doctorInfo: doctorInfo});
 
 		var db = await MongoClient.connect(MongoURL);
@@ -421,11 +442,9 @@ io.on('connection', function(socket){
 			patientsNotRegister.splice(index, 1);
 		}
 
-		jianyanke.forEach(function(socket){
-			if(!socket || typeof socket == undefined) return;
-			socket.emit('patients', {patients:[{pid: pid, pname: patientInfo.name,
-				did: did, dname: doctorInfo.name, keshi: doctorInfo.keshi, registerTime: time}]});
-		});
+		notifyJianyankeForNewPatient({pid: pid, pname: patientInfo.name,
+										did: did, dname: doctorInfo.name,
+										keshi: doctorInfo.keshi, registerTime: time})
 	}));
 
 
@@ -451,6 +470,19 @@ io.on('connection', function(socket){
 		});
 	}));
 
+	// socket.on('getPatientSelfRecords', asyncMiddlewareOneArgs(async function(req){
+	// 	var pid = req.pid;
+	// 	var end = Math.floor(new Date() / 1000);
+
+	// 	cmd = './bishe/getPatientRecords.sh ' + did + ' ' + hospital + ' ' + pid + ' 0 ' + end.toString();
+	// 	console.log("socket.on getPatientRecords cmd: ", cmd);
+	// 	execResult = await exec(cmd);
+
+	// 	var patientRecords = JSON.parse(execResult.stdout).Records;
+	// 	console.log("[socket.on getPatientSelfRecords] patientRecords: ", patientRecords);
+
+	// 	socket.emit('patientRecords', {id: pid, records: patientRecords});
+	// }));
 
 
 
@@ -490,6 +522,11 @@ io.on('connection', function(socket){
 		var doctorInfo = await getDoctorInfo(id);
 		socket.emit('doctorInfo', {id: id, hospitalName: hospitalName, doctorInfo: doctorInfo});
 
+		if(req.isJianyanke) {
+			console.log("socket.on doc login isJianyanke id: ", id);
+			return;
+		}
+
 		await newWorkingDoctor(doctorInfo);
 
 		for(var i = 0; i < patientsNotRegister.length; i++) {
@@ -517,23 +554,28 @@ io.on('connection', function(socket){
 
 
 	socket.on('getPatientRecords', asyncMiddlewareOneArgs(async function(req){
-		var doctorId = req.doctorId;
-		var patientId = req.patientId;
+		var did = req.did;
+		var pid = req.pid;
 
-		var patientInfo = await getPatientInfo(patientId);
-		socket.emit('patientInfo', {id: patientId, hospital: hospital, patientInfo: patientInfo});
+		var patientInfo = await getPatientInfo(pid);
+		socket.emit('patientInfo', {id: pid, hospital: hospital, patientInfo: patientInfo});
 
 		var end = Math.floor(new Date() / 1000);
-		cmd = './bishe/getPatientRecords.sh ' + doctorId + ' ' + hospital + ' ' + patientId + ' 0 ' + end.toString();
+		cmd = './bishe/getPatientRecords.sh ' + did + ' ' + hospital + ' ' + pid + ' 0 ' + end.toString();
 		console.log("socket.on getPatientRecords cmd: ", cmd);
 		execResult = await exec(cmd);
 		var patientRecords = JSON.parse(execResult.stdout).Records;
 		console.log("[socket.on getPatientRecords] patientRecords: ", patientRecords);
 
-		socket.emit('patientRecords', {id: patientId, records: patientRecords});
+		socket.emit('patientRecords', {id: pid, records: patientRecords});
 	}));
 
-
+	function getHospitalIpPort(hid) {
+		if(hid == 1)
+			return "http://172.18.232.124:8080";
+		else if(hid == 2)
+			return "http://172.18.232.124:8181";
+	}
 
 	socket.on('requestDetail', asyncMiddlewareOneArgs(async function(req){
 		var rid = req.rid;
@@ -551,9 +593,7 @@ io.on('connection', function(socket){
 
 		var txid = execResult.stdout;
 
-		var targetHospitalIpPort = "http://172.18.232.124:8080";
-		if(targetHospital.toString() === "2")
-			targetHospitalIpPort = "http://172.18.232.124:8181";
+		var targetHospitalIpPort = getHospitalIpPort(targetHospital);
 
 		cmd = 'curl -sS ' + targetHospitalIpPort + '/requestDetail/' + txid;
 		execResult = await exec(cmd);

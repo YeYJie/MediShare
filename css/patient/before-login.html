@@ -1,0 +1,178 @@
+<div class="row" id="before-register">
+	<!-- <div style="height: 10vh;"></div> -->
+	<div class="col-md-4 col-md-offset-4">
+		<div class="panel panel-login">
+
+			<div class="form-group">
+				<div class="col-md-5 col-md-offset-4">
+					<h3 id="before-login-hname"></h3>
+					<div style="height:3vh;"></div>
+				</div>
+			</div>
+
+			<div class="panel-heading">
+				<div class="row">
+					<div class="col-xs-6">
+						<a href="#" class="active" id="login-form-link">挂号</a>
+					</div>
+					<div class="col-xs-6">
+						<a href="#" id="register-form-link">注册</a>
+					</div>
+				</div>
+				<hr>
+			</div>
+			<div class="panel-body">
+				<div class="row">
+					<div class="col-lg-12">
+
+						<div id="login-form" style="display: block;">
+							<div class="form-group">
+								<input type="text" name="username" id="login-id" tabindex="1" class="form-control" placeholder="Id" value="">
+							</div>
+							<div class="form-group">
+								<input type="password" name="password" id="login-pwd" tabindex="2" class="form-control" placeholder="Password">
+							</div>
+							<div class="form-group">
+								<div class="row">
+									<div class="col-md-3">
+										<a>内科</a>
+									</div>
+									<div id="neike"></div>
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="row">
+									<div class="col-md-3">
+										<a>外科</a>
+									</div>
+									<div id="waike"></div>
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="row">
+									<div class="col-sm-6 col-sm-offset-3">
+										<button id="login-button" class="btn btn-lg btn-primary btn-block" type="submit">挂号</button>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div id="register-form" style="display: none;">
+							<div class="form-group">
+								<input type="text" id="signupId" class="form-control" placeholder="身份证" value="">
+							</div>
+							<div class="form-group">
+								<input type="text" id="signupName" class="form-control" placeholder="姓名" value="">
+							</div>
+							<div class="form-group">
+								<input type="password" id="signupPwd" class="form-control" placeholder="密码">
+							</div>
+							<div class="form-group">
+								<input type="password" id="confirm-password" class="form-control" placeholder="确认密码">
+							</div>
+							<div class="form-group">
+								<input type="email" id="signupEmail" class="form-control" placeholder="邮箱" value="">
+							</div>
+							<div class="form-group">
+								<input type="text" id="signupPhone" class="form-control" placeholder="联系电话" value="">
+							</div>
+							<div class="form-group">
+								<input type="text" id="signupAddr" class="form-control" placeholder="住址" value="">
+							</div>
+							<div class="form-group">
+								<div class="row">
+									<div class="col-sm-6 col-sm-offset-3">
+										<button id="signup-button" class="btn btn-lg btn-primary btn-block" type="submit">病人注册</button>
+									</div>
+								</div>
+							</div>
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<script type="text/javascript">
+
+$('#login-form-link').click(function(e) {
+	$("#login-form").delay(100).fadeIn(100);
+	$("#register-form").fadeOut(100);
+	$('#register-form-link').removeClass('active');
+	$(this).addClass('active');
+	e.preventDefault();
+});
+$('#register-form-link').click(function(e) {
+	$("#register-form").delay(100).fadeIn(100);
+	$("#login-form").fadeOut(100);
+	$('#login-form-link').removeClass('active');
+	$(this).addClass('active');
+	e.preventDefault();
+});
+
+$("#login-button").click(function() {
+	var pid = $("#login-id").val(); $("#login-id").val("");
+	var pwd = $("#login-pwd").val(); $("#login-pwd").val("");
+	var did = $('input[name="doctor"]:checked').val();
+	globalPid = pid;
+	globalDid = did;
+	console.log([pid, pwd, did]);
+	socket.emit('register', {
+		pid: pid,
+		did: did,
+		pwd: pwd,
+		time: Math.floor(new Date() / 1000).toString()
+	});
+	socket.emit('getPatientRecords', {did: globalDid, pid: globalPid});
+
+	document.getElementById("before-login-div").style.display = "none";
+	document.getElementById("after-login-div").style.display = "block";
+	document.getElementById("nav-bar-div").style.display = "block";
+});
+
+var doctorOnPage = [];
+
+var processDoctor = function(doctor) {
+	var did = doctor.did;
+	var keshi;
+	if (doctor.keshi === "内科") keshi = "neike";
+	else if (doctor.keshi === "外科") keshi = "waike";
+	var index = doctorOnPage.indexOf(did);
+	if (index < 0) {
+		doctorOnPage.push(did);
+		var divHTML = document.getElementById(keshi).innerHTML;
+		divHTML += '<div class="col-md-3" id="' + did + '"><input type="radio" name="doctor" value="' + did + '">' + doctor.dname + '</div>';
+		document.getElementById(keshi).innerHTML = divHTML;
+	}
+}
+
+socket.on("doctors", function(data) {
+	console.log("doctors: ", data.doctors);
+	if (data.doctors) {
+		for (var i = 0; i < data.doctors.length; i++) {
+			console.log(data.doctors[i]);
+			processDoctor(data.doctors[i]);
+		}
+	}
+});
+
+socket.on("newWorkingDoctor", function(data) {
+	console.log("newWorkingDoctor", data.doctor);
+	processDoctor(data.doctor);
+});
+
+socket.on("doctorLogout", function(data) {
+	console.log("doctorLogout", data, doctorOnPage);
+	var did = data.did;
+	var index = doctorOnPage.indexOf(did);
+	if (index > -1) {
+		doctorOnPage.splice(index, 1);
+		console.log("remove doctor from page ", doctorOnPage);
+		document.getElementById(did).outerHTML = "";
+	}
+});
+
+</script>

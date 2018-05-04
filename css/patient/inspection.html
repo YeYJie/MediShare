@@ -1,0 +1,26 @@
+<div id="diagnose">
+	<div id="diagnose-inspection"></div>
+</div>
+
+
+<script type="text/javascript">
+
+	socket.on('newInspection', function(data){
+		console.log("newInspection", data);
+		var inspection = data.data;
+		var name = inspection.jianyan;
+		var id = inspection.jianyanId;
+		var ins = {
+			name: name,
+			id: id,
+			detail: inspection
+		}
+		if(patientInspection[inspection.pid])
+			patientInspection[inspection.pid].push(ins);
+		else
+			patientInspection[inspection.pid] = [ins];
+		console.log('newInspection patientInspection[inspection.pid]: ', patientInspection[inspection.pid]);
+		document.getElementById("diagnose-inspection").innerHTML = showInspections(globalPid);
+	});
+
+</script>

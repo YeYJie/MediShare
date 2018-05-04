@@ -13,20 +13,6 @@
 <body>
 	<div id="nav-bar-div" style="display: none;"></div>
 
-<!-- 	<div class="container-fluid">
-		<div id="before-login-div"></div>
-		<div class="row" id="after-login" style="display: none;">
-			<div class="col-sm-3 col-md-2 sidebar">
-				<div id="doctorInfo-sidebar-div"></div>
-				<div id="patientInfo-sidebar-div"></div>
-			</div>
-			<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-				<div id="patientList-div"></div>
-				<div id="diagnose-div"></div>
-			</div>
-		</div>
-	</div> -->
-
 	<div class="container-fluid">
 		<div id="before-login-div" style="display: block;"></div>
 		<div id="after-login" class="row" style="display: none;">
@@ -46,7 +32,7 @@
 					<div class="col-md-6" id="right-div">
 						<div id="patientInfo-sidebar-div"></div>
 						<div id="patientRecords-div"></div>
-						<div id="recordDetail-div"></div>
+						<!-- <div id="recordDetail-div"></div> -->
 					</div>
 				</div>
 			</div>
@@ -66,19 +52,15 @@
 	var globalDid;
 	var globalPid;
 
+	var isJianyanke = true;
+
 	$("#nav-bar-div").load("/nav.html");
 	$("#before-login-div").load("/before-login.html");
 	$("#doctorInfo-sidebar-div").load("/doctorInfo.html");
 	$("#patientInfo-sidebar-div").load("/patientInfo.html");
-
 	$("#patientList-div").load("/patientList.html");
-
 	$("#diagnose-div").load("/jianyan/jianyan.html");
-
-
-
-	// $("#patientList-div").load("/doc/patientList.html");
-	// $("#patientRecords-div").load("/doc/patientRecords.html");
+	$("#patientRecords-div").load("/doc/patientRecords.html");
 	// $("#recordDetail-div").load("/doc/recordDetail.html");
 
 	$(function() {

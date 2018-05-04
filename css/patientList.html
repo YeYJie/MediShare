@@ -42,7 +42,7 @@
 			currentPatient.keshi = $(this).data('keshi');
 			console.log("patientList currentPatient: ", currentPatient);
 
-			socket.emit('getPatientRecords', {patientId: patientId, doctorId: globalDid});
+			socket.emit('getPatientRecords', {pid: patientId, did: globalDid});
 
 			document.getElementById("diagnose-submit").disabled = false;
 			if(document.getElementById("recordDetail")) {

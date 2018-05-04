@@ -1,0 +1,35 @@
+<div id="patientInfo">
+	<div class="row">
+		<div class="col-md-6 col-md-offset-3">
+			<ul id="patientInfoHeader" class="nav nav-sidebar"></ul>
+		</div>
+	</div>
+
+	<ul id="patientInfoDetail" class="nav nav-sidebar"></ul>
+
+</div>
+
+<script type="text/javascript">
+	$(function() {
+
+		socket.on('patientInfo', function(data) {
+			// console.log('patientInfo', data);
+			console.log("socket.on patientInfo data: ", data);
+			var patientInfo = data.patientInfo;
+			document.getElementById("patientInfoHeader").innerHTML = '<li><a><img src="/header/' + patientInfo.id + '" /></a></li>';
+			var patientInfoDetailHTML = '<li><a>姓名: ' + patientInfo.name + '</a></li>';
+			patientInfoDetailHTML += '<li><a>性别: ' + patientInfo.gender + '</a></li>';
+			patientInfoDetailHTML += '<li><a>出生日期: ' + patientInfo.birth + '</a></li>';
+			patientInfoDetailHTML += '<li><a>民族: ' + patientInfo.minzu + '</a></li>';
+			patientInfoDetailHTML += '<li><a>婚姻状况: ' + patientInfo.maritalStatus + '</a></li>';
+			patientInfoDetailHTML += '<li><a>教育情况: ' + patientInfo.educationalLevel + '</a></li>';
+			patientInfoDetailHTML += '<li><a>职业: ' + patientInfo.occupation + '</a></li>';
+			patientInfoDetailHTML += '<li><a>工作单位: ' + patientInfo.company + '</a></li>';
+			patientInfoDetailHTML += '<li><a>居住地址: ' + patientInfo.addr + '</a></li>';
+			patientInfoDetailHTML += '<li><a>过敏史: ' + patientInfo.allergy + '</a></li>';
+			document.getElementById("patientInfoDetail").innerHTML = patientInfoDetailHTML;
+			// document.getElementById("hospital-name").innerHTML = data.hospitalName;
+		});
+
+	});
+</script>

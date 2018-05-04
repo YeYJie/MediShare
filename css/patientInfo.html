@@ -8,7 +8,7 @@
 <script type="text/javascript">
 
 	var processPatientInfo = function(patient) {
-		var patientInfoHeader = '<img src="/header/' + patient.id + '" />';
+		var patientInfoHeader = '<img src="/header/' + patient.id + '" class="img-responsive"/>';
 		// console.log("processPatientInfo header: " + patientInfoHeader);
 		document.getElementById("patientInfoHeader").innerHTML = patientInfoHeader;
 		// console.log(document.getElementById("patientInfoHeader").innerHTML);
@@ -43,7 +43,7 @@
 	$(function() {
 
 		socket.on('patientInfo', function(data) {
-			console.log('patientInfo', data);
+			console.log('socket.on patientInfo', data);
 			processPatientInfo(data.patientInfo);
 		});
 

@@ -51,6 +51,7 @@
 	var socket = io();
 	var globalDid = "123456";
 	var globalPid;
+	var isJianyanke = false;
 
 	$("#nav-bar-div").load("/nav.html");
 	$("#before-login-div").load("/before-login.html");
@@ -93,8 +94,8 @@
 			if (payload.Did === globalDid && payload.Pid === globalPid) {
 				console.log("patient has new record");
 				socket.emit('getPatientRecords', {
-					doctorId: globalDid,
-					patientId: globalPid
+					did: globalDid,
+					pid: globalPid
 				});
 			}
 		}

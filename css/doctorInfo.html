@@ -34,7 +34,7 @@
 		socket.on('doctorInfo', function(data) {
 			console.log('doctorInfo', data);
 			var doctorInfo = data.doctorInfo;
-			document.getElementById("doctorInfoHeader").innerHTML = '<li><a><img src="/header/' + doctorInfo.id + '" /></a></li>';
+			document.getElementById("doctorInfoHeader").innerHTML = '<li><a><img src="/header/' + doctorInfo.id + '" class="img-responsive"/></a></li>';
 			var doctorInfoDetailHTML = '<li><a>姓名: ' + doctorInfo.name + '</a></li>';
 			doctorInfoDetailHTML += '<li><a>科室: ' + doctorInfo.keshi + '</a></li>';
 			doctorInfoDetailHTML += '<li><a>职位: ' + doctorInfo.title + '</a></li>';

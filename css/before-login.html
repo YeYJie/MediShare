@@ -88,7 +88,8 @@
 			globalDid = $('#login-id').val().toString();
 			socket.emit('login', {
 				id: globalDid,
-				pwd: $('#login-pwd').val()
+				pwd: $('#login-pwd').val(),
+				isJianyanke: isJianyanke
 			})
 			$('#login-id').val(""); $('#login-pwd').val("");
 			document.getElementById("before-login").style.display = "none";
