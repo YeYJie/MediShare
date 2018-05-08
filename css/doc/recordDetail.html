@@ -9,6 +9,10 @@
 	var recordDetailDoctorName = "";
 	var recordDetailTime = "";
 
+	function clearDetail() {
+		document.getElementById("recordDetail-content").innerHTML = "";
+	}
+
 	var buildDetail = function(detail) {
 
 		var buildDetailTableRow = function(name, value) {

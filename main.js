@@ -94,7 +94,10 @@ var eventWatcher = [];
 var currentBlock;
 var latestBlock = [];
 
-
+app.get('/bc', function(req, res){
+	// console.log('/bc');
+	res.sendFile(__dirname + '/page/bc.html');
+});
 
 app.get('/doc', function(req, res){
 	// console.log('/doc');
@@ -421,6 +424,7 @@ io.on('connection', function(socket){
 		var pkc = req.pkc;
 
 		patientSocket[pid] = socket;
+		eventWatcher.push(socket);
 
 		var patientInfo = await getPatientInfo(pid);
 		socket.emit('patientInfo', {patientInfo: patientInfo});
@@ -699,6 +703,26 @@ function updateBlock() {
 	// console.log(updateBlock, latestBlock);
 };
 setInterval(updateBlock, 1000);
+
+
+// var getBlockByNumber = function(peer,channelName, blockNumber, username, org) {
+// var getTransactionByID = function(peer,channelName, trxnID, username, org) {
+// var getBlockByHash = function(peer, hash, username, org) {
+// var getChannelHeight=function(peer,channelName,username,org){
+
+app.get('/gbbn/:bn', asyncMiddlewareThreeArgs(async function(req, res, next){
+	res.send(await query.getBlockByNumber('peer1', 'mychannel', req.params.bn, 'admin', 'org1'));
+}));
+
+// app.get('/gcc', asyncMiddlewareThreeArgs(async function(req, res, next) {
+// 	var ret = await query.getChannelConfig('org1', 'mychannel');
+// 	console.log(ret);
+// 	res.send(ret);
+// }));
+
+app.get('/gci', asyncMiddlewareThreeArgs(async function(req, res, next){
+	res.send(await query.getChainInfo('peer1', 'mychannel', 'admin', 'org1'));
+}));
 
 
 // ============= start server =======================

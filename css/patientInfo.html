@@ -7,7 +7,7 @@
 
 <script type="text/javascript">
 
-	var processPatientInfo = function(patient) {
+	function processPatientInfo(patient) {
 		var patientInfoHeader = '<img src="/header/' + patient.id + '" class="img-responsive"/>';
 		// console.log("processPatientInfo header: " + patientInfoHeader);
 		document.getElementById("patientInfoHeader").innerHTML = patientInfoHeader;
@@ -38,6 +38,11 @@
 			+'	</tbody>'
 			+'</table>';
 		document.getElementById("patientInfoDetail").innerHTML = patientInfoTable;
+	}
+
+	function clearPatientInfo() {
+		document.getElementById("patientInfoHeader").innerHTML = "";
+		document.getElementById("patientInfoDetail").innerHTML = "";
 	}
 
 	$(function() {

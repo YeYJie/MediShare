@@ -2,22 +2,21 @@
 	<div id="patientRecords-record">
 		<h3 class="page-header media-heading" style="">病历记录</h3>
 		<table id="patientRecords-table" class="table">
-			<thead>
 				<th>就诊医院</th>
 				<th>时间</th>
 				<th>诊断</th>
 				<th>检查项目</th>
 				<th></th>
-			</thead>
-			<tbody>
-
-			</tbody>
 		</table>
 	 </div>
 </div>
 
 <script type="text/javascript">
 
+	function clearPatientRecords() {
+		console.log("[clearPatientRecords]");
+		$("#patientRecords-table").find("tr:gt(0)").remove();
+	};
 
 	socket.on('patientRecords', function(data){
 

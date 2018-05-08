@@ -59,7 +59,7 @@
 	$("#patientInfo-sidebar-div").load("/patientInfo.html");
 	$("#patientList-div").load("/patientList.html");
 
-	$("#patientRecords-div").load("/doc/patientRecords.html");
+	$("#patientRecords-div").load("/patientRecords.html");
 	$("#diagnose-div").load("/doc/diagnose.html");
 	$("#recordDetail-div").load("/doc/recordDetail.html");
 
@@ -70,10 +70,7 @@
 			if (payload.Doctor === globalDid) {
 				console.log("patient deRegister from me");
 				var pid = payload.Patient;
-				var index = myPatients.indexOf(pid);
-				if (index > -1)
-					myPatients.splice(index, 1);
-				$("#patient-block-" + pid).remove();
+				patientDeRegister(pid);
 			}
 		} else if (data.EventType === "register") {
 			var payload = JSON.parse(data.Payload);

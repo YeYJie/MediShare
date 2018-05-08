@@ -1,22 +1,12 @@
 <nav class="navbar navbar-inverse navbar-fixed-top" id="nav">
 	<a class="navbar-brand" id="nav-hname" style="color: #ffffff;">Project name</a>
-	<a href="#" class="navbar-brand pull-right" style="color: #ffffff;" id="deRegister-button">登出</a>
+	<a href="#" class="navbar-brand pull-right" style="color: #ffffff;" id="nav-logout-button">登出</a>
 </nav>
 
 <script type="text/javascript">
 	$(function(){
-		console.log("loading nav.html...");
 
-		// TODO: not working...
-		$("logout-button").click(function(){
-			console.log("log out");
-		});
-
-		// TODO:
-		$("#deRegister-button").click(function() {
-			document.getElementById("onRegister").style.display = "none";
-			document.getElementById("before-register").style.display = "block";
-			$("#onRegisterMsg").text("Wait for Register");
+		$("#nav-logout-button").click(function() {
 			socket.emit('deRegister', {
 				id: globalPid,
 				did: globalDid,
@@ -24,6 +14,9 @@
 				sig: "deRegisterSig",
 				pkc: "patientPKC"
 			});
+			document.getElementById("before-login-div").style.display = "block";
+			document.getElementById("after-login-div").style.display = "none";
+			document.getElementById("nav-bar-div").style.display = "none";
 		})
 
 	});

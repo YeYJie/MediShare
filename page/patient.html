@@ -79,6 +79,20 @@
 			}
 		});
 
+		socket.on('event', function(data) {
+			console.log(data);
+			if (data.EventType === "newRecord") {
+				var payload = JSON.parse(data.Payload);
+				if (payload.Did === globalDid && payload.Pid === globalPid) {
+					console.log("patient has new record");
+					socket.emit('getPatientRecords', {
+						did: globalDid,
+						pid: globalPid
+					});
+				}
+			}
+		});
+
 	})
 </script>
 

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script type="text/javascript" src="/ht.js"></script>
+		<script type="text/javascript" src="/ht-flow.js"></script>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!-- <link href="https://cdn.bootcss.com/bootstrap/4.1.0/css/bootstrap.min.css" rel="stylesheet"> -->
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" crossorigin="anonymous">
+	</head>
+
+<script type="text/javascript">
+
+var cw;
+function shit() {
+	console.log("shit...");
+	cw = parent.window.document.getElementById("iframe").contentWindow;
+}
+
+</script>
+
+<body>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-5" id="blockchain-div">
+
+<!-- 				<div class="row"><div style="height: 3vh;"></div></div>
+				<div class="row">
+					<div class="col-md-1"></div>
+					<div class="col-md-10">
+						<div class="card card-block">
+							<div class="card-header">
+								<a href="">Block # 1</a>
+							</div>
+							<div class="card-block">
+								<table class="table table-bordered" style="margin-bottom: 0;">
+									<tbody>
+										<tr><td colspan="12">Prev Hash: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</td></tr>
+										<tr><td colspan="12">Data Hash: xxxxxxxxxxxxxxxxxxxxxxxxxxx</td></tr>
+										<tr><td colspan="12">Create Date: xxxxxxxxxxxxxxxxxxxxxxxxxxx</td></tr>
+										<tr><td colspan="4">Tx Count: 1</td><td colspan="8">Tx Timestamp: 2018-04-06 12:36:59</td></tr>
+										<tr><td colspan="12">TxId: xxxxxxxxxxxxxxxxxxxxxxxxxxx</td></tr>
+										<tr><td colspan="2">Payload: </td><td colspan="5">Patient: 24301036</td><td colspan="5">Doctor: 14301036</td></tr>
+										<tr><td colspan="2"></td><td colspan="5">Hospital: 1</td><td colspan="5">Time: 2018-6-6 20:36:59</td></tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div> -->
+
+			</div>
+			<div class="col-md-7" id="flow-div">
+				<iframe id="iframe" class="embed-responsive-item" src="/iframe.html" style="width: 100%; height: 100vh;" onload="shit();"></iframe>
+			</div>
+		</div>
+	</div>
+</body>
+
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" crossorigin="anonymous"></script>
+
+
+<script src="/socket.io/socket.io.js"></script>
+
+<script type="text/javascript">
+
+var socket = io();
+socket.emit('watch', {});
+
+var timeToString = function(t) {
+	var date = new Date(parseInt(t) * 1000);
+	var year = date.getFullYear().toString();
+	var month = (date.getMonth() + 1).toString();
+	var day = date.getDate().toString();
+	var hour = date.getHours().toString();
+	var minute = date.getMinutes().toString();
+	var second = date.getSeconds().toString();
+	return [year, month, day].join('-') + ' ' + [hour, minute, second].join(':')
+}
+
+var blocks = [];
+var txs = {};
+
+socket.on('event', function(data) {
+	txs[data.TxId] = data;
+	console.log('txs: ', txs);
+});
+
+socket.on('newBlocks', function(data) {
+	console.log('newBlocks', data);
+
+	var bs = data.blocks.rows;
+	for (var i = 0; i < bs.length; i++) {
+		var bid = data.blocks.rows[i].blocknum;
+		if (blocks.indexOf(bid) > -1) return;
+		blocks.push(bid);
+		console.log('blocks arr: ', blocks);
+		var createdt = data.blocks.rows[i].createdt;
+		var datahash = data.blocks.rows[i].datahash;
+		var prevhash = data.blocks.rows[i].prehash;
+		var txhash = data.blocks.rows[i].txhash;
+		document.getElementById("blockchain-div").innerHTML += buildBlock(bid, createdt, datahash, prevhash, txhash);
+	}
+});
+
+// function buildBlock(bid, createdt, datahash, prevhash, txhash) {
+// 	var res = ''
+// 		+'<div class="row">'
+// 		+'	<div style="height: 3vh;"></div>'
+// 		+'</div>'
+// 		+'<div class="row">'
+// 		+'	<div class="col-md-8 col-md-offset-2">'
+// 		+'		<div style="border-radius: 25px; border: 2px solid #428bca;">'
+// 		+'			<div class="row">'
+// 		+'				<div class="col-md-10 col-md-offset-1">'
+// 		+'					<p> Block ID: ' + bid + '</p>'
+// 		+'					<p> Create Date: ' + createdt + '</p>'
+// 		+'					<p> Datahash: ' + datahash + '</p>'
+// 		+'					<p> Prevhash: ' + prevhash + '</p>'
+// 		+'					<p> TxCount: ' + txhash.length + '</p>';
+// 	for (var i = 0; i < txhash.length; i++) {
+// 		var data = txs[txhash[i]];
+// 		if (!data) return "";
+// 		res += buildRow(data.TxId, data.Timestamp, data.EventType, JSON.parse(data.Payload));
+// 	}
+// 	res += '</div></div></div></div></div>';
+// 	return res;
+// };
+
+
+function buildBlock(bid, createdt, datahash, prevhash, txhash) {
+
+	var res = ''
++'<div class="row"><div style="height: 3vh;"></div></div>'
++'<div class="row">'
++'	<div class="col-md-1"></div>'
++'	<div class="col-md-10">'
++'		<div class="card card-block">'
++'			<div class="card-header">'
++'				<a href="">Block # ' + bid + '</a>'
++'			</div>'
++'			<div class="card-block">'
++'				<table class="table table-bordered" style="margin-bottom: 0;">'
++'					<tbody>'
++'						<tr><td colspan="12">Prev Hash: ' + prevhash + '</td></tr>'
++'						<tr><td colspan="12">Data Hash: ' + datahash + '</td></tr>'
++'						<tr><td colspan="8">Create Date: ' + createdt + '</td><td colspan="4">Tx Count: ' + txhash.length + '</td></tr>';
+
+// +'						<tr><td colspan="4">Tx # ' + + '</td><td colspan="8">Tx Timestamp: ' + + '</td></tr>'
+// +'						<tr><td colspan="12">TxId: ' + + '</td></tr>'
+// +'						<tr><td colspan="2">Payload: </td><td colspan="5">Patient: ' + + '</td><td colspan="5">Doctor: ' + + '</td></tr>'
+// +'						<tr><td colspan="2"></td><td colspan="5">Hospital: ' + + '</td><td colspan="5">Time: ' + + '</td></tr>'
+
+	for (var i = 0; i < txhash.length; i++) {
+		var data = txs[txhash[i]];
+		if (!data) return "";
+		res += buildRow(i, data.TxId, data.Timestamp, data.EventType, JSON.parse(data.Payload));
+	}
+
+res += ''
++'					</tbody>'
++'				</table>'
++'			</div>'
++'		</div>'
++'	</div>'
++'</div>';
+
+	return res;
+};
+
+var buildRow = function(i, tid, timestamp, etype, payload) {
+	var payloadHTML = ''
++'<tr><td colspan="2"># ' + i + '</td><td colspan="5">' + etype + '</td><td colspan="5">Tx Timestamp: ' + timestamp + '</td></tr>'
++'<tr><td colspan="12">TxId: ' + tid + '</td></tr>'
+
+	if(etype === "register") {
+		payload += ''
++'<tr><td colspan="2">Payload: </td><td colspan="5">Patient: ' + payload.Patient + '</td><td colspan="5">Doctor: ' + payload.Doctor + '</td></tr>'
++'<tr><td colspan="2"></td><td colspan="5">Hospital: ' + payload.Hospital + '</td><td colspan="5">Time: ' + timeToString(payload.HospitalTime) + '</td></tr>'
+	}
+	else if(etype === "deRegister") {
+		payload += ''
++'<tr><td colspan="2">Payload: </td><td colspan="5">Patient: ' + payload.Patient + '</td><td colspan="5">Doctor: ' + payload.Doctor + '</td></tr>'
++'<tr><td colspan="2"></td><td colspan="5">Hospital: ' + payload.Hospital + '</td><td colspan="5">Time: ' + timeToString(payload.PatientTime) + '</td></tr>'
+	}
+	else if(etype === "newRecord") {
+		payload += ''
++'<tr><td colspan="2">Payload: </td><td colspan="5">Hospital: ' + payload.Hid + '</td><td colspan="5">Doctor: ' + payload.Did + '</td></tr>'
++'<tr><td colspan="2"></td><td colspan="5">Patient: ' + payload.Pid + '</td><td colspan="5">Time: ' + timeToString(payload.PatientTime) + '</td></tr>'
++'<tr><td colspan="2"></td><td colspan="10">RecordId: ' + payload.RecordId + '</td></tr>'
++'<tr><td colspan="2"></td><td colspan="5">Diagnose: ' + payload.Zhenduan + '</td><td colspan="5">Inspections: ' + payload.Jianyan + '</td></tr>'
+	}
+	else if(etype === "requestGrant") {
+		payload += ''
++'<tr><td colspan="2">Payload:</td><td colspan="5">RequestDoctor: ' + payload.RequestDoctor +'</td><td colspan="5">RequestHospital: ' + payload.RequestHospital + '</td></tr>'
++'<tr><td colspan="2"></td><td colspan="5">Patient: ' + payload.Patient + '</td><td colspan="5">TargetHospital: ' + payload.TargetHospital + '</td></tr>'
++'<tr><td colspan="2"></td><td colspan="10">RecordId: ' + payload.RecordId + '</td></tr>'
+	}
+	return payloadHTML;
+};
+
+
+</script>
+
+</html>
