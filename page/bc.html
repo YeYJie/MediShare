@@ -40,6 +40,8 @@ function shit() {
 
 <script type="text/javascript">
 
+var blocks = {};
+
 var socket = io();
 socket.emit('watch', {});
 
@@ -52,13 +54,105 @@ socket.on('event', function(data) {
 		processData: false,
 		success: function(block) {
 			console.log("ajax get /getLatestBlock: ", block);
-			document.getElementById("blockchain-div").innerHTML += buildBlock(block);
+			doSomeStatistic(block);
+			showBlock(block);
+			showStatistic();
 			return false;
 		},
 		error: function(xhr) {
 		}
 	});
 });
+
+var registerCount = {};
+var dataSharing = {};
+
+function doSomeStatistic(block) {
+	for(var i = 0; i < block.txCount; i++) {
+		var tx = block.txs[i];
+		if(tx.EventType === "register") {
+			var hid = tx.Payload.Hospital;
+			if(registerCount[hid]) {
+				registerCount[hid] += 1;
+			} else {
+				registerCount[hid] = 1;
+			}
+		}
+		if(tx.EventType === "requestGrant") {
+			var pid = tx.Payload.Patient;
+			var rh = tx.Payload.RequestHospital;
+			var th = tx.Payload.TargetHospital;
+			if(rh === th) return;
+			if(!dataSharing[pid]) {
+				dataSharing[pid] = [];
+			}
+			dataSharing[pid].push(cw.eList[th][rh]);
+		}
+		if(tx.EventType === "deRegister") {
+			var hid = tx.Payload.Hospital;
+			registerCount[hid] -= 1;
+			var pid = tx.Payload.Patient;
+			if(dataSharing[pid]) {
+				delete dataSharing[pid];
+			}
+		}
+	}
+}
+
+function showStatistic() {
+	for(var hid in registerCount) {
+		cw.hList[hid].setStyle("note", "patient on register: " + registerCount[hid].toString());
+	}
+	cw.removeAllFlow();
+	for(var pid in dataSharing) {
+		var edges = dataSharing[pid];
+		for(var i = 0; i < edges.length; i++) {
+			cw.addFlowForEdge(edges[i]);
+		}
+	}
+}
+
+var latestBlockNum;
+
+function blockHelper(bn) {
+	if(bn >= parseInt(latestBlockNum)) {
+		showStatistic();
+		return;
+	}
+	$.ajax({
+		type: "GET",
+		url: "/gbbn/" + bn.toString(),
+		contentType: false,
+		processData: false,
+		success: function(block) {
+			blocks[bn.toString()] = block;
+			showBlock(block);
+			doSomeStatistic(block);
+			blockHelper(bn + 1);
+			return false;
+		},
+		error: function(xhr) {
+			blockHelper(bn + 1);
+			return false;
+		}
+	});
+}
+
+$.ajax({
+	type: "GET",
+	url: "/gch",
+	contentType: false,
+	processData: false,
+	success: function(bn) {
+		console.log("ajax get /gch: ", bn);
+		latestBlockNum = bn;
+		blockHelper(1);
+		return false;
+	},
+	error: function(xhr) {
+	}
+});
+
 
 
 
@@ -73,6 +167,12 @@ function timeToString(t) {
 	return [year, month, day].join('-') + ' ' + [hour, minute, second].join(':')
 }
 
+function showBlock(block) {
+	blocks[block.blocknum.toString()] = block;
+	var blockHTML = buildBlock(block);
+	document.getElementById("blockchain-div").innerHTML += blockHTML;
+}
+
 function buildBlock(block) {
 	var res = ''
 	+'<div class="row"><div style="height: 3vh;"></div></div>'
@@ -80,7 +180,9 @@ function buildBlock(block) {
 	+'	<div class="col-md-12">'
 	+'		<div class="card card-block">'
 	+'			<div class="card-header">'
-	+'				<a href="">Block # ' + block.blocknum + '</a>'
+	+'				<a href="javascript:void(0);" '
+	+'					id="block-' + block.blocknum.toString() + '" '
+	+'					data-bid="' + block.blocknum.toString() + '">Block # ' + block.blocknum.toString() + '</a>'
 	+'			</div>'
 	+'			<div class="card-block">'
 	+'				<table class="table table-bordered" style="margin-bottom: 0;">'

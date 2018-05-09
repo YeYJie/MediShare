@@ -55,9 +55,6 @@ addHospital("1");
 addHospital("2");
 addHospital("3");
 
-showFlow("1", "3");
-showFlow("2", "1");
-
 }
 
 
@@ -67,7 +64,6 @@ var eList = new Map();
 function newNode(hid, x, y) {
 	var res = new ht.Node("shit");
 	res.setName(hid);
-	// res.setPosition(x, y);
 	res.setSize(80, 80);
 	return res;
 }
@@ -80,15 +76,12 @@ function newEdge(from, to) {
 }
 
 function addHospital(newhid) {
-	// var newh = new ht.Node();
 	var newh = newNode(newhid);
 	dm.add(newh);
 	eList[newhid] = new Map();
 	for(var hid in hList) {
 		var node = hList[hid];
 		console.log("addHospital forloop ", hid, node);
-		// var e1 = new ht.Edge(newh, node);
-		// var e2 = new ht.Edge(node, newh);
 		var e1 = newEdge(newh, node);
 		var e2 = newEdge(node, newh);
 		dm.add(e1); dm.add(e2);
@@ -110,6 +103,12 @@ function showFlow(fromHid, toHid) {
 		console.log("showFlow error: eList[fromHid][toHid] not exists");
 		return;
 	}
+	e.s("flow", true);
+	e.setStyle("flow.count", 10);
+	flowingEdge.push(e);
+}
+
+function addFlowForEdge(e) {
 	e.s("flow", true);
 	e.setStyle("flow.count", 10);
 	flowingEdge.push(e);

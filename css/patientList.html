@@ -63,10 +63,10 @@
 		if (index > -1)
 			myPatients.splice(index, 1);
 		$("#patientList-" + pid).parent().remove();
-				// $("#patient-block-" + pid).remove();
 		if(globalPid === pid) {
 			clearPatientInfo();
 			clearPatientRecords();
+			removeCacheForPatient(pid);
 			hideDetail();
 		}
 	}

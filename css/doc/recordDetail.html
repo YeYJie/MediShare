@@ -5,13 +5,11 @@
 
 <script type="text/javascript">
 	var detailCache = {};
+	var pidToCacheIndex = {};
 	var recordDetailTargetHospitalName = "";
 	var recordDetailDoctorName = "";
 	var recordDetailTime = "";
 
-	// function clearDetail() {
-	// 	document.getElementById("recordDetail-content").innerHTML = "";
-	// }
 	function hideDetail() {
 		document.getElementById("recordDetail").style.display = "none";
 	}
@@ -80,9 +78,22 @@
 		return res;
 	};
 
+	function removeCacheForPatient(pid) {
+		pidToCacheIndex[pid].forEach(function(cacheIndex){
+			delete detailCache[cacheIndex];
+		});
+		delete pidToCacheIndex[pid];
+		console.log("[removeCacheForPatient]", pidToCacheIndex);
+	}
 
-	var updateDetailCache = function(pid, targetHospital, rid, detail) {
+	function updateDetailCache(pid, targetHospital, rid, detail) {
 		var cacheIndex = pid + targetHospital.toString() + rid;
+
+		if(!pidToCacheIndex[pid]) {
+			pidToCacheIndex[pid] = new Set();
+		}
+		pidToCacheIndex[pid].add(cacheIndex);
+
 		detailCache[cacheIndex] = detail;
 		console.log("updateDetailCache ", detailCache);
 	}
