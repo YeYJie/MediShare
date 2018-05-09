@@ -9,8 +9,11 @@
 	var recordDetailDoctorName = "";
 	var recordDetailTime = "";
 
-	function clearDetail() {
-		document.getElementById("recordDetail-content").innerHTML = "";
+	// function clearDetail() {
+	// 	document.getElementById("recordDetail-content").innerHTML = "";
+	// }
+	function hideDetail() {
+		document.getElementById("recordDetail").style.display = "none";
 	}
 
 	var buildDetail = function(detail) {

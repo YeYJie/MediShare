@@ -22,7 +22,7 @@ var EventHub = require('fabric-client/lib/EventHub.js');
 var config = require('../config.json');
 var helper = require('./helper.js');
 var logger = helper.getLogger('Query');
-logger.setLevel('ERROR');
+// logger.setLevel('ERROR');
 
 
 var peerFailures = 0;

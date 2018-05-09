@@ -67,17 +67,17 @@ function exec(command, options = { log: false, cwd: process.cwd() }) {
 
 
 
-var execOld = require('child-process-promise').exec;
-var asyncExec = function(cmd, callback) {
-	// console.log(asyncExec, cmd);
-	execOld(cmd)
-		.then((result) => {
-			callback(result);
-		})
-		.catch((err) => {
-			console.error('ERROR: ', err);
-		});
-};
+// var execOld = require('child-process-promise').exec;
+// var asyncExec = function(cmd, callback) {
+// 	// console.log(asyncExec, cmd);
+// 	execOld(cmd)
+// 		.then((result) => {
+// 			callback(result);
+// 		})
+// 		.catch((err) => {
+// 			console.error('ERROR: ', err);
+// 		});
+// };
 
 
 
@@ -91,8 +91,7 @@ var patientsNotRegister = [];
 
 var eventWatcher = [];
 
-var currentBlock;
-var latestBlock = [];
+
 
 app.get('/bc', function(req, res){
 	// console.log('/bc');
@@ -355,8 +354,6 @@ io.on('connection', function(socket){
 	*/
 	socket.on('watch', function(req) {
 		eventWatcher.push(socket);
-		latestBlock[eventWatcher.length - 1] = currentBlock;
-		socket.emit('newBlock', {block: latestBlock});
 	});
 
 	/*
@@ -610,44 +607,42 @@ io.on('connection', function(socket){
 
 
 
-	socket.on('search-time', function(req) {
-		console.log("search-time", [req.type, req.begin, req.end]);
-		var cmd = ['./bishe/searchTime.sh', req.type, req.begin, req.end].join(' ');
-		asyncExec(cmd, function(result){
-			console.log(result.stdout);
-			socket.emit('search-time', {type: req.type, result: result.stdout});
-		});
-	});
-	socket.on('search-patient', function(req) {
-		console.log("search-patient", [req.patient, req.type, req.begin, req.end]);
-		var cmd = ['./bishe/searchPatient.sh', req.patient, req.type, req.begin, req.end].join(' ');
-		asyncExec(cmd, function(result){
-			console.log(result.stdout);
-			socket.emit('search-patient', {type: req.type, result: result.stdout});
-		});
-	});
-	socket.on('search-doctor', function(req) {
-		console.log("search-doctor", [req.doctor, req.type, req.begin, req.end]);
-		var cmd = ['./bishe/searchDoctor.sh', req.doctor, req.type, req.begin, req.end].join(' ');
-		asyncExec(cmd, function(result){
-			console.log(result.stdout);
-			socket.emit('search-doctor', {type: req.type, result: result.stdout});
-		});
-	});
-	socket.on('search-hospital', function(req) {
-		console.log("search-hospital", [req.hospital, req.type, req.begin, req.end]);
-		var cmd = ['./bishe/searchHospital.sh', req.hospital, req.type, req.begin, req.end].join(' ');
-		asyncExec(cmd, function(result){
-			console.log(result.stdout);
-			socket.emit('search-hospital', {type: req.type, result: result.stdout});
-		});
-	});
-
+	// socket.on('search-time', function(req) {
+	// 	console.log("search-time", [req.type, req.begin, req.end]);
+	// 	var cmd = ['./bishe/searchTime.sh', req.type, req.begin, req.end].join(' ');
+	// 	asyncExec(cmd, function(result){
+	// 		console.log(result.stdout);
+	// 		socket.emit('search-time', {type: req.type, result: result.stdout});
+	// 	});
+	// });
+	// socket.on('search-patient', function(req) {
+	// 	console.log("search-patient", [req.patient, req.type, req.begin, req.end]);
+	// 	var cmd = ['./bishe/searchPatient.sh', req.patient, req.type, req.begin, req.end].join(' ');
+	// 	asyncExec(cmd, function(result){
+	// 		console.log(result.stdout);
+	// 		socket.emit('search-patient', {type: req.type, result: result.stdout});
+	// 	});
+	// });
+	// socket.on('search-doctor', function(req) {
+	// 	console.log("search-doctor", [req.doctor, req.type, req.begin, req.end]);
+	// 	var cmd = ['./bishe/searchDoctor.sh', req.doctor, req.type, req.begin, req.end].join(' ');
+	// 	asyncExec(cmd, function(result){
+	// 		console.log(result.stdout);
+	// 		socket.emit('search-doctor', {type: req.type, result: result.stdout});
+	// 	});
+	// });
+	// socket.on('search-hospital', function(req) {
+	// 	console.log("search-hospital", [req.hospital, req.type, req.begin, req.end]);
+	// 	var cmd = ['./bishe/searchHospital.sh', req.hospital, req.type, req.begin, req.end].join(' ');
+	// 	asyncExec(cmd, function(result){
+	// 		console.log(result.stdout);
+	// 		socket.emit('search-hospital', {type: req.type, result: result.stdout});
+	// 	});
+	// });
 });
 
 
-
-var eventCallback = async function(event) {
+async function eventCallback(event) {
 	var e = JSON.parse(event.payload);
 	if(!e) return;
 	console.log("eventCallback: ", [e.TxId, e.EventType, e.Payload]);
@@ -671,58 +666,50 @@ var eventCallback = async function(event) {
 
 
 
-function updateBlock() {
-	var cmd = 'curl -sS sysundc:8888/api/status/mychannel';
-	asyncExec(cmd, function(result1){
-		// console.log(result1.stdout);
-		var lb = JSON.parse(result1.stdout).latestBlock;
-		var lbid = parseInt(lb);
-
-		eventWatcher.forEach(function(soc, i){
-			if(soc && typeof soc == 'undefined') {
-				console.log("fucking eventWatcher ", i);
-				return;
-			}
-			// console.log("lucky eventWatcher ", i);
-			var watherLatestBlock = latestBlock[i];
-			var startBlock = lbid;
-			if(watherLatestBlock && lbid > parseInt(watherLatestBlock.blocknum))
-				startBlock = parseInt(watherLatestBlock.blocknum)
-			if(watherLatestBlock && startBlock == lbid)
-				return;
-			var limits = lbid - startBlock + 1;
-			cmd = 'curl -sS sysundc:8888/api/blockAndTxList/mychannel/' + startBlock.toString()
-					+ '/' + limits.toString() + '/0';
-			asyncExec(cmd, function(result2){
-				blocks = JSON.parse(result2.stdout);
-				latestBlock[i] = blocks.rows[0];
-				soc.emit('newBlocks', {blocks: blocks});
-			});
-		});
-	});
-	// console.log(updateBlock, latestBlock);
+async function getLatestBlock() {
+	var latestBlock = await getChannelHeight();
+	var block = await getBlockByNumber(latestBlock - 1);
+	console.log("[getLatestBlock]: ", block);
+	return block;
 };
-setInterval(updateBlock, 1000);
 
+app.get("/getLatestBlock", asyncMiddlewareThreeArgs(async function(req, res, next){
+	var block = await getLatestBlock();
+	res.send(block);
+}));
 
-// var getBlockByNumber = function(peer,channelName, blockNumber, username, org) {
-// var getTransactionByID = function(peer,channelName, trxnID, username, org) {
-// var getBlockByHash = function(peer, hash, username, org) {
-// var getChannelHeight=function(peer,channelName,username,org){
+async function getChannelHeight() {
+	return query.getChannelHeight('peer1', 'mychannel', 'admin', 'org1');
+}
+
+app.get('/gch', asyncMiddlewareThreeArgs(async function(req, res, next){
+	res.send(await getChannelHeight());
+}));
+
+async function getBlockByNumber(bid) {
+	var block = await query.getBlockByNumber('peer1', 'mychannel', bid, 'admin', 'org1');
+	var ret = {};
+	ret.prevhash = block.header.previous_hash;
+	ret.datahash = block.header.data_hash;
+	ret.blocknum = block.header.number.low;
+	ret.timestamp = block.data.data[0].payload.header.channel_header.timestamp;
+
+	var actions = block.data.data[0].payload.data.actions;
+	ret.txCount = actions.length;
+
+	ret.txs = [];
+	for(var i = 0; i < ret.txCount; i++) {
+		var txPayload = JSON.parse(actions[i].payload.action.proposal_response_payload.extension.events.payload);
+		txPayload.Payload = JSON.parse(txPayload.Payload);
+		ret.txs[i] = txPayload;
+	}
+	return ret;
+}
 
 app.get('/gbbn/:bn', asyncMiddlewareThreeArgs(async function(req, res, next){
-	res.send(await query.getBlockByNumber('peer1', 'mychannel', req.params.bn, 'admin', 'org1'));
+	res.send(await getBlockByNumber(req.params.bn));
 }));
 
-// app.get('/gcc', asyncMiddlewareThreeArgs(async function(req, res, next) {
-// 	var ret = await query.getChannelConfig('org1', 'mychannel');
-// 	console.log(ret);
-// 	res.send(ret);
-// }));
-
-app.get('/gci', asyncMiddlewareThreeArgs(async function(req, res, next){
-	res.send(await query.getChainInfo('peer1', 'mychannel', 'admin', 'org1'));
-}));
 
 
 // ============= start server =======================
