@@ -1,21 +1,12 @@
 <div id="doctorInfo">
 	<div class="row">
 		<div class="col-md-6 col-md-offset-3">
-			<ul id="doctorInfoHeader" class="nav nav-sidebar"></ul>
+			<div id="doctorInfoHeader" class="nav nav-sidebar"></div>
+			<div style="height: 3vh;"></div>
 		</div>
 	</div>
 
 	<ul id="doctorInfoDetail" class="nav nav-sidebar"></ul>
-
-<!-- 	<div class="row">
-		<ul class="nav nav-sidebar">
-			<li>
-				<a>
-					<button id="doctor-logout-button" class="btn btn-default btn-lg btn-block">登出</button>
-				</a>
-			</li>
-		</ul>
-	</div> -->
 </div>
 
 <script type="text/javascript">
@@ -34,7 +25,7 @@
 		socket.on('doctorInfo', function(data) {
 			console.log('doctorInfo', data);
 			var doctorInfo = data.doctorInfo;
-			document.getElementById("doctorInfoHeader").innerHTML = '<li><a><img src="/header/' + doctorInfo.id + '" class="img-responsive"/></a></li>';
+			document.getElementById("doctorInfoHeader").innerHTML = '<img src="/header/' + doctorInfo.id + '" class="img-responsive"/>';
 			var doctorInfoDetailHTML = '<li><a>姓名: ' + doctorInfo.name + '</a></li>';
 			doctorInfoDetailHTML += '<li><a>科室: ' + doctorInfo.keshi + '</a></li>';
 			doctorInfoDetailHTML += '<li><a>职位: ' + doctorInfo.title + '</a></li>';

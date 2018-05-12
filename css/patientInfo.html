@@ -7,11 +7,9 @@
 
 <script type="text/javascript">
 
-	function processPatientInfo(patient) {
+	function doShowPatientInfo(patient) {
 		var patientInfoHeader = '<img src="/header/' + patient.id + '" class="img-responsive"/>';
-		// console.log("processPatientInfo header: " + patientInfoHeader);
 		document.getElementById("patientInfoHeader").innerHTML = patientInfoHeader;
-		// console.log(document.getElementById("patientInfoHeader").innerHTML);
 		var patientInfoTable = ''
 			+'<table class="table table-bordered">'
 			+'	<tbody>'
@@ -40,6 +38,31 @@
 		document.getElementById("patientInfoDetail").innerHTML = patientInfoTable;
 	}
 
+	var patientInfoCache = {};
+
+	function showPatientInfo(pid) {
+		var pInfo = patientInfoCache[pid];
+
+		if(!pInfo) {
+			$.ajax({
+				type: "GET",
+				url: "/getPatientInfo/" + pid,
+				success: function(patientInfo) {
+					console.log("[patientInfo.html showPatientInfo]: ", patientInfo);
+					// processPatients(doctorPatients.patients);
+					patientInfoCache[patientInfo.id.toString()] = patientInfo;
+					doShowPatientInfo(patientInfo);
+					return false;
+				},
+				error: function(xhr) {
+				}
+			});
+		}
+		else {
+			doShowPatientInfo(pInfo);
+		}
+	}
+
 	function clearPatientInfo() {
 		document.getElementById("patientInfoHeader").innerHTML = "";
 		document.getElementById("patientInfoDetail").innerHTML = "";
@@ -49,7 +72,6 @@
 
 		socket.on('patientInfo', function(data) {
 			console.log('socket.on patientInfo', data);
-			processPatientInfo(data.patientInfo);
 		});
 
 	});

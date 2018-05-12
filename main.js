@@ -169,7 +169,7 @@ app.get('/getPatientInfo/:id', asyncMiddlewareThreeArgs(async function(req, res,
 async function getDoctorsPatients(did) {
 	var db = await MongoClient.connect(MongoURL);
 	var result = await db.db(dbname).collection("doctor_patients")
-						.find({did: did}, {_id: 0}).toArray();
+						.find({did: did, status: "onRegistered"}, {_id: 0}).toArray();
 	console.log("[getDoctorsPatients] result: ", result);
 	return result;
 }
@@ -576,6 +576,8 @@ io.on('connection', function(socket){
 			return "http://172.18.232.124:8080";
 		else if(hid == 2)
 			return "http://172.18.232.124:8181";
+		else if(hid == 3)
+			return "http://172.18.232.124:8282";
 	}
 
 	socket.on('requestDetail', asyncMiddlewareOneArgs(async function(req){

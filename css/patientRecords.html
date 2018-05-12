@@ -18,9 +18,21 @@
 		$("#patientRecords-table").find("tr:gt(0)").remove();
 	};
 
-	socket.on('patientRecords', function(data){
+	var patientRecordsCache = {};
 
-		function unixSecondToString(unixSecond) {
+	function showPatientRecords(pid) {
+		var pRecords = patientRecordsCache[pid];
+		if(!pRecords) {
+			socket.emit('getPatientRecords', {pid: pid, did: globalDid});
+		}
+		else {
+			doShowPatientRecords(pid, pRecords);
+		}
+	}
+
+	function doShowPatientRecords(pid, records) {
+
+		var unixSecondToString = function(unixSecond) {
 			var date = new Date(parseInt(unixSecond) * 1000);
 			var y = date.getFullYear();
 			var m = date.getMonth() + 1;
@@ -28,7 +40,7 @@
 			return y + '-' + m + '-' + d;
 		};
 
-		function buildRecordRow(record) {
+		var buildRecordRow = function(record) {
 			var recordTime = unixSecondToString(record.RecordTime);
 			return ''
 				+'<tr>'
@@ -38,7 +50,7 @@
 				+'	<td>' + record.Jianyan + '</td>'
 				+'	<td><a id="patientRecord-' + record.RecordId
 				+ '" data-rid="' + record.RecordId
-				+ '" data-pid="' + data.id
+				+ '" data-pid="' + pid
 				+ '" data-th="' + record.Hid
 				+ '" data-doctorname="' + record.Dname
 				+ '" data-targethospitalname="' + record.Hname
@@ -48,8 +60,8 @@
 		};
 
 		$("#patientRecords-table").find("tr:gt(0)").remove();
-		console.log('patientRecords', data);
-		var patientRecords = data.records;
+
+		var patientRecords = records;
 
 		if(!patientRecords) return;
 		for(var i = 0; i < patientRecords.length; i++) {
@@ -68,6 +80,14 @@
 				showRecordDetail(pid, targetHospital, rid);
 			});
 		}
+	}
+
+	socket.on('patientRecords', function(data){
+		console.log("[patientRecords.html socket.on patientRecords]", data);
+ 		var pid = data.id;
+ 		var records = data.records;
+ 		patientRecordsCache[pid] = records;
+ 		doShowPatientRecords(pid, records);
 	});
 
 	$(function(){

@@ -11,7 +11,7 @@
 				bottom: 0;
 			}
 			body {
-				background: white;
+				background: #DCDCDC;
 			}
 		</style>
 		<script type="text/javascript" src="/ht.js"></script>
@@ -51,9 +51,9 @@ function init() {
 	graph.enableFlow(60);
 
 
-addHospital("1");
-addHospital("2");
-addHospital("3");
+addHospital("1", "广东省中医院", 200, 350);
+addHospital("2", "中山大学附属第三医院", 500, 200);
+addHospital("3", "南方医科大学附属医院", 600, 550);
 
 }
 
@@ -61,10 +61,13 @@ addHospital("3");
 var hList = new Map();
 var eList = new Map();
 
-function newNode(hid, x, y) {
-	var res = new ht.Node("shit");
-	res.setName(hid);
+function newNode(hid, hname, x, y) {
+	var res = new ht.Node(hid);
+	res.setName(hname);
 	res.setSize(80, 80);
+	res.setPosition(x, y);
+	res.setStyle("note.font", "20px sans-serif");
+	res.setStyle("label.font", "20px arial, sans-serif");
 	return res;
 }
 
@@ -75,8 +78,8 @@ function newEdge(from, to) {
 	return res;
 }
 
-function addHospital(newhid) {
-	var newh = newNode(newhid);
+function addHospital(newhid, newhname, x, y) {
+	var newh = newNode(newhid, newhname, x, y);
 	dm.add(newh);
 	eList[newhid] = new Map();
 	for(var hid in hList) {

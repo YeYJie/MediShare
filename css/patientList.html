@@ -1,5 +1,5 @@
 <div id="patientList">
-	<h3 class="page-header">挂号病人</h3>
+	<h3 class="page-header">挂号患者</h3>
 	<div class="row" id="patient-blocks">
 		<div class="col-md-12">
 			<ul class="nav nav-pills nav-stacked" id="patientList-ul"></ul>
@@ -23,17 +23,15 @@
 
 	var addPatient = function(patient) {
 		console.log("[addPatient]: ", patient);
-		var index = myPatients.indexOf(patient.pid);
-		if(index > -1) return null;
-		myPatients.push(patient.pid);
 
-		document.getElementById("patientList-ul").innerHTML += buildPatientBlockHelper(patient);
+		$("#patientList-ul").append(buildPatientBlockHelper(patient));
 
-		$('#patientList-' + patient.pid.toString()).click(function(){
+		$('#patientList-' + patient.pid).click(function(){
 			clearDiagnose();
+			hideDetail();
 
-			var patientId = $(this).data('pid').toString();
-			globalPid = patientId;
+			var pid = $(this).data('pid').toString();
+			globalPid = pid;
 
 			currentPatient.pid = $(this).data('pid').toString();
 			currentPatient.pname = $(this).data('pname');
@@ -42,20 +40,40 @@
 			currentPatient.keshi = $(this).data('keshi');
 			console.log("patientList currentPatient: ", currentPatient);
 
-			socket.emit('getPatientRecords', {pid: patientId, did: globalDid});
-
 			document.getElementById("diagnose-submit").disabled = false;
-			if(document.getElementById("recordDetail")) {
-				document.getElementById("recordDetail").style.display = "none";
-			}
+			showPatientInfo(pid);
+			showPatientRecords(pid);
 		});
 	}
+
 
 	function processPatients(patients) {
 		console.log("[processPatients]: ", patients);
 		for(var i = 0; i < patients.length; i++) {
+			var index = myPatients.indexOf(patients[i].pid);
+			if(index > -1) {
+				console.log("patientList.html processPatients patient exists: " + patients[i].pid);
+				continue;
+			}
+			myPatients.push(patients[i].pid);
 			addPatient(patients[i]);
 		}
+		console.log("[processPatients]myPatients: ", myPatients);
+	}
+
+	function getDoctorPatients(did) {
+		$.ajax({
+			type: "GET",
+			url: "/getDoctorsPatients/" + did,
+			success: function(doctorPatients) {
+				console.log("[patientList.html getDoctorsPatients]: ", doctorPatients);
+				processPatients(doctorPatients.patients);
+				return false;
+			},
+			error: function(xhr) {
+				console.log("[patientList.html getDoctorsPatients]err: ", xhr);
+			}
+		});
 	}
 
 	function patientDeRegister(pid) {
@@ -74,7 +92,7 @@
 	$(function() {
 
 		socket.on('patients', function(data) {
-			console.log("socket.on patients data: ", data);
+			console.log("patientList.html socket.on patients data: ", data);
 			var patients = data.patients;
 			processPatients(patients);
 		});

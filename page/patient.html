@@ -74,7 +74,8 @@
 			success: function(text) {
 				hname = text;
 				console.log("ajax.getHospitalName hname: ", hname);
-				document.getElementById("before-login-hname").innerHTML = "欢迎来到" + hname;
+				// document.getElementById("before-login-hname").innerHTML = "欢迎来到" + hname;
+				document.getElementById("before-login-hname").innerHTML = hname;
 				document.getElementById("nav-hname").innerHTML = hname;
 			}
 		});

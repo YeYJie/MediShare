@@ -7,3 +7,6 @@ HOST="localhost" PORT="8080" HOSPITAL="1" HNAME="广东省中医院" DBNAME="hos
 
 kill -9 $(lsof -t -i:8181)
 HOST="localhost" PORT="8181" HOSPITAL="2" HNAME="中山大学附属第三医院" DBNAME="hospital2" node main.js >hospital2.log 2>&1 &
+
+kill -9 $(lsof -t -i:8282)
+HOST="localhost" PORT="8282" HOSPITAL="3" HNAME="南方医科大学附属医院" DBNAME="hospital3" node main.js >hospital3.log 2>&1 &
