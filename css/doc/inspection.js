@@ -8,7 +8,8 @@ var showInspections = function(pid) {
 	inspections.forEach(function(ins){
 		res += buildInspection(ins.detail);
 	});
-	return res;
+	// return res;
+	document.getElementById("diagnose-inspection").innerHTML = res;
 };
 
 var buildInspection = function(ins) {

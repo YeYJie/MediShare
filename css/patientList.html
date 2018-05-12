@@ -28,7 +28,10 @@
 
 		$('#patientList-' + patient.pid).click(function(){
 			clearDiagnose();
-			hideDetail();
+
+			if(!isJianyanke) {
+				hideDetail();
+			}
 
 			var pid = $(this).data('pid').toString();
 			globalPid = pid;
@@ -43,6 +46,9 @@
 			document.getElementById("diagnose-submit").disabled = false;
 			showPatientInfo(pid);
 			showPatientRecords(pid);
+			if(!isJianyanke) {
+				showInspections(patient.pid);
+			}
 		});
 	}
 

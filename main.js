@@ -325,6 +325,14 @@ app.post('/jianyankeUpload', asyncMiddlewareThreeArgs(async function(req, res, n
 	}
 
 	var db = await MongoClient.connect(MongoURL);
+
+	var registerRecordId = await db.db(dbname).collection("doctor_patients")
+			.findOne({did: data.did, pid: data.pid, status: "onRegistered"});
+	if(!registerRecordId) {
+		console.log("[jianyankeUpload] !registerRecordId did: " + data.did + " pid: " + data.pid);
+	}
+	data.registerRecordId = registerRecordId._id;
+	console.log("[jianyankeUpload] registerRecordId: ", registerRecordId);
 	var doc = await db.db(dbname).collection("jianyan").insertOne(data);
 
 	var jianyanId = doc.ops[0]._id;
@@ -430,6 +438,8 @@ io.on('connection', function(socket){
 		socket.emit('doctorInfo', {did: did, hospitalName: hospitalName, doctorInfo: doctorInfo});
 
 		var db = await MongoClient.connect(MongoURL);
+		await db.db(dbname).collection("doctor_patients")
+				.remove({did: did, pid: pid, status: "onRegistered"});
 		db.db(dbname).collection("doctor_patients")
 				.insertOne({did: did, dname: doctorInfo.name,
 							pid: pid, pname: patientInfo.name,

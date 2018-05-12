@@ -130,7 +130,7 @@
 		else
 			patientInspection[inspection.pid] = [ins];
 		console.log('newInspection patientInspection[inspection.pid]: ', patientInspection[inspection.pid]);
-		document.getElementById("diagnose-inspection").innerHTML = showInspections(globalPid);
+		showInspections(globalPid);
 	});
 
 	var gatherDiagnose = function() {
