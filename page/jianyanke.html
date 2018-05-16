@@ -26,7 +26,7 @@
 			</div>
 			<div class="col-md-10" main>
 				<div class="row">
-					<div class="col-md-6" id="middle-div">
+					<div class="col-md-6 pre-scrollable" id="middle-div" style="max-height: 88vh;">
 						<div id="diagnose-div"></div>
 					</div>
 					<div class="col-md-6" id="right-div">
@@ -64,7 +64,17 @@
 	// $("#recordDetail-div").load("/doc/recordDetail.html");
 
 	$(function() {
-
+		$.ajax({
+			type: "GET",
+			url: "/getHospitalName",
+			success: function(text) {
+				hname = text;
+				console.log("ajax.getHospitalName hname: ", hname);
+				// document.getElementById("before-login-hname").innerHTML = "欢迎来到" + hname;
+				document.getElementById("before-login-hname").innerHTML = hname;
+				document.getElementById("hospital-name").innerHTML = hname;
+			}
+		});
 		socket.emit('jianyanke', {});
 	});
 </script>

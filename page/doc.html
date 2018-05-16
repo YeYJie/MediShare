@@ -88,6 +88,21 @@
 			}
 		}
 	});
+
+	$(function(){
+		$.ajax({
+			type: "GET",
+			url: "/getHospitalName",
+			success: function(text) {
+				hname = text;
+				console.log("ajax.getHospitalName hname: ", hname);
+				// document.getElementById("before-login-hname").innerHTML = "欢迎来到" + hname;
+				document.getElementById("before-login-hname").innerHTML = hname;
+				document.getElementById("hospital-name").innerHTML = hname;
+			}
+		});
+	});
+
 </script>
 
 </html>
